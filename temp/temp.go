@@ -8,7 +8,7 @@ import (
 	"barista.run/modules/cputemp"
 	"barista.run/outputs"
 	"barista.run/pango"
-	"github.com/glebtv/custom_barista/utils"
+	"github.com/AnatolyShirykalov/custom_barista/utils"
 	"github.com/martinlindhe/unit"
 )
 

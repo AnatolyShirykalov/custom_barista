@@ -6,13 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"barista.run/format"
 	"barista.run/bar"
+	"barista.run/format"
 	"barista.run/modules/diskio"
 	"barista.run/modules/diskspace"
 	"barista.run/outputs"
 	"barista.run/pango"
-	"github.com/glebtv/custom_barista/utils"
+	"github.com/AnatolyShirykalov/custom_barista/utils"
 )
 
 func AddTo(modules []bar.Module) []bar.Module {
@@ -50,4 +50,3 @@ func AddTo(modules []bar.Module) []bar.Module {
 
 	return modules
 }
-

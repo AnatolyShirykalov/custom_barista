@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/glebtv/custom_barista/kbdlayout"
+	"github.com/AnatolyShirykalov/custom_barista/kbdlayout"
 )
 
 func main() {

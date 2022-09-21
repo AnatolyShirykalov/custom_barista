@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/glebtv/custom_barista/kbdlayout"
 	"barista.run/bar"
+	"github.com/AnatolyShirykalov/custom_barista/kbdlayout"
 )
 
 func main() {

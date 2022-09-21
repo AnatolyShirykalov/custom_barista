@@ -1,12 +1,12 @@
 package vol
 
 import (
-	"github.com/glebtv/custom_barista/utils"
 	"barista.run/bar"
 	"barista.run/colors"
 	"barista.run/modules/volume"
 	"barista.run/outputs"
 	"barista.run/pango"
+	"github.com/AnatolyShirykalov/custom_barista/utils"
 )
 
 func Get() *volume.Module {

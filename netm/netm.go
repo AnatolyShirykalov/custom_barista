@@ -5,14 +5,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/glebtv/custom_barista/utils"
 	"barista.run/bar"
-	"barista.run/format"
 	"barista.run/colors"
+	"barista.run/format"
 	"barista.run/modules/netspeed"
 	"barista.run/modules/wlan"
 	"barista.run/outputs"
 	"barista.run/pango"
+	"github.com/AnatolyShirykalov/custom_barista/utils"
 )
 
 func AddTo(modules []bar.Module) []bar.Module {

@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/glebtv/custom_barista/utils"
 	"barista.run/bar"
 	"barista.run/colors"
 	"barista.run/modules/media"
 	"barista.run/outputs"
 	"barista.run/pango"
+	"github.com/AnatolyShirykalov/custom_barista/utils"
 )
 
 func truncate(in string, l int) string {

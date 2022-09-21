@@ -8,7 +8,7 @@ Includes custom keyboard layout module
 
 With a working GO env:
 
-    go install github.com/glebtv/custom_barista:latest
+    go install github.com/AnatolyShirykalov/custom_barista@latest
 
 Add fonts from fonts dir to ~/.fonts
 

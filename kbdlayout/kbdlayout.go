@@ -4,10 +4,10 @@ import (
 	"log"
 	"strings"
 
+	"github.com/AnatolyShirykalov/custom_barista/kbdlayout/xkeyboard"
 	"github.com/BurntSushi/xgb/xproto"
 	"github.com/BurntSushi/xgbutil"
 	"github.com/BurntSushi/xgbutil/xevent"
-	"github.com/glebtv/custom_barista/kbdlayout/xkeyboard"
 )
 
 var Layouts []string

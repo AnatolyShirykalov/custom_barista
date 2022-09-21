@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
+	"github.com/AnatolyShirykalov/custom_barista/kbdlayout/xkeyboard"
 	"github.com/BurntSushi/xgb"
 	"github.com/BurntSushi/xgb/xproto"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/glebtv/custom_barista/kbdlayout/xkeyboard"
 )
 
 func main() {

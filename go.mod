@@ -1,4 +1,4 @@
-module github.com/glebtv/custom_barista
+module github.com/AnatolyShirykalov/custom_barista
 
 go 1.18
 

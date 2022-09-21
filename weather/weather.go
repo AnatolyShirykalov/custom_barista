@@ -3,12 +3,12 @@ package weather
 import (
 	"time"
 
-	"github.com/glebtv/custom_barista/utils"
 	"barista.run/bar"
 	"barista.run/modules/weather"
 	"barista.run/modules/weather/openweathermap"
 	"barista.run/outputs"
 	"barista.run/pango"
+	"github.com/AnatolyShirykalov/custom_barista/utils"
 )
 
 func Get(cityId string) *weather.Module {
