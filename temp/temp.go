@@ -12,8 +12,8 @@ import (
 	"github.com/martinlindhe/unit"
 )
 
-func Get() *cputemp.Module {
-	temp := cputemp.New().
+func Get(zone string) *cputemp.Module {
+	temp := cputemp.Zone(zone).
 		RefreshInterval(2 * time.Second).
 		Output(func(temp unit.Temperature) bar.Output {
 			out := outputs.Pango(

@@ -8,7 +8,6 @@ import (
 	barista "barista.run"
 	"barista.run/bar"
 	"barista.run/colors"
-	"barista.run/modules/counter"
 	"barista.run/pango/icons/material"
 	"barista.run/pango/icons/typicons"
 	"github.com/glebtv/custom_barista/batt"
@@ -17,7 +16,6 @@ import (
 	"github.com/glebtv/custom_barista/load"
 	"github.com/glebtv/custom_barista/ltime"
 	"github.com/glebtv/custom_barista/mem"
-	"github.com/glebtv/custom_barista/music"
 	"github.com/glebtv/custom_barista/netm"
 	"github.com/glebtv/custom_barista/temp"
 	"github.com/glebtv/custom_barista/utils"
@@ -38,11 +36,6 @@ func main() {
 
 	modules = append(modules, kbdlayout.Get())
 
-	//modules = append(modules, music.Get("google-play-music-desktop-player"))
-	modules = append(modules, music.Get("DeaDBeeF"))
-
-	modules = append(modules, counter.New("C:%d"))
-
 	modules = dsk.AddTo(modules)
 
 	modules = append(modules, load.Get())
@@ -52,9 +45,8 @@ func main() {
 
 	modules = append(modules, batt.Get())
 
-	modules = append(modules, temp.Get())
-	//modules = append(modules, weather.Get("524901"))
-	//modules = append(modules, vol.Get())
+	modules = append(modules, temp.Get("thermal_zone0"))
+	modules = append(modules, temp.Get("thermal_zone1"))
 
 	// pacin gsimplecal
 	modules = append(modules, ltime.Get())
