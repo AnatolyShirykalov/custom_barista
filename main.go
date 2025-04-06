@@ -45,8 +45,7 @@ func main() {
 
 	modules = append(modules, batt.Get())
 
-	modules = append(modules, temp.Get("thermal_zone0"))
-	modules = append(modules, temp.Get("thermal_zone1"))
+	modules = append(modules, temp.Module())
 
 	// pacin gsimplecal
 	modules = append(modules, ltime.Get())
