@@ -11,12 +11,14 @@ import (
 	"barista.run/pango/icons/material"
 	"barista.run/pango/icons/typicons"
 	"github.com/AnatolyShirykalov/custom_barista/batt"
+	"github.com/AnatolyShirykalov/custom_barista/ccusage"
 	"github.com/AnatolyShirykalov/custom_barista/dsk"
 	"github.com/AnatolyShirykalov/custom_barista/kbdlayout"
 	"github.com/AnatolyShirykalov/custom_barista/load"
 	"github.com/AnatolyShirykalov/custom_barista/ltime"
 	"github.com/AnatolyShirykalov/custom_barista/mem"
 	"github.com/AnatolyShirykalov/custom_barista/netm"
+	"github.com/AnatolyShirykalov/custom_barista/nvidia"
 	"github.com/AnatolyShirykalov/custom_barista/temp"
 	"github.com/AnatolyShirykalov/custom_barista/utils"
 )
@@ -40,12 +42,15 @@ func main() {
 
 	modules = append(modules, load.Get())
 	modules = append(modules, mem.Get())
+	modules = append(modules, nvidia.Module())
 
 	modules = netm.AddTo(modules)
 
 	modules = append(modules, batt.Get())
 
 	modules = append(modules, temp.Module())
+
+	modules = append(modules, ccusage.Get())
 
 	// pacin gsimplecal
 	modules = append(modules, ltime.Get())
