@@ -36,23 +36,32 @@ func main() {
 
 	modules := make([]bar.Module, 0)
 
+	// Input/Interface
 	modules = append(modules, kbdlayout.Get())
 
-	modules = dsk.AddTo(modules)
-
+	// CPU stats grouped together
 	modules = append(modules, load.Get())
-	modules = append(modules, mem.Get())
-	modules = append(modules, nvidia.Module())
-
-	modules = netm.AddTo(modules)
-
-	modules = append(modules, batt.Get())
-
 	modules = append(modules, temp.Module())
 
+	// System resources
+	modules = append(modules, mem.Get())
+
+	// Storage
+	modules = dsk.AddTo(modules)
+
+	// GPU
+	modules = append(modules, nvidia.Module())
+
+	// Network
+	modules = netm.AddTo(modules)
+
+	// Power
+	modules = append(modules, batt.Get())
+
+	// Applications
 	modules = append(modules, ccusage.Get())
 
-	// pacin gsimplecal
+	// Time (always last)
 	modules = append(modules, ltime.Get())
 
 	panic(barista.Run(modules...))

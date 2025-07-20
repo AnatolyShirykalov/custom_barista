@@ -9,7 +9,6 @@ import (
 	"barista.run/bar"
 	"barista.run/colors"
 	"barista.run/outputs"
-	"barista.run/pango"
 )
 
 type TokenCounts struct {
@@ -92,12 +91,12 @@ func getUsageData() (*UsageData, error) {
 				usage.ProjectedTokens = block.Projection.TotalTokens
 				usage.RemainingMinutes = block.Projection.RemainingMinutes
 			}
-			
+
 			// Calculate usage percentage against actual Claude token limit
 			if block.TokenLimitStatus != nil && block.TokenLimitStatus.Limit > 0 {
 				usage.UsagePercentage = float64(block.TotalTokens) / float64(block.TokenLimitStatus.Limit) * 100
 			}
-			
+
 			// Calculate cache hit ratio
 			totalCacheTokens := block.TokenCounts.CacheReadInputTokens
 			totalInputTokens := block.TokenCounts.InputTokens + block.TokenCounts.CacheCreationInputTokens + block.TokenCounts.CacheReadInputTokens
@@ -131,8 +130,7 @@ func (m *CCUsageModule) updateUsage(sink bar.Sink) {
 	// If no active session, show a simple message
 	if usage.CurrentTokens == 0 && usage.ProjectedTokens == 0 {
 		sink.Output(outputs.Pango(
-			pango.Icon("material-monetization_on"),
-			" No active session",
+			"",
 		).Color(colors.Scheme("dim-icon")))
 		return
 	}
@@ -153,26 +151,25 @@ func (m *CCUsageModule) updateUsage(sink bar.Sink) {
 	displayText := ""
 	if usage.UsagePercentage > 0 {
 		if usage.UsagePercentage < 1 {
-			displayText += fmt.Sprintf(" %.1f%%", usage.UsagePercentage)
+			displayText += fmt.Sprintf("%.1f%%", usage.UsagePercentage)
 		} else {
-			displayText += fmt.Sprintf(" %.0f%%", usage.UsagePercentage)
+			displayText += fmt.Sprintf("%.0f%%", usage.UsagePercentage)
 		}
 	}
-	
+
 	// Add human-readable token count
 	if usage.CurrentTokens > 0 {
 		displayText += fmt.Sprintf(" %s", formatTokens(usage.CurrentTokens))
 	}
-	
+
 	// Add cache hit ratio
 	if usage.CacheHitRatio > 0 {
-		displayText += fmt.Sprintf(" 🧊%.0f%%", usage.CacheHitRatio)
+		displayText += fmt.Sprintf(" CH %.0f%%", usage.CacheHitRatio)
 	}
-	
+
 	displayText += timeStr
 
 	out := outputs.Pango(
-		pango.Icon("material-monetization_on"),
 		displayText,
 	)
 

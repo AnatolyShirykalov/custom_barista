@@ -20,9 +20,9 @@ func Module() bar.Module {
 	return &NvidiaModule{}
 }
 
-func readGpuStats() (temp, vramUsed, vramTotal int, err error) {
+func readGpuStats() (temp, vramUsed int, err error) {
 	cmd := exec.Command("nvidia-smi",
-		"--query-gpu=temperature.gpu,memory.used,memory.total",
+		"--query-gpu=temperature.gpu,memory.used",
 		"--format=csv,noheader,nounits")
 	var out bytes.Buffer
 	cmd.Stdout = &out
@@ -31,7 +31,7 @@ func readGpuStats() (temp, vramUsed, vramTotal int, err error) {
 		return
 	}
 	fields := strings.Split(strings.TrimSpace(out.String()), ", ")
-	if len(fields) != 3 {
+	if len(fields) != 2 {
 		err = exec.ErrNotFound
 		return
 	}
@@ -40,16 +40,12 @@ func readGpuStats() (temp, vramUsed, vramTotal int, err error) {
 		return
 	}
 	vramUsed, err = strconv.Atoi(fields[1])
-	if err != nil {
-		return
-	}
-	vramTotal, err = strconv.Atoi(fields[2])
 	return
 }
 
 func (m *NvidiaModule) Stream(sink bar.Sink) {
 	for range time.Tick(2 * time.Second) {
-		temp, used, total, err := readGpuStats()
+		temp, used, err := readGpuStats()
 		if err != nil {
 			sink.Output(outputs.Text("GPU ERR").Color(colors.Scheme("bad")))
 			continue
@@ -59,7 +55,7 @@ func (m *NvidiaModule) Stream(sink bar.Sink) {
 			pango.Icon("mdi-thermometer"), utils.Spacer,
 			pango.Textf("%2d℃", temp), utils.Spacer,
 			pango.Icon("mdi-memory"), utils.Spacer,
-			pango.Textf("%d/%d MiB", used, total),
+			pango.Textf("%d MiB", used),
 		)
 
 		// Color based on temperature
