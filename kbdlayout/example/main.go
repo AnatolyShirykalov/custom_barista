@@ -7,15 +7,15 @@ import (
 )
 
 func main() {
-	layout, err := kbdlayout.GetLayout()
+	layout, mods, err := kbdlayout.GetLayout()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("layout:", layout)
+	fmt.Println("layout:", layout, "mods:", mods)
 	//kbdlayout.Switch(1)
 	kbdlayout.SwitchToNext()
-	kbdlayout.Subscribe(func(layout string) {
-		fmt.Println("layout:", layout)
+	kbdlayout.Subscribe(func(layout string, mods uint8) {
+		fmt.Println("layout:", layout, "mods:", mods)
 	})
 
 	//select {}

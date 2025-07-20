@@ -11,11 +11,11 @@ import (
 	"github.com/AnatolyShirykalov/custom_barista/utils"
 )
 
-func Get(cityId string) *weather.Module {
+func Get(apiKey, cityId string) *weather.Module {
 	// Weather information comes from OpenWeatherMap.
 	// https://openweathermap.org/api.
 	wthr := weather.New(
-		openweathermap.CityID(cityId).Build(),
+		openweathermap.New(apiKey).CityID(cityId),
 	).Output(func(w weather.Weather) bar.Output {
 		iconName := ""
 		switch w.Condition {
