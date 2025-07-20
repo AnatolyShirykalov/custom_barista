@@ -22,7 +22,7 @@ func AddTo(modules []bar.Module) []bar.Module {
 	}
 	for _, ifc := range ifs {
 		//spew.Dump(ifc)
-		if strings.HasPrefix(ifc.Name, "en") || strings.HasPrefix(ifc.Name, "wl") {
+		if strings.HasPrefix(ifc.Name, "en") || (strings.HasPrefix(ifc.Name, "wl") && ifc.Flags&net.FlagUp != 0) {
 			//log.Println("add interface", ifc.Name)
 			ift := ifc
 			net := netspeed.New(ift.Name).
@@ -97,8 +97,11 @@ func AddTo(modules []bar.Module) []bar.Module {
 		}
 
 		if strings.HasPrefix(ifc.Name, "wl") {
-			wlan := wlan.Named(ifc.Name)
-			modules = append(modules, wlan)
+			// Only add wlan module if the wifi interface is up
+			if ifc.Flags&net.FlagUp != 0 {
+				wlan := wlan.Named(ifc.Name)
+				modules = append(modules, wlan)
+			}
 		}
 	}
 	return modules
