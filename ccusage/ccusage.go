@@ -51,9 +51,7 @@ type BlocksResponse struct {
 
 type UsageData struct {
 	CurrentTokens    int64
-	CurrentCost      float64
 	ProjectedTokens  int64
-	ProjectedCost    float64
 	RemainingMinutes int
 	UsagePercentage  float64
 	CacheHitRatio    float64
@@ -88,12 +86,10 @@ func getUsageData() (*UsageData, error) {
 	for _, block := range response.Blocks {
 		if block.IsActive && !block.IsGap {
 			usage.CurrentTokens = block.TotalTokens
-			usage.CurrentCost = block.CostUSD
 			usage.RemainingMinutes = 0
 
 			if block.Projection != nil {
 				usage.ProjectedTokens = block.Projection.TotalTokens
-				usage.ProjectedCost = block.Projection.TotalCost
 				usage.RemainingMinutes = block.Projection.RemainingMinutes
 			}
 			
@@ -154,7 +150,7 @@ func (m *CCUsageModule) updateUsage(sink bar.Sink) {
 	}
 
 	// Build the display string
-	displayText := fmt.Sprintf(" $%.2f", usage.CurrentCost)
+	displayText := ""
 	if usage.UsagePercentage > 0 {
 		if usage.UsagePercentage < 1 {
 			displayText += fmt.Sprintf(" %.1f%%", usage.UsagePercentage)
@@ -180,11 +176,11 @@ func (m *CCUsageModule) updateUsage(sink bar.Sink) {
 		displayText,
 	)
 
-	// Color based on usage percentage and cost
+	// Color based on usage percentage
 	switch {
-	case usage.UsagePercentage > 90 || usage.CurrentCost > 10:
+	case usage.UsagePercentage > 90:
 		out.Color(colors.Scheme("bad"))
-	case usage.UsagePercentage > 70 || usage.CurrentCost > 5:
+	case usage.UsagePercentage > 70:
 		out.Color(colors.Scheme("degraded"))
 	default:
 		out.Color(colors.Scheme("good"))
