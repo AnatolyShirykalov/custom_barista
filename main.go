@@ -5,6 +5,8 @@
 package main
 
 import (
+	"runtime"
+
 	barista "barista.run"
 	"barista.run/bar"
 	"barista.run/colors"
@@ -14,6 +16,7 @@ import (
 	"github.com/AnatolyShirykalov/custom_barista/ccusage"
 	"github.com/AnatolyShirykalov/custom_barista/clipboard"
 	"github.com/AnatolyShirykalov/custom_barista/dsk"
+	"github.com/AnatolyShirykalov/custom_barista/freq"
 	"github.com/AnatolyShirykalov/custom_barista/kbdlayout"
 	"github.com/AnatolyShirykalov/custom_barista/load"
 	"github.com/AnatolyShirykalov/custom_barista/ltime"
@@ -22,6 +25,7 @@ import (
 	"github.com/AnatolyShirykalov/custom_barista/nvidia"
 	"github.com/AnatolyShirykalov/custom_barista/temp"
 	"github.com/AnatolyShirykalov/custom_barista/utils"
+	"github.com/AnatolyShirykalov/custom_barista/vol"
 )
 
 func main() {
@@ -43,6 +47,7 @@ func main() {
 	// CPU stats grouped together
 	modules = append(modules, load.Get())
 	modules = append(modules, temp.Module())
+	modules = append(modules, freq.Module(runtime.NumCPU()))
 
 	// System resources
 	modules = append(modules, mem.Get())
@@ -58,6 +63,9 @@ func main() {
 
 	// Power
 	modules = append(modules, batt.Get())
+
+	// Audio
+	modules = append(modules, vol.Get())
 
 	// Applications
 	modules = append(modules, ccusage.Get())

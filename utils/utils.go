@@ -7,7 +7,7 @@ import (
 	"barista.run/pango"
 )
 
-var Spacer = pango.Text(" ").XXSmall()
+var Spacer = pango.Text(" ")
 
 func Home(path string) string {
 	usr, err := user.Current()
