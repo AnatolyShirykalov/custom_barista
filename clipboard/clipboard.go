@@ -61,11 +61,10 @@ func (m *ClipboardModule) updateClipboard(sink bar.Sink) {
 
 	out := outputs.Text(fmt.Sprintf("📋 %s", sizeStr)).
 		Color(colors.Scheme("good")).
-		OnClick(click.RunLeft(`/home/anatoly/scripts/clipboard_menu.sh`))
+		OnClick(click.RunLeft(`/home/anatolii/scripts/clipboard_menu.sh`))
 
 	sink.Output(out)
 }
-
 
 func Get() bar.Module {
 	return &ClipboardModule{}

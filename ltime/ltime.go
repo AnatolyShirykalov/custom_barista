@@ -18,7 +18,7 @@ func Get() bar.Module {
 			now.Format("Mon 2006-01-02 "),
 			pango.Icon("material-access-time").Color(colors.Scheme("dim-icon")),
 			now.Format("15:04:05"),
-		).OnClick(click.RunLeft(`/home/anatoly/scripts/open_calender.sh`))
+		).OnClick(click.RunLeft(`/home/anatolii/scripts/open_calender.sh`))
 	})
 	return time
 }
