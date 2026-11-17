@@ -54,3 +54,7 @@ Verdict: **accept with fixes** (one small builder item, 5c). Screenshot of both 
 ## Clip fixture (#9, 2026-11-17)
 
 - `scripts/test.sh` generates the 2 MB `data_2m` into a `mktemp -d` (removed on exit); tracked file git rm-ed, no .gitignore needed. `cl` now takes a full path for the data file. 22/22 pass.
+
+## Upstream issue draft (#10, 2026-11-17)
+
+- `docs/design/D3-i3status-rust/upstream-issue.md`: nvidia_gpu `temperature: u32` + `parse().unwrap_or_default()` (nvidia_gpu.rs L210/L258) turns float `44.79` into `0°`. No existing upstream issue (#1769 is the `[N/A]` case). User posts it.

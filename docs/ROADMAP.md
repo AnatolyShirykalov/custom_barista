@@ -18,7 +18,6 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-- Draft upstream issue → `researcher` (sonnet), started 2026-11-17
 - Code review (recurring) → `code-reviewer` (opus), started 2026-11-17
 ### Queued next (one agent each, in order)
 
@@ -33,7 +32,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 7. [x] **README refresh**: module list stale (missing clipboard, freq, vol, weather, music; ccusage described as CPU usage); Go version prereq. Done: README matches `main.go`. → `chore` Done 2026-11-17: also deleted unused weather/ and music/; see docs/progress/docs.md.
 8. [x] **Trial bar polish**: layout `us`/`ru` → `US`/`RU` via `[block.mappings]`; sound block shows `0.0%` on first frame. → `widget-builder` Done: mappings + alsa driver, see progress/migration.md.
 9. [x] **Generate 2 MB clip fixture**: `test.sh` now generates it in a `mktemp -d` (trap cleanup); tracked file removed. → `chore` Done 2026-11-17, 22/22.
-10. [ ] **Draft upstream nvidia_gpu issue**: text in `docs/design/D3-i3status-rust/upstream-issue.md`, user posts. → `researcher`
+10. [x] **Draft upstream nvidia_gpu issue**: text in `docs/design/D3-i3status-rust/upstream-issue.md`, user posts. → `researcher` Done 2026-11-17: draft ready, no existing upstream issue; user posts.
 
 ### Background checks
 
