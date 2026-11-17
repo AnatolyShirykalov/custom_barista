@@ -33,6 +33,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 8. [x] **Trial bar polish**: layout `us`/`ru` → `US`/`RU` via `[block.mappings]`; sound block shows `0.0%` on first frame. → `widget-builder` Done: mappings + alsa driver, see progress/migration.md.
 9. [x] **Generate 2 MB clip fixture**: `test.sh` now generates it in a `mktemp -d` (trap cleanup); tracked file removed. → `chore` Done 2026-11-17, 22/22.
 10. [x] **Draft upstream nvidia_gpu issue**: text in `docs/design/D3-i3status-rust/upstream-issue.md`, user posts. → `researcher` Done 2026-11-17: draft ready, no existing upstream issue; user posts.
+11. [ ] **Block explanations** (user asked for tooltips; i3bar has no hover): middle-click every trial-bar block → `notify-send` with what it shows, units, color thresholds, click actions; one script `i3status-rust/scripts/explain.sh <block>`; check middle button unused, else pick another. → `widget-builder`
 
 ### Background checks
 
