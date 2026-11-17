@@ -56,7 +56,7 @@ Add to your `~/.i3/config` or `~/.config/i3/config`:
 
 ```
 bar {
-    position top
+    position bottom
     status_command exec $GOPATH/bin/custom_barista
     font pango:PragmataPro Mono 11
     colors {
