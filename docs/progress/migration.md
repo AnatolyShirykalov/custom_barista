@@ -58,3 +58,10 @@ Verdict: **accept with fixes** (one small builder item, 5c). Screenshot of both 
 ## Upstream issue draft (#10, 2026-11-17)
 
 - `docs/design/D3-i3status-rust/upstream-issue.md`: nvidia_gpu `temperature: u32` + `parse().unwrap_or_default()` (nvidia_gpu.rs L210/L258) turns float `44.79` into `0°`. No existing upstream issue (#1769 is the `[N/A]` case). User posts it.
+
+## 2026-11-17: Per-monitor trial bars (2a, widget-builder)
+- i3status-rust 0.40.1 has no config include/merge, so `i3status-rust/compact.toml` is generated from `config.toml` by `scripts/gen-compact.sh` (awk: drops `disk_space`, `disk_iostats`, the ccusage custom block, ` $ip ` in the `^en` net format). `test.sh` checks it is in sync and that config.toml still has the 4 patterns the generator keys on (31 pass).
+- `barcycle.sh` sets `bar-rs` and `bar-rs-small` to the same mode (state still read from `bar-rs`). Cycle verified: barista -> rs (both dock) -> off -> barista.
+- Barista left as is (one bar, no `output`, on both monitors): main.go has no flags, a per-output variant would need a CLI flag and module filtering; not cheap enough for the trial.
+- `~/.i3/config` (separate git repo, no commits): `bar-rs` got `output DP-0`; new `bar-rs-small` block after it (same settings, `output DP-2`, `status_command i3status-rs ~/projects/custom_barista/i3status-rust/compact.toml`, `tray_output none`). Backup: `~/.i3/config.bak-2026-11-17-2005`. `i3 -C` clean; after restart 3 i3bars + 2 i3status-rs run, no error blocks.
+- Remaining: 2b (tray follows Win+i, bars.conf).

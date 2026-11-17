@@ -1,5 +1,6 @@
 #!/bin/bash
 # Win+i: cycle bars off -> barista -> rs -> off. Config default is barista (restart resets to it).
+# "rs" is two bars (bar-rs on DP-0, bar-rs-small on DP-2), always switched together.
 state_file="${XDG_RUNTIME_DIR:-/tmp}/barcycle.state"
 
 mode_of() { i3-msg -t get_bar_config "$1" | grep -o '"mode": *"[a-z]*"' | grep -o '[a-z]*"$' | tr -d '"'; }
@@ -16,5 +17,5 @@ case "$cur" in
   barista) next=rs;      bm=invisible; rm=dock ;;
   *)       next=off;     bm=invisible; rm=invisible ;;
 esac
-i3-msg "bar mode $bm bar-barista; bar mode $rm bar-rs" >/dev/null
+i3-msg "bar mode $bm bar-barista; bar mode $rm bar-rs; bar mode $rm bar-rs-small" >/dev/null
 echo "$next" > "$state_file"

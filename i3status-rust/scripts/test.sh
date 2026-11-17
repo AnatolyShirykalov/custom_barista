@@ -41,4 +41,8 @@ for v in '{"t":5,"c":0,"r":5}' '{"t":999,"c":3,"r":59}' '{"t":12345,"c":50,"r":6
 done
 printf '99, 16303\n' > "$cj"; o=$("$d/gpu.sh" "$cj"); printf '9, 5\n' > "$cj"; o2=$("$d/gpu.sh" "$cj")
 [ "$(len "$o")" == "$(len "$o2")" ] && pass=$((pass+1)) || { echo "FAIL gpuwidth"; fail=$((fail+1)); }
+# compact.toml (DP-2 bar) is generated from config.toml and must be in sync and without the dropped parts
+"$d/gen-compact.sh" - | cmp -s - "$d/../compact.toml" && pass=$((pass+1)) || { echo "FAIL compact: out of sync, run scripts/gen-compact.sh"; fail=$((fail+1)); }
+grep -qE 'disk_space|disk_iostats|ccusage\.sh|\$ip' "$d/../compact.toml" && { echo "FAIL compact: dropped block left"; fail=$((fail+1)); } || pass=$((pass+1))
+[ "$(grep -cE 'disk_space|disk_iostats|ccusage\.sh"|\$ip ' "$d/../config.toml")" == 4 ] && pass=$((pass+1)) || { echo "FAIL compact: config.toml patterns changed, update gen-compact.sh"; fail=$((fail+1)); }
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]
