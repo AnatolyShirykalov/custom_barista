@@ -50,3 +50,7 @@ Verdict: **accept with fixes** (one small builder item, 5c). Screenshot of both 
 
 - Layout: `[block.mappings]` with keys `"us (N/A)"`/`"ru (N/A)"` (xkbevent has no variant) gives `US`/`RU`; verified by toggling layout, width unchanged.
 - Sound: first-frame `0.0%` came from the pulseaudio/auto driver (volume 0 before the first query; 10 frames at start). `driver = "alsa"` (pipewire-alsa Master) shows 70% from frame 1, 0 early `0.0%` frames. Trade-off: no >100% display (max_vol 100 anyway). Click/mute not re-tested with alsa.
+
+## Clip fixture (#9, 2026-11-17)
+
+- `scripts/test.sh` generates the 2 MB `data_2m` into a `mktemp -d` (removed on exit); tracked file git rm-ed, no .gitignore needed. `cl` now takes a full path for the data file. 22/22 pass.

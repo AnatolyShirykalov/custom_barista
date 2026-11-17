@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Runs the spec test table against testdata/. Prints failures and a summary line.
 d=$(cd "$(dirname "$0")" && pwd); t=$d/testdata; pass=0; fail=0
+gd=$(mktemp -d); head -c 2097152 /dev/zero | tr '\0' a >"$gd/data_2m"
 strip() { sed 's/<[^>]*>//g'; }
 check() { # name json expected_text expected_state
   jq -e . >/dev/null 2>&1 <<<"$2" || { echo "FAIL $1: invalid JSON: $2"; fail=$((fail+1)); return; }
@@ -20,17 +21,17 @@ check cc8 "$(cc cc_55m.json)" " 97%  53.3M CH  96% 0h40m" Critical
 check cc9 "$(cc cc_empty.json)" "" ""
 check cc10 "$(cc cc_bad.json)" "cc err" Critical
 # clip text is padded to 5 chars (fixed width), so compare after trimming
-cl() { CLIP_TARGETS=$t/$1 CLIP_DATA=$t/${2:-/dev/null} "$d/clip.sh" | jq -c '.text |= gsub("^ +";"")'; }
+cl() { CLIP_TARGETS=$t/$1 CLIP_DATA=${2:-/dev/null} "$d/clip.sh" | jq -c '.text |= gsub("^ +";"")'; }
 check clip11 "$(cl targets_empty)" "empty" Info
-check clip12 "$(cl targets_text data_5)" "5B" Idle
-check clip13 "$(cl targets_text data_2k)" "2.0K" Idle
+check clip12 "$(cl targets_text $t/data_5)" "5B" Idle
+check clip13 "$(cl targets_text $t/data_2k)" "2.0K" Idle
 check clip14 "$(CLIP_TARGETS=$t/targets_img "$d/clip.sh" | jq -c '.text |= gsub("^ +";"")')" "img" Idle
-check clip15 "$(cl targets_text data_2m)" ">1M" Idle
+check clip15 "$(cl targets_text "$gd/data_2m")" ">1M" Idle
 check gpu1 "$("$d/gpu.sh" "$t/gpu_ok")" "34°  4781MiB" Idle
 check gpu2 "$("$d/gpu.sh" "$t/gpu_bad")" "GPU ERR" Critical
 # constant text length across small/large values
 len() { jq -r .text <<<"$1" | strip | awk '{print length($0)}'; }
-cj=$(mktemp); trap 'rm -f $cj' EXIT; base=$(len "$(cc cc_100m.json)")
+cj=$(mktemp); trap 'rm -f $cj; rm -rf "$gd"' EXIT; base=$(len "$(cc cc_100m.json)")
 for v in '{"t":5,"c":0,"r":5}' '{"t":999,"c":3,"r":59}' '{"t":12345,"c":50,"r":61}' '{"t":53300000,"c":100,"r":299}'; do
   jq -c --argjson v "$v" '(.blocks[]|select(.isActive)) |= (.totalTokens=$v.t | .tokenLimitStatus.limit=100000000 | .tokenCounts.inputTokens=(100-$v.c) | .tokenCounts.cacheCreationInputTokens=0 | .tokenCounts.cacheReadInputTokens=$v.c | .projection.remainingMinutes=$v.r)' "$t/cc_100m.json" > "$cj"
   o=$(CCUSAGE_JSON=$cj "$d/ccusage.sh"); [ "$(len "$o")" == "$base" ] || { echo "FAIL ccwidth $v: $(jq -r .text <<<"$o") len $(len "$o") want $base"; fail=$((fail+1)); }; pass=$((pass+1))

@@ -18,8 +18,6 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-- Generate 2 MB clip fixture → `chore` (sonnet), started 2026-11-17
-
 ### Queued next (one agent each, in order)
 
 1. [x] **Fix GPU widget** (`nvidia/nvidia.go`): shows "GPU ERR" since the last upgrade. Likely cause: `nvidia-smi --query-gpu=temperature.gpu` now prints `39.70` (float), `strconv.Atoi` fails. Parse floats, add a parser table test, show a short reason on error. Done: bar shows temp + VRAM on the RTX 5070 Ti, deployed. → `widget-builder` Done 2026-11-17, see docs/progress/widgets.md.
@@ -32,7 +30,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 6. [ ] **Switch to i3status-rust** after ~1 week trial (ask when 2026-11-24; trial watch: sound block on alsa driver — mute/wheel and Bluetooth/headphone sink switch): remove barista bar, decide repo fate. → `widget-builder`
 7. [x] **README refresh**: module list stale (missing clipboard, freq, vol, weather, music; ccusage described as CPU usage); Go version prereq. Done: README matches `main.go`. → `chore` Done 2026-11-17: also deleted unused weather/ and music/; see docs/progress/docs.md.
 8. [x] **Trial bar polish**: layout `us`/`ru` → `US`/`RU` via `[block.mappings]`; sound block shows `0.0%` on first frame. → `widget-builder` Done: mappings + alsa driver, see progress/migration.md.
-9. [ ] **Generate 2 MB clip fixture**: `i3status-rust/scripts/testdata/data_2m` tracked; generate in `test.sh` instead. → `chore`
+9. [x] **Generate 2 MB clip fixture**: `test.sh` now generates it in a `mktemp -d` (trap cleanup); tracked file removed. → `chore` Done 2026-11-17, 22/22.
 
 ### Background checks
 
