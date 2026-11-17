@@ -45,3 +45,8 @@ Verdict: **accept with fixes** (one small builder item, 5c). Screenshot of both 
 - `test.sh`: expectations updated; width rows vary tokens 5..53.3M, CH 0..100, remaining 5..299 min, GPU `99, 16303` vs `9, 5`. 22 pass, 0 fail.
 - Trial bar not restarted (5b was changing bar modes); the new text shows at the next rs restart.
 - 2026-11-17 ccusage cost sample: 3 runs/5 min on trial bar (was every 5 s). OK.
+
+## Trial bar polish (#8, 2026-11-17)
+
+- Layout: `[block.mappings]` with keys `"us (N/A)"`/`"ru (N/A)"` (xkbevent has no variant) gives `US`/`RU`; verified by toggling layout, width unchanged.
+- Sound: first-frame `0.0%` came from the pulseaudio/auto driver (volume 0 before the first query; 10 frames at start). `driver = "alsa"` (pipewire-alsa Master) shows 70% from frame 1, 0 early `0.0%` frames. Trade-off: no >100% display (max_vol 100 anyway). Click/mute not re-tested with alsa.

@@ -20,6 +20,9 @@ clipboard = "\U000F0A38"  # md-clipboard_text_outline
 block = "keyboard_layout"
 driver = "xkbevent"
 format = " ^icon_keyboard $layout "
+[block.mappings]   # keys are "layout (variant)"; xkbevent reports variant N/A
+"us (N/A)" = "US"
+"ru (N/A)" = "RU"
 [[block.click]]
 button = "left"
 cmd = "xdotool key ISO_Next_Group"
@@ -107,7 +110,7 @@ interval = 60
 
 [[block]]
 block = "sound"
-driver = "auto"
+driver = "alsa"   # pulseaudio/auto driver emits a first frame of 0.0% before the real volume
 format = " $icon {$volume.eng(w:3)|MUT} "
 max_vol = 100
 [[block.click]]

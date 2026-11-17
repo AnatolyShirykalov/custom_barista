@@ -18,7 +18,6 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-- Trial bar polish → `widget-builder` (sonnet), started 2026-11-17
 
 ### Queued next (one agent each, in order)
 
@@ -31,7 +30,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 5b. [x] **Win+i bar cycle** (user request): `$mod+i` cycles off (barista `hide`, rs `invisible`) → barista dock (rs invisible) → i3status-rust dock (barista invisible); script `i3status-rust/scripts/barcycle.sh`, state in `$XDG_RUNTIME_DIR`, barista bar gets `id bar-barista`, replace `bindsym $mod+i bar mode toggle` in `~/.i3/config` (backup first), drop Mod3 reveal. Done: 3 presses cycle all states, verified via `i3-msg -t get_bar_config`. → `widget-builder`
 6. [ ] **Switch to i3status-rust** after ~1 week trial (ask when 2026-11-24): remove barista bar, decide repo fate. → `widget-builder`
 7. [x] **README refresh**: module list stale (missing clipboard, freq, vol, weather, music; ccusage described as CPU usage); Go version prereq. Done: README matches `main.go`. → `chore` Done 2026-11-17: also deleted unused weather/ and music/; see docs/progress/docs.md.
-8. [ ] **Trial bar polish**: layout `us`/`ru` → `US`/`RU` via `[block.mappings]`; sound block shows `0.0%` on first frame. → `widget-builder`
+8. [x] **Trial bar polish**: layout `us`/`ru` → `US`/`RU` via `[block.mappings]`; sound block shows `0.0%` on first frame. → `widget-builder` Done: mappings + alsa driver, see progress/migration.md.
 9. [ ] **Generate 2 MB clip fixture**: `i3status-rust/scripts/testdata/data_2m` tracked; generate in `test.sh` instead. → `chore`
 
 ### Background checks
