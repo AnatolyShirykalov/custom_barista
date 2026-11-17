@@ -75,6 +75,10 @@ The bar uses a custom color scheme:
 - `bad`: #d66 (red) - Critical status
 - `dim-icon`: #777 (gray) - Inactive icons
 
+## Apply the setup for another user: install.sh
+
+`./install.sh [--dry-run] [--no-restart] [--yes]` from the checkout (any location), as the user who runs the bar. Idempotent: pulls the repo (`--ff-only`, skipped if dirty), warns about missing tools, runs `go install .`, generates `~/.config/custom_barista/{config,compact}.toml` (tracked files stay untouched) and writes the bars and the `$mod+i` binding from `i3status-rust/i3/bars.conf.tmpl` into the i3 config between `# BEGIN custom_barista` / `# END custom_barista`. Old `bar {}` blocks are shown and removed only on `y`. The config is backed up (`config.bak.<timestamp>`), checked with `i3 -C` (restored on failure) and i3 is restarted. Needs beforehand: go, i3status-rs, the fonts (see above) and `~/scripts/clipboard_menu.sh`, `open_calender.sh` (not in this repo).
+
 ## Trial bar: i3status-rust
 
 A second bar, for comparison during a trial week. Config and scripts live in `i3status-rust/`.
