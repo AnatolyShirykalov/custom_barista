@@ -12,7 +12,6 @@ Work items are checkboxes (`1. [ ]`): what, where, done condition, `→ agent-na
 ### Design
 
 1. [ ] **Upstream issue i3status-rust nvidia_gpu**: block shows 0° because nvidia-smi 620.x prints float temperature (`34.59`), block parses u32. File issue (user's call) so gpu.sh can go. → `researcher`
-1. [ ] **Trial bar polish**: layout `us`/`ru` → `US`/`RU` via `[block.mappings]`; sound block shows `0.0%` on first frame. → `widget-builder`
 
 1. [ ] **Implement bar design audit option(s)** chosen by the user from D1 spec, then designer review. → `widget-builder` → `bar-designer`
 
@@ -26,4 +25,3 @@ Work items are checkboxes (`1. [ ]`): what, where, done condition, `→ agent-na
 - [ ] **Dependency survey + safe bumps**: go.mod (toolchain go1.24.5, system Go 1.27), barista.run, direct deps; commit safe bumps, backlog breaking ones. Done: builds, bar runs, versions in `docs/progress/deps.md`. → `dep-updater` (parked: i3status-rust migration)
 - [ ] **Bar design audit** (spec mode): screenshot current bar, list clarity/look issues (grouping, widths jitter, colors, icons), 2-3 options for the top issues. Done: `docs/design/D1-bar-audit-spec.md`. → `bar-designer` (parked: i3status-rust migration)
 - [ ] **Barista diskio + click paths**: diskio looks for `cryptroot` (kernel dev is `dm-0`), click scripts point to `/home/anatolii/...`. Only if barista stays past trial. (from D3 spec) → `widget-builder`
-- [ ] **Generate 2 MB clip fixture**: `i3status-rust/scripts/testdata/data_2m` tracked; generate in `test.sh` instead (from git hygiene 2026-11-17). → `chore`
