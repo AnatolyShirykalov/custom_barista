@@ -20,13 +20,14 @@ out=$(printf '%s' "$raw" | jq -c '
     | ($b.projection.remainingMinutes // 0) as $rem
     | def r0: (. + 0.5 | floor | tostring);
       def f1: (. * 10 + 0.5 | floor / 10 | tostring) as $s | if ($s | test("\\.")) then $s else $s + ".0" end;
+      def pad($n): tostring | (($n - length) as $k | if $k > 0 then (" " * $k) + . else . end);
       { icon: "ccusage",
         state: (if $pct == null then "Good" elif $pct > 90 then "Critical" elif $pct > 70 then "Warning" else "Good" end),
         text: ([
-          (if $pct == null then empty elif $pct < 1 then ($pct | f1) + "%" else ($pct | r0) + "%" end),
-          (if $t >= 1e6 then ($t / 1e6 | f1) + "M" elif $t >= 1e3 then ($t / 1e3 | f1) + "K" else ($t | floor | tostring) end),
-          (if $ch > 0 then "CH " + ($ch | r0) + "%" else empty end),
-          (if $rem > 0 then (if $rem >= 60 then (($rem / 60 | floor | tostring) + "h" + (($rem % 60) | floor | tostring) + "m") else (($rem | floor | tostring) + "m") end) else empty end)
+          (if $pct == null then "    " elif $pct < 1 then (($pct | f1) + "%" | pad(4)) else (($pct | r0) + "%" | pad(4)) end),
+          (if $t >= 1e6 then (($t / 1e6 | f1) | pad(5)) + "M" elif $t >= 1e3 then (($t / 1e3 | f1) | pad(5)) + "K" else (($t | floor | tostring) | pad(5)) + " " end),
+          ("CH " + (($ch | r0) + "%" | pad(4))),
+          (($rem | floor) as $m | (($m / 60 | floor | tostring) + "h" + (($m % 60) | tostring | pad(2) | gsub(" "; "0")) + "m"))
         ] | join(" ")) }
     end' 2>/dev/null)
 if [ -n "$out" ]; then echo "$out"; else echo "$err"; fi

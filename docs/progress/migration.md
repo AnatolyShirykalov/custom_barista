@@ -37,3 +37,10 @@ Verdict: **accept with fixes** (one small builder item, 5c). Screenshot of both 
 - `~/.i3/config` (backup `config.bak-5b`): barista bar got `id bar-barista`, `mode dock`; bar-rs `mode invisible`; `modifier Mod3` removed from both (dead key); `$mod+i` runs `i3status-rust/scripts/barcycle.sh`.
 - Script cycles off -> barista -> rs -> off; derives the current state from real bar modes (`get_bar_config`), so a restart/reload (which resets to config default = barista dock) never leaves a stale state file; `${XDG_RUNTIME_DIR:-/tmp}/barcycle.state` records the next state.
 - Verified after `i3-msg reload`: 4 calls gave rs, off, barista, rs, all modes matching; left in barista.
+
+## 5c D3 fix widths (widget-builder, 2026-11-17)
+
+- `ccusage.sh`: pct padded to 4 (`%` incl.), tokens padded to 5 + unit (blank unit under 1K), `CH` pad 4, remaining always `%dh%02dm`; unknown pct and zero values keep their slots (no omitted parts). Text is now 25 chars always.
+- `gpu.sh`: `%5dMiB` (fits 16303).
+- `test.sh`: expectations updated; width rows vary tokens 5..53.3M, CH 0..100, remaining 5..299 min, GPU `99, 16303` vs `9, 5`. 22 pass, 0 fail.
+- Trial bar not restarted (5b was changing bar modes); the new text shows at the next rs restart.

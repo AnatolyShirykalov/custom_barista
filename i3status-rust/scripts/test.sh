@@ -13,10 +13,10 @@ o=$("$d/freq.sh" "$t/freq3"); check freq3 "$o" "      0 0 0 0 0 0 1" Idle
 grep -q "#ff0000'>1</span>\"" <<<"$o" || { echo "FAIL freq3: last color"; fail=$((fail+1)); }
 check freq4 "$("$d/freq.sh" "$t/freq4")" "FREQ ERR" Critical
 cc() { CCUSAGE_JSON=$t/$1 "$d/ccusage.sh"; }
-check cc5 "$(cc cc_null.json)" "53.3M CH 96% 1h46m" Good
-check cc6 "$(cc cc_100m.json)" "53% 53.3M CH 96% 1h46m" Good
-check cc7 "$(cc cc_60m.json)" "89% 53.3M CH 96% 1h46m" Warning
-check cc8 "$(cc cc_55m.json)" "97% 53.3M CH 96% 40m" Critical
+check cc5 "$(cc cc_null.json)" "      53.3M CH  96% 1h46m" Good
+check cc6 "$(cc cc_100m.json)" " 53%  53.3M CH  96% 1h46m" Good
+check cc7 "$(cc cc_60m.json)" " 89%  53.3M CH  96% 1h46m" Warning
+check cc8 "$(cc cc_55m.json)" " 97%  53.3M CH  96% 0h40m" Critical
 check cc9 "$(cc cc_empty.json)" "" ""
 check cc10 "$(cc cc_bad.json)" "cc err" Critical
 # clip text is padded to 5 chars (fixed width), so compare after trimming
@@ -26,6 +26,15 @@ check clip12 "$(cl targets_text data_5)" "5B" Idle
 check clip13 "$(cl targets_text data_2k)" "2.0K" Idle
 check clip14 "$(CLIP_TARGETS=$t/targets_img "$d/clip.sh" | jq -c '.text |= gsub("^ +";"")')" "img" Idle
 check clip15 "$(cl targets_text data_2m)" ">1M" Idle
-check gpu1 "$("$d/gpu.sh" "$t/gpu_ok")" "34° 4781MiB" Idle
+check gpu1 "$("$d/gpu.sh" "$t/gpu_ok")" "34°  4781MiB" Idle
 check gpu2 "$("$d/gpu.sh" "$t/gpu_bad")" "GPU ERR" Critical
+# constant text length across small/large values
+len() { jq -r .text <<<"$1" | strip | awk '{print length($0)}'; }
+cj=$(mktemp); trap 'rm -f $cj' EXIT; base=$(len "$(cc cc_100m.json)")
+for v in '{"t":5,"c":0,"r":5}' '{"t":999,"c":3,"r":59}' '{"t":12345,"c":50,"r":61}' '{"t":53300000,"c":100,"r":299}'; do
+  jq -c --argjson v "$v" '(.blocks[]|select(.isActive)) |= (.totalTokens=$v.t | .tokenLimitStatus.limit=100000000 | .tokenCounts.inputTokens=(100-$v.c) | .tokenCounts.cacheCreationInputTokens=0 | .tokenCounts.cacheReadInputTokens=$v.c | .projection.remainingMinutes=$v.r)' "$t/cc_100m.json" > "$cj"
+  o=$(CCUSAGE_JSON=$cj "$d/ccusage.sh"); [ "$(len "$o")" == "$base" ] || { echo "FAIL ccwidth $v: $(jq -r .text <<<"$o") len $(len "$o") want $base"; fail=$((fail+1)); }; pass=$((pass+1))
+done
+printf '99, 16303\n' > "$cj"; o=$("$d/gpu.sh" "$cj"); printf '9, 5\n' > "$cj"; o2=$("$d/gpu.sh" "$cj")
+[ "$(len "$o")" == "$(len "$o2")" ] && pass=$((pass+1)) || { echo "FAIL gpuwidth"; fail=$((fail+1)); }
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]
