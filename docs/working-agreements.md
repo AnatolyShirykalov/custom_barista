@@ -1,0 +1,39 @@
+# Working agreements
+
+User preferences for how work runs in this repo. Commands and agents cite them by slug. On a change keep the old rule as "Earlier rule (date)".
+
+## Specialist agents (`specialists`, workflow; 2026-11-17)
+*Work goes to project agents, never general-purpose.*
+The main session coordinates; each item goes to the matching agent in `.claude/agents/` (`widget-builder`, `dep-updater`, `bar-designer`, `chore`, `researcher`, `code-reviewer`, `agent-curator`, `repo-janitor`, `context-auditor`). Reports ≤10 lines. One item per agent.
+**Why:** set up with /roadmap-init.
+**How to apply:** no specialist fits → note it for the Agent roster check. [[one-at-a-time]]
+
+## One agent at a time (`one-at-a-time`, workflow; 2026-11-17)
+*Run agents one at a time (two at most).*
+Small single-machine project; there is one live bar to test against.
+**Why:** default chosen at setup; parallel runs hit the usage limit.
+**How to apply:** wait for the final notification before the next agent. [[specialists]]
+
+## Batched push (`batched-push`, git; 2026-11-17)
+*Agents commit, never push; main session pushes in batches.*
+Push about every 5 reviewed items, and always before `/clear`, at wrapup, before a tag. Reviewed work is never left unpushed.
+**Why:** user picked "Batched push, deploy freely".
+**How to apply:** agents' commit rule says "Do not push unless the prompt says so". [[deploy-freely]]
+
+## Deploy freely (`deploy-freely`, deploy; 2026-11-17)
+*Installing and restarting the live bar needs no confirmation.*
+After checks pass: `go install .` then `i3-msg restart`; verify the bar shows no ERR.
+**Why:** user picked "Batched push, deploy freely".
+**How to apply:** builders deploy their own finished item. [[batched-push]]
+
+## Model tiers (`model-tiers`, workflow; 2026-11-17)
+*Top model only for the hardest ~10 % of judgement items; middle model for judgement agents; sonnet for mechanical ones.*
+Top: hard diagnosis, second try after a failed fix, specs many items build on (mark `(top)` in the roadmap). Sonnet: `chore`, `dep-updater`-style runs.
+**Why:** set up with /roadmap-init.
+**How to apply:** state the tier in one line before each judgement item.
+
+## Recurring checks (`recurring-checks`, workflow; 2026-11-17)
+*After about every 3 tasks run the recurring check with the oldest date.*
+Rows: Agent roster, Git hygiene, Context diet, Backlog tidy (monthly), Dependency updates, Look/usability pass, Widget health, Code review + docs.
+**Why:** user chose all four optional checks at setup.
+**How to apply:** table in `docs/ROADMAP.md`, log in `docs/progress/recurring.md`.
