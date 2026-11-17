@@ -25,7 +25,7 @@ out=$(printf '%s' "$raw" | jq -c '
         state: (if $pct == null then "Good" elif $pct > 90 then "Critical" elif $pct > 70 then "Warning" else "Good" end),
         text: ([
           (if $pct == null then "    " elif $pct < 1 then (($pct | f1) + "%" | pad(4)) else (($pct | r0) + "%" | pad(4)) end),
-          (if $t >= 1e6 then (($t / 1e6 | f1) | pad(5)) + "M" elif $t >= 1e3 then (($t / 1e3 | f1) | pad(5)) + "K" else (($t | floor | tostring) | pad(5)) + " " end),
+          ((($t / 1e3 * 10 + 0.5 | floor) / 10) as $k | if $t >= 1e6 or $k >= 1000 then (($t / 1e6 | f1) | pad(5)) + "M" elif $t >= 1e3 then (($t / 1e3 | f1) | pad(5)) + "K" else (($t | floor | tostring) | pad(5)) + " " end),
           ("CH " + (($ch | r0) + "%" | pad(4))),
           (($rem | floor) as $m | (($m / 60 | floor | tostring) + "h" + (($m % 60) | tostring | pad(2) | gsub(" "; "0")) + "m"))
         ] | join(" ")) }

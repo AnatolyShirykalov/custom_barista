@@ -10,3 +10,8 @@
 ## Click paths via home dir (2026-11-17)
 - `clipboard` and `ltime` hardcoded `/home/anatolii/scripts/…`; now `utils.Script(name)` (`os.UserHomeDir()` + `filepath.Join`, relative `scripts/<name>` fallback on error, no panic). No other `anatolii` in Go code.
 - Table test `utils/utils_test.go`. Build/vet/test green, smoke 0 ERR, deployed.
+
+## Trial width bugs (2026-11-17)
+- clip.sh: K sizes now <=5 chars (`99.9K`, `200K`, rolls to `1.0M` at >=999.5K after rounding). ccusage.sh: K/M unit chosen after rounding (999950 -> `1.0M`).
+- test.sh: trap/mktemp order fixed, `$cj` quoted, failed ccwidth no longer counts as pass; added clip width rows (204800, 102300, 1048000, 1048575) and cc rows (999950, 200000). 28 pass.
+- `gofmt -w kbdlayout/mods.go mem/mem.go`.

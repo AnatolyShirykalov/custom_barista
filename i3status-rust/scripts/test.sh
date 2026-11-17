@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs the spec test table against testdata/. Prints failures and a summary line.
 d=$(cd "$(dirname "$0")" && pwd); t=$d/testdata; pass=0; fail=0
-gd=$(mktemp -d); head -c 2097152 /dev/zero | tr '\0' a >"$gd/data_2m"
+gd=$(mktemp -d); cj=$(mktemp); trap 'rm -f "$cj"; rm -rf "$gd"' EXIT; head -c 2097152 /dev/zero | tr '\0' a >"$gd/data_2m"
 strip() { sed 's/<[^>]*>//g'; }
 check() { # name json expected_text expected_state
   jq -e . >/dev/null 2>&1 <<<"$2" || { echo "FAIL $1: invalid JSON: $2"; fail=$((fail+1)); return; }
@@ -26,15 +26,18 @@ check clip11 "$(cl targets_empty)" "empty" Info
 check clip12 "$(cl targets_text $t/data_5)" "5B" Idle
 check clip13 "$(cl targets_text $t/data_2k)" "2.0K" Idle
 check clip14 "$(CLIP_TARGETS=$t/targets_img "$d/clip.sh" | jq -c '.text |= gsub("^ +";"")')" "img" Idle
+for sz in 204800 1048000 1048575 102300; do head -c $sz /dev/zero | tr '\0' a >"$gd/d_$sz"
+  o=$(CLIP_TARGETS=$t/targets_text CLIP_DATA=$gd/d_$sz "$d/clip.sh"); l=$(jq -r .text <<<"$o" | awk '{print length($0)}')
+  [ "$l" == 5 ] && pass=$((pass+1)) || { echo "FAIL clipwidth $sz: '$(jq -r .text <<<"$o")'"; fail=$((fail+1)); }; done
 check clip15 "$(cl targets_text "$gd/data_2m")" ">1M" Idle
 check gpu1 "$("$d/gpu.sh" "$t/gpu_ok")" "34°  4781MiB" Idle
 check gpu2 "$("$d/gpu.sh" "$t/gpu_bad")" "GPU ERR" Critical
 # constant text length across small/large values
 len() { jq -r .text <<<"$1" | strip | awk '{print length($0)}'; }
-cj=$(mktemp); trap 'rm -f $cj; rm -rf "$gd"' EXIT; base=$(len "$(cc cc_100m.json)")
-for v in '{"t":5,"c":0,"r":5}' '{"t":999,"c":3,"r":59}' '{"t":12345,"c":50,"r":61}' '{"t":53300000,"c":100,"r":299}'; do
+base=$(len "$(cc cc_100m.json)")
+for v in '{"t":5,"c":0,"r":5}' '{"t":999,"c":3,"r":59}' '{"t":12345,"c":50,"r":61}' '{"t":999950,"c":50,"r":61}' '{"t":200000,"c":50,"r":61}' '{"t":53300000,"c":100,"r":299}'; do
   jq -c --argjson v "$v" '(.blocks[]|select(.isActive)) |= (.totalTokens=$v.t | .tokenLimitStatus.limit=100000000 | .tokenCounts.inputTokens=(100-$v.c) | .tokenCounts.cacheCreationInputTokens=0 | .tokenCounts.cacheReadInputTokens=$v.c | .projection.remainingMinutes=$v.r)' "$t/cc_100m.json" > "$cj"
-  o=$(CCUSAGE_JSON=$cj "$d/ccusage.sh"); [ "$(len "$o")" == "$base" ] || { echo "FAIL ccwidth $v: $(jq -r .text <<<"$o") len $(len "$o") want $base"; fail=$((fail+1)); }; pass=$((pass+1))
+  o=$(CCUSAGE_JSON=$cj "$d/ccusage.sh"); if [ "$(len "$o")" == "$base" ]; then pass=$((pass+1)); else echo "FAIL ccwidth $v: $(jq -r .text <<<"$o") len $(len "$o") want $base"; fail=$((fail+1)); fi
 done
 printf '99, 16303\n' > "$cj"; o=$("$d/gpu.sh" "$cj"); printf '9, 5\n' > "$cj"; o2=$("$d/gpu.sh" "$cj")
 [ "$(len "$o")" == "$(len "$o2")" ] && pass=$((pass+1)) || { echo "FAIL gpuwidth"; fail=$((fail+1)); }

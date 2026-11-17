@@ -1,9 +1,9 @@
 package mem
 
 import (
-	"barista.run/format"
 	"barista.run/bar"
 	"barista.run/colors"
+	"barista.run/format"
 	"barista.run/modules/meminfo"
 	"barista.run/outputs"
 	"barista.run/pango"

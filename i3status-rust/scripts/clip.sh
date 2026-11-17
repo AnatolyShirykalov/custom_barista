@@ -10,6 +10,6 @@ if [ -n "${CLIP_DATA+x}" ]; then n=$(head -c 1048577 "$CLIP_DATA" | wc -c); else
   n=$(timeout 2 xclip -o -selection clipboard 2>/dev/null | head -c 1048577 | wc -c); fi
 if [ "$n" -eq 0 ]; then emit Info empty
 elif [ "$n" -lt 1024 ]; then emit Idle "${n}B"
-elif [ "$n" -lt 1048576 ]; then emit Idle "$(awk -v n="$n" 'BEGIN{printf "%4.1fK", n/1024}')"
+elif [ "$n" -lt 1048576 ]; then emit Idle "$(awk -v n="$n" 'BEGIN{k=n/1024; if(k<99.95) printf "%.1fK", k; else if(k<999.5) printf "%dK", k+0.5; else print "1.0M"}')"
 else emit Idle ">1M"; fi
 exit 0
