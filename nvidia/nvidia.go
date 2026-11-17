@@ -1,7 +1,8 @@
 package nvidia
 
 import (
-	"bytes"
+	"fmt"
+	"math"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -20,34 +21,45 @@ func Module() bar.Module {
 	return &NvidiaModule{}
 }
 
-func readGpuStats() (temp, vramUsed int, err error) {
-	cmd := exec.Command("nvidia-smi",
-		"--query-gpu=temperature.gpu,memory.used",
-		"--format=csv,noheader,nounits")
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err = cmd.Run()
-	if err != nil {
-		return
-	}
-	fields := strings.Split(strings.TrimSpace(out.String()), ", ")
+// parseGpuStats parses one csv line "temp, vram" (values may be int, float
+// or "[N/A]"); a field that is not a number is an error.
+func parseGpuStats(line string) (temp, vramUsed int, err error) {
+	fields := strings.Split(strings.TrimSpace(line), ",")
 	if len(fields) != 2 {
-		err = exec.ErrNotFound
-		return
+		return 0, 0, fmt.Errorf("want 2 fields, got %d", len(fields))
 	}
-	temp, err = strconv.Atoi(fields[0])
+	var vals [2]int
+	for i, f := range fields {
+		v, perr := strconv.ParseFloat(strings.TrimSpace(f), 64)
+		if perr != nil {
+			return 0, 0, perr
+		}
+		vals[i] = int(math.Round(v))
+	}
+	return vals[0], vals[1], nil
+}
+
+func readGpuStats() (temp, vramUsed int, err error) {
+	out, err := exec.Command("nvidia-smi",
+		"--query-gpu=temperature.gpu,memory.used",
+		"--format=csv,noheader,nounits").Output()
 	if err != nil {
 		return
 	}
-	vramUsed, err = strconv.Atoi(fields[1])
-	return
+	return parseGpuStats(string(out))
 }
 
 func (m *NvidiaModule) Stream(sink bar.Sink) {
 	for range time.Tick(2 * time.Second) {
 		temp, used, err := readGpuStats()
 		if err != nil {
-			sink.Output(outputs.Text("GPU ERR").Color(colors.Scheme("bad")))
+			reason := "GPU parse"
+			if _, ok := err.(*exec.Error); ok {
+				reason = "GPU n/a"
+			} else if _, ok := err.(*exec.ExitError); ok {
+				reason = "GPU smi"
+			}
+			sink.Output(outputs.Text(reason).Color(colors.Scheme("dim-icon")))
 			continue
 		}
 		// Compose output: temperature + VRAM usage

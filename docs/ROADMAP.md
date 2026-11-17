@@ -19,11 +19,10 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 ## In flight
 
 
-- Fix GPU widget → `widget-builder` (sonnet), started 2026-11-17
 
 ### Queued next (one agent each, in order)
 
-1. [ ] **Fix GPU widget** (`nvidia/nvidia.go`): shows "GPU ERR" since the last upgrade. Likely cause: `nvidia-smi --query-gpu=temperature.gpu` now prints `39.70` (float), `strconv.Atoi` fails. Parse floats, add a parser table test, show a short reason on error. Done: bar shows temp + VRAM on the RTX 5070 Ti, deployed. → `widget-builder`
+1. [x] **Fix GPU widget** (`nvidia/nvidia.go`): shows "GPU ERR" since the last upgrade. Likely cause: `nvidia-smi --query-gpu=temperature.gpu` now prints `39.70` (float), `strconv.Atoi` fails. Parse floats, add a parser table test, show a short reason on error. Done: bar shows temp + VRAM on the RTX 5070 Ti, deployed. → `widget-builder` Done 2026-11-17, see docs/progress/widgets.md.
 2. [ ] **Alternatives report** (user request): challenge the custom-barista approach. Compare alternatives (i3status, i3status-rust, i3blocks, bumblebee-status, py3status, polybar, waybar/sway path, yambar, keep barista, others found) on: features we use (nvidia, hwmon temps, freq, vol, clipboard, ccusage, netm), migration cost, maintenance after upgrades, upstream activity, resources, theming. Recommendation. Done: local `docs/design/A1-alternatives/report.html`. → `researcher`
 3. [ ] **Widget health sweep**: run `timeout 5 go run .`, list every widget that prints ERR/empty after the upgrade (hwmon, vol, freq, batt…), one backlog item each. Done: table in `docs/progress/widgets.md`. → `widget-builder`
 4. [ ] **Dependency survey + safe bumps**: go.mod (toolchain go1.24.5, system Go 1.27), barista.run, direct deps; commit safe bumps, backlog breaking ones. Done: builds, bar runs, versions in `docs/progress/deps.md`. → `dep-updater`
