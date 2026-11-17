@@ -18,7 +18,8 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-_(none)_
+- 5b Win+i bar cycle → `widget-builder` (sonnet), started 2026-11-17
+- 5c D3 fix widths → `widget-builder` (sonnet), started 2026-11-17
 
 
 ### Queued next (one agent each, in order)
