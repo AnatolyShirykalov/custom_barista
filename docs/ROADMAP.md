@@ -18,17 +18,17 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-_(none)_
+- D3 i3status-rust spec → `bar-designer` (opus, middle tier), started 2026-11-17
 
 
 ### Queued next (one agent each, in order)
 
 1. [x] **Fix GPU widget** (`nvidia/nvidia.go`): shows "GPU ERR" since the last upgrade. Likely cause: `nvidia-smi --query-gpu=temperature.gpu` now prints `39.70` (float), `strconv.Atoi` fails. Parse floats, add a parser table test, show a short reason on error. Done: bar shows temp + VRAM on the RTX 5070 Ti, deployed. → `widget-builder` Done 2026-11-17, see docs/progress/widgets.md.
 2. [x] **Alternatives report** (user request): challenge the custom-barista approach. Compare alternatives (i3status, i3status-rust, i3blocks, bumblebee-status, py3status, polybar, waybar/sway path, yambar, keep barista, others found) on: features we use (nvidia, hwmon temps, freq, vol, clipboard, ccusage, netm), migration cost, maintenance after upgrades, upstream activity, resources, theming. Recommendation. Done: local `docs/design/A1-alternatives/report.html`. → `researcher` Done 2026-11-17: recommends staged migration to i3status-rust (barista archived, domain expired); icon blanks = mdi provider never loaded. See docs/progress/alternatives.md.
-3. [ ] **Icon specificity spec** (user pain #1): every widget gets a specific, descriptive glyph; GPU has none today. Designer surveys icon sources (Nerd Fonts / full MDI, current material/typicons, barista icon providers), proposes one glyph per widget with 2-3 options where unclear, writes `docs/design/D2-icons/questions.html` (decision page) + spec `D2-icons-spec.md`. Then builder implements, designer reviews. Waits for alternatives report (may change platform). → `bar-designer` → `widget-builder` → `bar-designer`
-4. [ ] **Widget health sweep**: run `timeout 5 go run .`, list every widget that prints ERR/empty after the upgrade (hwmon, vol, freq, batt…), one backlog item each. Done: table in `docs/progress/widgets.md`. → `widget-builder`
-5. [ ] **Dependency survey + safe bumps**: go.mod (toolchain go1.24.5, system Go 1.27), barista.run, direct deps; commit safe bumps, backlog breaking ones. Done: builds, bar runs, versions in `docs/progress/deps.md`. → `dep-updater`
-6. [ ] **Bar design audit** (spec mode): screenshot current bar, list clarity/look issues (grouping, widths jitter, colors, icons), 2-3 options for the top issues. Done: `docs/design/D1-bar-audit-spec.md`. → `bar-designer`
+3. [ ] **D3 i3status-rust spec**: map every barista widget (main.go order) to an i3status-rust block or custom block (ccusage, clipboard), icons via `icons = "material-nf"` + per-widget overrides (GPU must get a specific glyph), colors from our scheme, click/scroll actions; config path `i3status-rust/config.toml` in repo, i3 config snippet for a second trial bar. Options needing user choice → `docs/design/D3-i3status-rust/questions.html`. Done: `docs/design/D3-i3status-rust/spec.md`. → `bar-designer`
+4. [ ] **D3 build trial bar**: write config + custom block scripts per spec, add second bar to i3 config, `i3-msg restart`, both bars run. → `widget-builder`
+5. [ ] **D3 review**: screenshot both bars, check spec, list gaps. → `bar-designer`
+6. [ ] **Switch to i3status-rust** after ~1 week trial (ask when 2026-11-24): remove barista bar, decide repo fate. → `widget-builder`
 7. [ ] **README refresh**: module list stale (missing clipboard, freq, vol, weather, music; ccusage described as CPU usage); Go version prereq. Done: README matches `main.go`. → `chore`
 
 ### Background checks
@@ -53,9 +53,12 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 | Code review + docs | `code-reviewer` | review diffs since last run; README module list and CLAUDE.md match the code | never |
 
 
+## Decisions made
+
+- 2026-11-17: trial i3status-rust as second bar, then switch (A1 report). Barista-only items (health sweep, dep survey, design audit, dead import path) parked in backlog.
+
 ## Open decisions (ask the user)
 
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
-- Migrate to i3status-rust (staged trial, ~4-5 h) or keep barista + fixes (~2 h)? See `docs/design/A1-alternatives/report.html`. Blocks #3 icons. asked 2026-11-17
 - Keep or remove unused `weather`/`music` packages — ask when the README refresh runs.
