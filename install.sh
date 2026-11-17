@@ -114,4 +114,4 @@ if cmp -s "$cfg" "$tmp/new"; then say "i3 config already up to date"; else
   fi
 fi
 if [ $restart = 1 ] && command -v i3-msg >/dev/null && i3-msg -t get_version >/dev/null 2>&1; then i3-msg restart >/dev/null && say "i3 restarted"; fi
-say done
+say "done"
