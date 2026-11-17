@@ -18,6 +18,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
+- README refresh → `chore` (sonnet), started 2026-11-17
 
 ### Queued next (one agent each, in order)
 
@@ -55,6 +56,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 ## Decisions made
 
+- 2026-11-17: delete unused `weather/`, `music/`; README covers both bars during trial.
 - 2026-11-17 D3 picks: GPU md-expansion_card U+F08AE; keep freq histogram but with a better icon (cpu block's default icon or better); leave music/weather out; all numbers fixed width (no jumps 1↔2 digits). Packages installed.
 - 2026-11-17: trial i3status-rust as second bar, then switch (A1 report). Barista-only items (health sweep, dep survey, design audit, dead import path) parked in backlog.
 
@@ -62,4 +64,3 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
-- Keep or remove unused `weather`/`music` packages — ask when the README refresh runs.

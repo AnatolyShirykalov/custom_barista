@@ -26,3 +26,4 @@ Work items are checkboxes (`1. [ ]`): what, where, done condition, `→ agent-na
 - [ ] **Dependency survey + safe bumps**: go.mod (toolchain go1.24.5, system Go 1.27), barista.run, direct deps; commit safe bumps, backlog breaking ones. Done: builds, bar runs, versions in `docs/progress/deps.md`. → `dep-updater` (parked: i3status-rust migration)
 - [ ] **Bar design audit** (spec mode): screenshot current bar, list clarity/look issues (grouping, widths jitter, colors, icons), 2-3 options for the top issues. Done: `docs/design/D1-bar-audit-spec.md`. → `bar-designer` (parked: i3status-rust migration)
 - [ ] **Barista diskio + click paths**: diskio looks for `cryptroot` (kernel dev is `dm-0`), click scripts point to `/home/anatolii/...`. Only if barista stays past trial. (from D3 spec) → `widget-builder`
+- [ ] **Generate 2 MB clip fixture**: `i3status-rust/scripts/testdata/data_2m` tracked; generate in `test.sh` instead (from git hygiene 2026-11-17). → `chore`
