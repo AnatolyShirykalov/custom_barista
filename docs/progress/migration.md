@@ -31,3 +31,9 @@ Verdict: **accept with fixes** (one small builder item, 5c). Screenshot of both 
 | nvidia_gpu → gpu.sh | **Accepted.** nvidia-smi 620.70 prints `34.59`; upstream block parses temperature as u32 (docs.rs nvidia_gpu.rs), so the field fails. Upstream issue → backlog. |
 | Mod3 | `xmodmap -pm`: mod3 = ISO_Level5_Shift on keycode 203 only, a virtual key with no physical key. Hold-to-show is dead for **both** bars (pre-existing). Bars are reachable via `$mod+i` (`bar mode toggle`, toggles both); item 5b replaces this. |
 | Minor | Layout shows `us`/`ru` lowercase (barista `US`); 1st frame of sound block shows `0.0%` at startup only. Not fixed (backlog). |
+
+## 5b Win+i bar cycle (widget-builder, 2026-11-17)
+
+- `~/.i3/config` (backup `config.bak-5b`): barista bar got `id bar-barista`, `mode dock`; bar-rs `mode invisible`; `modifier Mod3` removed from both (dead key); `$mod+i` runs `i3status-rust/scripts/barcycle.sh`.
+- Script cycles off -> barista -> rs -> off; derives the current state from real bar modes (`get_bar_config`), so a restart/reload (which resets to config default = barista dock) never leaves a stale state file; `${XDG_RUNTIME_DIR:-/tmp}/barcycle.state` records the next state.
+- Verified after `i3-msg reload`: 4 calls gave rs, off, barista, rs, all modes matching; left in barista.
