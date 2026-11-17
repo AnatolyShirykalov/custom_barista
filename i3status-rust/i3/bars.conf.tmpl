@@ -1,32 +1,26 @@
-# Filled in by scripts/barsconf.sh (tokens below in at-signs): binary, generated i3status-rs configs dir,
-# per-state bar mode and tray output. The visible bar(s) dock and hold the tray (one bar per output can).
+# Filled in by scripts/barsconf.sh (tokens below in at-signs): per-state bar mode, status command and font.
+# Two bars that never change owner: Win+i swaps their status_command (i3bar restarts it on reload).
+# The tray stays on bar-main in every state: moving it between two i3bar processes loses icons (the old
+# i3bar keeps its event mask on icon windows that apps reuse; Qt apps can miss the handoff).
 bar {
-  id bar-barista
-  hidden_state hide
-  mode @BARISTA_MODE@
-  status_command @BIN@
-  tray_output @BARISTA_TRAY@
-}
-
-bar {
-  id bar-rs
+  id bar-main
   output DP-0
   position bottom
   hidden_state hide
-  mode @RS_MODE@
-  font pango:PragmataPro Mono, Symbols Nerd Font Mono 18
-  status_command i3status-rs @CONFDIR@/config.toml
-  tray_output @RS_TRAY@
+  mode @MODE@
+  @FONT@
+  status_command @MAIN_CMD@
+  tray_output DP-0
 }
 
-# DP-2 (2560): compact.toml is generated from config.toml (no disk, ccusage, IP)
+# DP-2 (2560): in the rs state compact.toml, generated from config.toml (no disk, ccusage, IP)
 bar {
-  id bar-rs-small
+  id bar-small
   output DP-2
   position bottom
   hidden_state hide
-  mode @RS_MODE@
-  font pango:PragmataPro Mono, Symbols Nerd Font Mono 18
-  status_command i3status-rs @CONFDIR@/compact.toml
+  mode @MODE@
+  @FONT@
+  status_command @SMALL_CMD@
   tray_output none
 }
