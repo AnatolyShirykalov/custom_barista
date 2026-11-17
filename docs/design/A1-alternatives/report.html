@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A1 - Status bar alternatives to custom_barista</title>
+<style>
+:root{--bg:#fbfbf9;--fg:#1d1d1f;--muted:#666;--card:#fff;--line:#ddd;--acc:#2a6fdb;--good:#1f8a3b;--mid:#a07000;--bad:#b3261e;--code:#f1f1ee}
+@media (prefers-color-scheme:dark){:root{--bg:#16171a;--fg:#e6e6e6;--muted:#9a9a9a;--card:#1f2024;--line:#33353b;--acc:#7aa7ff;--good:#6d6;--mid:#dd6;--bad:#f77;--code:#26282d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:1.2rem}
+h1{font-size:1.6rem;margin:.2rem 0}h2{font-size:1.25rem;margin-top:2.2rem;border-bottom:1px solid var(--line);padding-bottom:.3rem}h3{font-size:1.05rem;margin:.2rem 0 .4rem}
+.meta{color:var(--muted);font-size:.9rem}
+.box{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.9rem 1.1rem;margin:.8rem 0}
+.rec{border-left:5px solid var(--acc)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.88rem;background:var(--card)}
+th,td{border:1px solid var(--line);padding:.35rem .5rem;text-align:left;vertical-align:top}
+th{background:var(--code);position:sticky;top:0}
+td.n{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
+.s5,.B{color:var(--good);font-weight:600}.s4{color:var(--good)}.s3,.S{color:var(--mid)}.s2,.s1,.X{color:var(--bad)}.P{color:var(--mid);font-style:italic}
+code,pre{background:var(--code);border-radius:4px;font:13px/1.45 ui-monospace,"JetBrains Mono",Menlo,monospace}
+code{padding:0 .25rem}pre{padding:.7rem;overflow-x:auto}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:.8rem}
+.cards .box{margin:0}
+ul{padding-left:1.2rem}li{margin:.15rem 0}
+.pro::before{content:"+ ";color:var(--good);font-weight:700}.con::before{content:"- ";color:var(--bad);font-weight:700}
+.pro,.con{list-style:none;margin-left:-1.1rem}
+a{color:var(--acc)}
+.tag{display:inline-block;font-size:.75rem;border:1px solid var(--line);border-radius:10px;padding:0 .45rem;margin-left:.3rem;color:var(--muted)}
+</style>
+</head>
+<body><main>
+<h1>Status bar alternatives to custom_barista</h1>
+<p class="meta">A1 report, 2026-11-17. Machine: Arch, i3-wm 4.25.1 on X11, sway 1.12 installed, PipeWire 1.6 (pulse shim), RTX 5070 Ti, AMD CPU (k10temp). Repo state: <code>8fc269c</code>. Upstream numbers were collected from the GitHub/Codeberg/Arch APIs on 2026-11-17.</p>
+
+<h2 id="summary">1. Executive summary</h2>
+<div class="box rec">
+<p><b>Recommendation: migrate to i3status-rust, in stages.</b> Run it next to the current bar for a week, then switch. This repo stays as a fallback and holds the two scripts we still need (ccusage, clipboard). It takes about half a day.</p>
+<p>Why:</p>
+<ol>
+<li><b>barista is dead upstream.</b> <a href="https://github.com/soumya92/barista">soumya92/barista</a> has been archived since 2024-06-25. Its last commit was "Rehome project to github, remove references to barista.run, cleanup for archiving". The vanity domain has expired: <code>https://barista.run/?go-get=1</code> now redirects (301) to expireddomains.com. We still build only because proxy.golang.org caches our pinned <code>barista.run v0.0.0-20240418001405-c936f35316af</code>. The final upstream commit declares a new module path, <code>github.com/soumya92/barista</code>. The only fork with recent commits, <a href="https://github.com/barista-run/barista">barista-run/barista</a>, has 0 stars and 3 commits (2026-06-23).</li>
+<li><b>The breakages are in code we own.</b> The GPU bug (int to float) and the hwmon bug were in our own parsing (<code>nvidia/nvidia.go</code>, <code>temp/hwmon.go</code>). i3status-rust ships these as built-in blocks (<code>nvidia_gpu</code>, <code>temperature</code> via libsensors, <code>cpu</code> frequency, <code>sound</code> with a PipeWire driver). After an upgrade, many users report and fix such breakages upstream. It is active: v0.40.1 on 2026-11-08, about 3.2k stars, already in Arch <code>extra</code>.</li>
+<li><b>Icons (high weight).</b> i3status-rust has per-block icon sets built in (<code>icons = "material-nf"</code>, or <code>awesome4..7</code>, <code>emoji</code>). Every block gets a fitting glyph without hand-picking, and you can override any of them by name.</li>
+<li><b>It works on sway too.</b> The same config feeds swaybar, so a later move to sway or Wayland costs nothing extra.</li>
+</ol>
+<p><b>Icon root cause found in our code, worth fixing either way.</b> The GPU widget does ask for icons: <code>pango.Icon("mdi-thermometer")</code> and <code>"mdi-memory"</code> in nvidia/nvidia.go:67,69. But <code>main.go</code> never loads the <code>mdi</code> provider, and barista quietly returns an empty node for an unknown provider (barista <code>pango/icon.go:34-48</code>). The same happens in <code>vol/vol.go:18,30</code>, which uses <code>ion-*</code> although no ionicons provider exists. <code>typicons</code> is loaded but no widget uses it. If we keep barista, loading <code>mdi</code> fixes the "no GPU icon" problem in minutes and gives 7,447 icons instead of Material's 932.</p>
+<p><b>When to stay on barista instead:</b> if you value the per-core frequency histogram (<code>freq/</code>) and full Go control over the bar more than having upstream maintain the widgets. In that case do the "keep" plan in section 8, about 2 hours.</p>
+</div>
+
+<h2 id="ours">2. What we have today (from main.go)</h2>
+<div class="scroll"><table>
+<tr><th>#</th><th>Package</th><th>What it shows / source</th><th>Interactions</th></tr>
+<tr><td>1</td><td>kbdlayout</td><td>XKB layout via xgb (322 LOC, vendored)</td><td>left click: next layout</td></tr>
+<tr><td>2</td><td>load</td><td>loadavg (barista sysinfo)</td><td></td></tr>
+<tr><td>3</td><td>temp</td><td>CPU temp, k10temp found by hwmon name, every 2 s</td><td></td></tr>
+<tr><td>4</td><td>freq</td><td>per-core <code>scaling_cur_freq</code> histogram, every 2 s</td><td></td></tr>
+<tr><td>5</td><td>mem</td><td>memory (barista meminfo)</td><td></td></tr>
+<tr><td>6</td><td>dsk</td><td>diskspace + diskio, external command for <code>/</code></td><td></td></tr>
+<tr><td>7</td><td>nvidia</td><td><code>nvidia-smi</code> temp + VRAM every 2 s</td><td></td></tr>
+<tr><td>8</td><td>netm</td><td>netspeed + wlan (hidden when wifi is off)</td><td></td></tr>
+<tr><td>9</td><td>batt</td><td>battery</td><td></td></tr>
+<tr><td>10</td><td>vol</td><td>PulseAudio volume / mute</td><td>click: pavucontrol</td></tr>
+<tr><td>11</td><td>ccusage</td><td><code>npx ccusage@latest blocks --active --json</code> every 5 s</td><td></td></tr>
+<tr><td>12</td><td>clipboard</td><td>clipboard size via <code>xclip -o</code> every 2 s</td><td>left click: <code>~/scripts/clipboard_menu.sh</code></td></tr>
+<tr><td>13</td><td>ltime</td><td>clock</td><td></td></tr>
+</table></div>
+<p class="meta">Not wired: <code>weather/</code>, <code>music/</code> (an open decision). Running binary: RSS 25.9 MB, 12.6 MB on disk. Git history shows bursts of fixes after upgrades (2025-04-06 "fix for new proc", 2025-07-20 "full upgrade", 2026-09-06 "hwmon fix", 2026-11-17 GPU fix).</p>
+
+<h2 id="matrix">3. Score matrix</h2>
+<p class="meta">Scores run 1 (bad) to 5 (good). For "Migration" and "Maint." a higher score means less effort. "X11/i3" means it runs on the current setup today.</p>
+<div class="scroll"><table>
+<tr><th>Option</th><th>Coverage</th><th>Migration</th><th>Maint.</th><th>Upstream</th><th>Resources</th><th>Icons</th><th>Clicks/scroll</th><th>Extensible</th><th>X11/i3</th><th>Total /45</th></tr>
+<tr><td>Keep barista (as is)</td><td class="n s5">5</td><td class="n s5">5</td><td class="n s2">2</td><td class="n s1">1</td><td class="n s4">4</td><td class="n s2">2</td><td class="n s5">5</td><td class="n s5">5</td><td class="n s5">5</td><td class="n">34</td></tr>
+<tr><td>Keep barista, hardened (sec. 8)</td><td class="n s5">5</td><td class="n s4">4</td><td class="n s3">3</td><td class="n s2">2</td><td class="n s4">4</td><td class="n s4">4</td><td class="n s5">5</td><td class="n s5">5</td><td class="n s5">5</td><td class="n">37</td></tr>
+<tr><td><b>i3status-rust</b></td><td class="n s5">5</td><td class="n s4">4</td><td class="n s5">5</td><td class="n s5">5</td><td class="n s5">5</td><td class="n s5">5</td><td class="n s4">4</td><td class="n s4">4</td><td class="n s5">5</td><td class="n"><b>42</b></td></tr>
+<tr><td>py3status</td><td class="n s4">4</td><td class="n s3">3</td><td class="n s4">4</td><td class="n s4">4</td><td class="n s3">3</td><td class="n s2">2</td><td class="n s4">4</td><td class="n s5">5</td><td class="n s5">5</td><td class="n">34</td></tr>
+<tr><td>bumblebee-status</td><td class="n s4">4</td><td class="n s3">3</td><td class="n s3">3</td><td class="n s3">3</td><td class="n s3">3</td><td class="n s4">4</td><td class="n s4">4</td><td class="n s4">4</td><td class="n s5">5</td><td class="n">33</td></tr>
+<tr><td>i3blocks + scripts</td><td class="n s3">3</td><td class="n s2">2</td><td class="n s2">2</td><td class="n s2">2</td><td class="n s3">3</td><td class="n s2">2</td><td class="n s4">4</td><td class="n s5">5</td><td class="n s5">5</td><td class="n">28</td></tr>
+<tr><td>i3status</td><td class="n s2">2</td><td class="n s3">3</td><td class="n s4">4</td><td class="n s2">2</td><td class="n s5">5</td><td class="n s1">1</td><td class="n s1">1</td><td class="n s1">1</td><td class="n s5">5</td><td class="n">24</td></tr>
+<tr><td>polybar</td><td class="n s4">4</td><td class="n s2">2</td><td class="n s3">3</td><td class="n s3">3</td><td class="n s4">4</td><td class="n s3">3</td><td class="n s5">5</td><td class="n s4">4</td><td class="n s5">5</td><td class="n">33</td></tr>
+<tr><td>yambar</td><td class="n s2">2</td><td class="n s2">2</td><td class="n s3">3</td><td class="n s2">2</td><td class="n s5">5</td><td class="n s3">3</td><td class="n s4">4</td><td class="n s3">3</td><td class="n s4">4</td><td class="n">28</td></tr>
+<tr><td>sway + waybar</td><td class="n s4">4</td><td class="n s1">1</td><td class="n s4">4</td><td class="n s5">5</td><td class="n s3">3</td><td class="n s4">4</td><td class="n s5">5</td><td class="n s4">4</td><td class="n s1">1</td><td class="n">31</td></tr>
+<tr><td>eww (X11+Wayland)</td><td class="n s3">3</td><td class="n s1">1</td><td class="n s2">2</td><td class="n s3">3</td><td class="n s2">2</td><td class="n s4">4</td><td class="n s5">5</td><td class="n s5">5</td><td class="n s4">4</td><td class="n">29</td></tr>
+<tr><td>ags/astal, ironbar (Wayland)</td><td class="n s3">3</td><td class="n s1">1</td><td class="n s2">2</td><td class="n s4">4</td><td class="n s2">2</td><td class="n s4">4</td><td class="n s5">5</td><td class="n s5">5</td><td class="n s1">1</td><td class="n">27</td></tr>
+</table></div>
+<p class="meta">The resource scores are estimates from the runtime (native Rust/C/Go versus Python versus GTK/JS). Only our own bar was measured.</p>
+
+<h2 id="upstream">4. Upstream activity (2026-11-17)</h2>
+<div class="scroll"><table>
+<tr><th>Project</th><th>Lang</th><th>Stars</th><th>Last push</th><th>Last release</th><th>Arch</th></tr>
+<tr><td><a href="https://github.com/soumya92/barista">soumya92/barista</a></td><td>Go</td><td>~300</td><td>2024-06-25 <b>archived</b></td><td>none (pseudo-versions)</td><td>-</td></tr>
+<tr><td><a href="https://github.com/greshake/i3status-rust">greshake/i3status-rust</a></td><td>Rust</td><td>~3.2k</td><td>2026-11-17</td><td>v0.40.1, 2026-11-08</td><td>extra 0.40.1</td></tr>
+<tr><td><a href="https://github.com/ultrabug/py3status">ultrabug/py3status</a></td><td>Python</td><td>~0.9k</td><td>2026-11-17</td><td>tag 3.64</td><td>extra 3.64</td></tr>
+<tr><td><a href="https://github.com/tobi-wan-kenobi/bumblebee-status">bumblebee-status</a></td><td>Python</td><td>~1.3k</td><td>2026-10-03</td><td>v2.3.0, 2025-07-06</td><td>AUR</td></tr>
+<tr><td><a href="https://github.com/vivien/i3blocks">vivien/i3blocks</a></td><td>C</td><td>~2.5k</td><td>2023-11-22</td><td>1.5, 2019-08-12</td><td>extra 1.5</td></tr>
+<tr><td><a href="https://github.com/i3/i3status">i3/i3status</a></td><td>C</td><td>~0.65k</td><td>2024-09-09</td><td>tag 2.15</td><td>extra (installed)</td></tr>
+<tr><td><a href="https://github.com/polybar/polybar">polybar/polybar</a></td><td>C++</td><td>~15k</td><td>2025-09-24</td><td>3.7.2, 2024-08-17</td><td>extra 3.7.2</td></tr>
+<tr><td><a href="https://codeberg.org/dnkl/yambar">dnkl/yambar</a></td><td>C</td><td>~0.3k (Codeberg)</td><td>2025-05-05</td><td>1.11.0, 2024-04-17</td><td>AUR</td></tr>
+<tr><td><a href="https://github.com/Alexays/Waybar">Alexays/Waybar</a></td><td>C++</td><td>~12k</td><td>2026-11-15</td><td>0.16.0, 2026-11-05</td><td>extra 0.16.0</td></tr>
+<tr><td><a href="https://github.com/elkowar/eww">elkowar/eww</a></td><td>Rust</td><td>~13k</td><td>2026-07-17</td><td>v0.6.0, 2024-04-21</td><td>AUR</td></tr>
+<tr><td><a href="https://github.com/Aylur/ags">Aylur/ags</a></td><td>TS/GJS</td><td>~3.1k</td><td>2026-11-04</td><td>v3.1.2, 2026-04-08</td><td>AUR</td></tr>
+<tr><td><a href="https://github.com/JakeStanger/ironbar">JakeStanger/ironbar</a></td><td>Rust</td><td>~1.5k</td><td>2026-11-16</td><td>v0.19.1, 2026-09-20</td><td>AUR</td></tr>
+</table></div>
+<p class="meta">Sources: api.github.com/repos/&lt;repo&gt; and /releases/latest, the Codeberg API, archlinux.org/packages/search/json. A search for active i3bar-protocol tools pushed since 2025-06 found nothing above 30 stars.</p>
+
+<h2 id="coverage">5. Widget coverage matrix</h2>
+<p class="meta"><span class="B">B</span> = built in. <span class="S">S</span> = needs our own script or custom block. <span class="P">P</span> = partial (a different presentation). <span class="X">-</span> = not possible.</p>
+<div class="scroll"><table>
+<tr><th>Widget</th><th>barista (ours)</th><th>i3status-rust</th><th>py3status</th><th>bumblebee</th><th>i3blocks</th><th>i3status</th><th>polybar</th><th>yambar</th><th>waybar</th></tr>
+<tr><td>Keyboard layout + click switch</td><td class="B">B</td><td class="B">B <small>xkbevent; click via cmd</small></td><td class="B">B <small>xkb_input</small></td><td class="B">B <small>layout-xkb</small></td><td class="S">S</td><td class="X">-</td><td class="B">B <small>xkeyboard</small></td><td class="B">B <small>xkb</small></td><td class="B">B <small>sway/language</small></td></tr>
+<tr><td>Load avg</td><td class="B">B</td><td class="B">B</td><td class="B">B</td><td class="B">B</td><td class="S">S</td><td class="B">B</td><td class="S">S</td><td class="S">S</td><td class="B">B</td></tr>
+<tr><td>CPU temp (k10temp)</td><td class="S">S (own)</td><td class="B">B <small>libsensors chip</small></td><td class="B">B <small>sysdata</small></td><td class="B">B <small>sensors2</small></td><td class="S">S</td><td class="B">B <small>path</small></td><td class="B">B <small>hwmon-path</small></td><td class="S">S</td><td class="B">B <small>hwmon-path-abs</small></td></tr>
+<tr><td>CPU freq per-core histogram</td><td class="S">S (own)</td><td class="P">P <small>$frequency / $frequency&lt;N&gt;</small></td><td class="P">P</td><td class="P">P</td><td class="S">S</td><td class="X">-</td><td class="S">S</td><td class="S">S</td><td class="P">P <small>{avg_frequency}</small></td></tr>
+<tr><td>Memory</td><td class="B">B</td><td class="B">B</td><td class="B">B</td><td class="B">B</td><td class="S">S</td><td class="B">B</td><td class="B">B</td><td class="B">B</td><td class="B">B</td></tr>
+<tr><td>Disk space + IO</td><td class="B">B</td><td class="B">B <small>disk_space, disk_iostats</small></td><td class="B">B</td><td class="B">B</td><td class="S">S</td><td class="P">P</td><td class="P">P <small>fs only</small></td><td class="P">P</td><td class="B">B</td></tr>
+<tr><td>NVIDIA temp + VRAM</td><td class="S">S (own)</td><td class="B">B <small>nvidia_gpu</small></td><td class="B">B <small>nvidia_smi</small></td><td class="B">B <small>nvidiagpu</small></td><td class="S">S</td><td class="X">-</td><td class="S">S</td><td class="S">S</td><td class="S">S <small>wiki recipe</small></td></tr>
+<tr><td>Net speed + wifi (hide if off)</td><td class="B">B</td><td class="B">B <small>net</small></td><td class="B">B <small>net_rate</small></td><td class="B">B <small>traffic/nic</small></td><td class="S">S</td><td class="P">P <small>no speed</small></td><td class="B">B</td><td class="P">P</td><td class="B">B</td></tr>
+<tr><td>Battery</td><td class="B">B</td><td class="B">B</td><td class="B">B</td><td class="B">B</td><td class="S">S</td><td class="B">B</td><td class="B">B</td><td class="B">B</td><td class="B">B</td></tr>
+<tr><td>Volume (PipeWire/Pulse), click app</td><td class="B">B <small>pulse</small></td><td class="B">B <small>pipewire/pulse/alsa, scroll</small></td><td class="B">B</td><td class="B">B</td><td class="S">S</td><td class="P">P <small>no clicks</small></td><td class="B">B</td><td class="B">B</td><td class="B">B <small>wireplumber</small></td></tr>
+<tr><td>ccusage</td><td class="S">S (own)</td><td class="S">S <small>custom json</small></td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="X">-</td><td class="S">S</td><td class="S">S</td><td class="S">S</td></tr>
+<tr><td>Clipboard size + menu click</td><td class="S">S (own)</td><td class="S">S <small>custom + click</small></td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="X">-</td><td class="S">S</td><td class="S">S</td><td class="S">S</td></tr>
+<tr><td>Clock</td><td class="B">B</td><td class="B">B</td><td class="B">B</td><td class="B">B</td><td class="S">S</td><td class="B">B</td><td class="B">B</td><td class="B">B</td><td class="B">B</td></tr>
+</table></div>
+<p class="meta">Sources: <a href="https://docs.rs/i3status-rs/latest/i3status_rs/blocks/index.html">i3status-rs block index</a>, and the <a href="https://docs.rs/i3status-rs/latest/i3status_rs/blocks/nvidia_gpu/index.html">nvidia_gpu</a>, <a href="https://docs.rs/i3status-rs/latest/i3status_rs/blocks/temperature/index.html">temperature</a>, <a href="https://docs.rs/i3status-rs/latest/i3status_rs/blocks/cpu/index.html">cpu</a>, <a href="https://docs.rs/i3status-rs/latest/i3status_rs/blocks/sound/index.html">sound</a>, <a href="https://docs.rs/i3status-rs/latest/i3status_rs/blocks/keyboard_layout/index.html">keyboard_layout</a> and <a href="https://docs.rs/i3status-rs/latest/i3status_rs/blocks/custom/index.html">custom</a> pages. Also <a href="https://github.com/ultrabug/py3status/tree/master/py3status/modules">py3status modules dir</a>, <a href="https://bumblebee-status.readthedocs.io/en/main/modules.html">bumblebee modules</a>, <a href="https://github.com/Alexays/Waybar/wiki/Module:-Temperature">waybar temperature</a> and <a href="https://github.com/Alexays/Waybar/wiki/Module:-Custom:-Examples">waybar custom examples</a>. The yambar and polybar cells come from their module docs and are less certain (not re-fetched).</p>
+
+<h2 id="icons">6. Icons (high-weight criterion)</h2>
+<div class="scroll"><table>
+<tr><th>Option</th><th>Icon sets out of the box</th><th>Per-widget icons</th><th>Notes</th></tr>
+<tr><td>barista (ours)</td><td>Providers in our pinned version: <code>material</code> (932 icons, loaded), <code>typicons</code> (loaded, unused), <code>mdi</code> (Material Design Icons, about 7,447 in 7.4.47, <b>not loaded</b>), <code>fontawesome</code></td><td>hand-picked by name, <code>pango.Icon("mdi-chip")</code></td><td>An unknown provider renders nothing, silently. That is why the GPU (mdi-*) and volume (ion-*) icons are blank. The <code>mdi</code> loader parses <code>scss/_variables.scss</code> of <a href="https://github.com/Templarian/MaterialDesign-Webfont">MaterialDesign-Webfont</a>, and the format still matches the current 7.4.47 file. Useful names there: <code>expansion-card</code>, <code>chip</code>, <code>thermometer</code>, <code>memory</code>, <code>fan</code>, <code>clipboard-text</code>, <code>keyboard</code>, <code>harddisk</code>, <code>speedometer</code>.</td></tr>
+<tr><td><b>i3status-rust</b></td><td><code>none</code>, <code>awesome4/5/6/7</code>, <code>awesome7pro</code>, <code>emoji</code>, <code>material</code>, <b><code>material-nf</code></b> (any Nerd Font)</td><td><b>preset per block and state</b> (battery levels, volume levels, net up/down), overridable via <code>[icons.overrides]</code> or per-block <code>icons_overrides</code></td><td><a href="https://github.com/greshake/i3status-rust/blob/master/doc/themes.md">themes.md</a>. 19 built-in color themes, overridable. Needs <code>ttf-nerd-fonts-symbols</code> (extra 3.5.1).</td></tr>
+<tr><td>bumblebee-status</td><td>icon themes <code>awesome-fonts</code>, <code>ionicons</code>, <code>ascii</code>, <code>paxy97</code></td><td>preset per module via theme JSON</td><td><a href="https://github.com/tobi-wan-kenobi/bumblebee-status/tree/main/themes/icons">themes/icons</a></td></tr>
+<tr><td>waybar</td><td>none bundled; any font (Nerd Fonts is the usual choice)</td><td>hand-picked in <code>format-icons</code> (arrays by level, maps by state)</td><td>CSS styling, tooltips</td></tr>
+<tr><td>polybar / yambar</td><td>none bundled; several fonts (<code>font-0..N</code>)</td><td>hand-picked, with ramps per level</td><td></td></tr>
+<tr><td>py3status / i3blocks / i3status</td><td>none</td><td>hand-typed glyphs in format strings</td><td>i3status has no per-module fonts or colors beyond good/degraded/bad</td></tr>
+<tr><td>eww / ags</td><td>any font, plus GTK icon themes and SVG images</td><td>hand-built</td><td>most freedom, most work</td></tr>
+</table></div>
+<p>Nerd Fonts v3 contains MDI as <code>nf-md-*</code> at <code>U+F0001-F1AF0</code> (<a href="https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points">Nerd Fonts code points</a>), the same range the MDI webfont uses. So a single Symbols Nerd Font serves both i3status-rust <code>material-nf</code> and barista's <code>mdi</code> names, if barista's font family is overridden. Checking that on this machine is part of the keep plan.</p>
+
+<h2 id="cards">7. Per-alternative cards</h2>
+<div class="cards">
+<div class="box"><h3>Keep barista <span class="tag">status quo</span></h3><ul>
+<li class="pro">Covers everything, full Go control (freq histogram, compact layout), no migration</li>
+<li class="pro">Low resources (26 MB RSS, one process)</li>
+<li class="con">Upstream archived, the vanity domain expired, and we depend on the Go proxy cache</li>
+<li class="con">We fix every format change ourselves (nvidia-smi, hwmon, /proc)</li>
+<li class="con">Icons are hand-picked; two widgets render blank icons today</li></ul></div>
+<div class="box"><h3>i3status-rust <span class="tag">recommended</span></h3><ul>
+<li class="pro">Built-in blocks for 11 of our 13 widgets, including nvidia_gpu, libsensors temperature, PipeWire sound</li>
+<li class="pro">Preset <code>material-nf</code> icons for every block and state; 19 themes</li>
+<li class="pro">Very active (release 9 days ago), in Arch extra, also works with swaybar</li>
+<li class="pro">Custom block: JSON output, interval, signal, watch_files, clicks</li>
+<li class="con">TOML plus a format DSL instead of code. The per-core freq histogram becomes a script or <code>$frequency</code></li>
+<li class="con">Upstream format changes between minor versions (0.x) can need config edits</li></ul></div>
+<div class="box"><h3>py3status</h3><ul>
+<li class="pro">Large module set (nvidia_smi, sysdata, volume_status, net_rate, xkb_input); Python modules are easy to write</li>
+<li class="pro">Active, in Arch extra</li>
+<li class="con">Python runtime, wraps i3status for some data; no icon sets</li></ul></div>
+<div class="box"><h3>bumblebee-status</h3><ul>
+<li class="pro">Modules for nvidiagpu, sensors2, pipewire, layout-xkb; icon themes</li>
+<li class="con">Python; last release 2025-07; AUR only</li></ul></div>
+<div class="box"><h3>i3blocks + scripts</h3><ul>
+<li class="pro">Simplest model, any language</li>
+<li class="con">Every widget is our script, so the same maintenance burden as now, without barista's helpers. Upstream last released in 2019</li></ul></div>
+<div class="box"><h3>i3status</h3><ul>
+<li class="pro">Tiny, stable C, already installed</li>
+<li class="con">No GPU, freq, layout, clicks or custom modules: a non-starter alone</li></ul></div>
+<div class="box"><h3>polybar</h3><ul>
+<li class="pro">Rich X11 bar, ramps, clicks and scroll, many fonts</li>
+<li class="con">Replaces i3bar entirely (restyle from scratch); last release 2024-08; no Wayland path</li></ul></div>
+<div class="box"><h3>yambar</h3><ul>
+<li class="pro">Very light C, X11 and Wayland</li>
+<li class="con">Few system modules (temp, GPU, freq are scripts); last release 2024-04; AUR</li></ul></div>
+<div class="box"><h3>sway + waybar</h3><ul>
+<li class="pro">Active, CSS theming, temp via <code>hwmon-path-abs</code>, wireplumber, tooltips</li>
+<li class="con">Means changing the compositor (sway 1.12 is installed): NVIDIA and Wayland, i3 config port, X11-only tools (xclip, xgb kbdlayout). A large move for a bar problem</li></ul></div>
+<div class="box"><h3>eww / ags / ironbar</h3><ul>
+<li class="pro">Widget frameworks: popups, graphs, anything</li>
+<li class="con">Most effort and most code to maintain; ags/ironbar are Wayland-only; eww's last release was 2024-04</li></ul></div>
+</div>
+
+<h2 id="migration">8. Migration sketches</h2>
+<h3>A. i3status-rust (recommended), about 4-5 h</h3>
+<ol>
+<li><code>pacman -S i3status-rust ttf-nerd-fonts-symbols</code> (5 min).</li>
+<li>Write <code>~/.config/i3status-rust/config.toml</code> (sketch below, check the keys against the block docs) (1.5 h).</li>
+<li>Scripts: <code>ccusage.sh</code> prints i3status-rs JSON <code>{"text","state","icon"}</code> from <code>ccusage blocks --active --json | jq</code>, at <code>interval = 30</code> with a pinned version (see risk R3). <code>clip.sh</code> prints the clipboard size. Both can live in this repo under <code>scripts/</code> (1 h).</li>
+<li>Side by side: add a second <code>bar { status_command i3status-rs ...; font pango:PragmataPro, Symbols Nerd Font 10 }</code> block to the i3 config for a week. Then remove the barista bar (0.5 h, plus tuning widths and colors, 1 h).</li>
+<li>Rewrite <code>CLAUDE.md</code>/README: the repo becomes "bar config + scripts". The "Widget health" recurring check turns into "i3status-rs config still valid after upgrade".</li>
+</ol>
+<pre>icons_format = "{icon}"
+[theme]
+theme = "plain"
+[theme.overrides]
+good_fg = "#66dd66"
+warning_fg = "#dddd66"
+critical_fg = "#dd6666"
+[icons]
+icons = "material-nf"
+
+[[block]]
+block = "keyboard_layout"
+driver = "xkbevent"
+[[block.click]]
+button = "left"
+cmd = "xkb-switch -n"        # or a tiny setxkbmap toggle script
+
+[[block]]
+block = "load"
+[[block]]
+block = "temperature"
+chip = "k10temp-*"
+format = " $icon $max "
+[[block]]
+block = "cpu"
+format = " $icon $frequency "
+[[block]]
+block = "memory"
+[[block]]
+block = "disk_space"
+path = "/"
+[[block]]
+block = "nvidia_gpu"
+format = " $icon $temperature $memory "
+interval = 2
+[[block]]
+block = "net"
+[[block]]
+block = "battery"
+missing_format = ""
+[[block]]
+block = "sound"
+driver = "pipewire"
+[[block.click]]
+button = "left"
+cmd = "pavucontrol"
+[[block]]
+block = "custom"
+command = "~/projects/custom_barista/scripts/ccusage.sh"
+json = true
+interval = 30
+[[block]]
+block = "custom"
+command = "~/projects/custom_barista/scripts/clip.sh"
+interval = 2
+[[block.click]]
+button = "left"
+cmd = "~/scripts/clipboard_menu.sh"
+[[block]]
+block = "time"</pre>
+
+<h3>B. Keep barista, hardened, about 2 h</h3>
+<ol>
+<li><b>Icons (15 min):</b> clone MaterialDesign-Webfont to <code>~/.fonts/mdi</code>, call <code>mdi.Load(utils.Home(".fonts/mdi"))</code> in <code>main.go</code>, and give GPU and volume real names (<code>mdi-expansion-card</code>, <code>mdi-volume-high</code>). Drop the unused <code>typicons</code>, and later move the remaining <code>material-*</code> names to <code>mdi-*</code> so one font remains. Add a startup check that logs any <code>pango.Icon</code> name that resolves to nothing.</li>
+<li><b>Module path (30 min):</b> rewrite the imports in 20 files from <code>barista.run/...</code> to <code>github.com/soumya92/barista/...</code> at <code>v0.0.0-20240625171803-069b4f375d00</code>, the final commit, which declares that path. A <code>replace</code> line probably fails on the path mismatch. Alternatively, vendor (<code>go mod vendor</code>) so that the build does not depend on a dead domain.</li>
+<li><b>ccusage (20 min):</b> <code>npx ccusage@latest</code> every 5 s means a Node start every 5 s and an unpinned package fetched from npm. Pin the version and poll every 30-60 s.</li>
+<li><b>Clipboard (10 min):</b> reading the whole clipboard with <code>xclip -o</code> every 2 s just to get its size is wasteful. Poll less often, or use <code>xclip -t TARGETS</code> first.</li>
+<li><b>Upgrade resilience (30 min):</b> parser table tests for hwmon and freq, like the new <code>nvidia_test.go</code>, and short error reasons in every widget.</li>
+</ol>
+
+<h2 id="risks">9. Risks</h2>
+<div class="scroll"><table>
+<tr><th>#</th><th>Risk</th><th>Applies to</th><th>Mitigation</th></tr>
+<tr><td>R1</td><td>The <code>barista.run</code> domain expired. If someone re-registers it they can serve a different <code>go-import</code> for new versions (go.sum and sumdb protect the pinned version only). A build with <code>GOPROXY=direct</code> or a cache purge fails today.</td><td>keep</td><td>import rewrite or vendor (plan B2)</td></tr>
+<tr><td>R2</td><td>Go toolchain drift: the repo pins go1.24.5 while the system has 1.27; barista's 2024 deps (golang/protobuf etc.) get no updates</td><td>keep</td><td>dependency survey item (#4)</td></tr>
+<tr><td>R3</td><td><code>npx ccusage@latest</code> runs unpinned npm code every 5 s</td><td>all (the script carries over)</td><td>pin the version, poll less often</td></tr>
+<tr><td>R4</td><td>i3status-rs 0.x config breaks between versions (renamed keys or formats)</td><td>i3status-rust</td><td>read the release notes on <code>pacman -Syu</code>; keep the barista binary as fallback for a while</td></tr>
+<tr><td>R5</td><td>Loss of bespoke displays (per-core freq histogram, exact widths)</td><td>migrate</td><td>custom block with a small script, or accept <code>$frequency</code></td></tr>
+<tr><td>R6</td><td>On laptops <code>nvidia-smi</code> polling wakes the dGPU and can block D3cold (<a href="https://docs.rs/i3status-rs/latest/i3status_rs/blocks/nvidia_gpu/index.html">nvidia_gpu docs</a>, <a href="https://bbs.archlinux.org/viewtopic.php?id=311985">Arch forum</a>)</td><td>all</td><td>longer interval on battery</td></tr>
+</table></div>
+
+<h2 id="next">10. If we keep barista: next steps</h2>
+<ol>
+<li>Icon fix (plan B1). It also covers the user's GPU icon request and is the cheapest visible win.</li>
+<li>Module path or vendor (B2), folded into the queued "Dependency survey" item.</li>
+<li>ccusage and clipboard polling (B3, B4).</li>
+<li>Run the "Widget health sweep" (queued #3) and add parser tests for hwmon and freq (B5).</li>
+<li>Re-check upstream every quarter: if a maintained fork appears (barista-run/barista is the only candidate, 0 stars), consider switching to it.</li>
+</ol>
+</main></body></html>
