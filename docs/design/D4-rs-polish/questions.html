@@ -1,0 +1,104 @@
+<!doctype html>
+<!-- Decision page (roadmap-init template). Local file only: never publish. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D4 rs polish: decisions</title>
+<style>
+:root { --bg:#f6f7f9; --fg:#1b1f24; --muted:#5b6470; --card:#fff; --line:#d9dee5; --accent:#2f6fde; --rec:#1f8a4c; --risk:#b25e09; }
+@media (prefers-color-scheme: dark) { :root { --bg:#14171c; --fg:#e6e9ee; --muted:#9aa3ae; --card:#1d2129; --line:#2e3440; --accent:#6ea0ff; --rec:#4cc47e; --risk:#e0a050; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
+main { max-width:1000px; margin:0 auto; padding:24px 16px 64px; }
+h1 { font-size:1.6rem; margin:0 0 4px; }
+h2 { font-size:1.25rem; margin:0 0 8px; }
+.sub { color:var(--muted); margin:0 0 24px; }
+section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin:0 0 20px; }
+img { max-width:100%; height:auto; border-radius:8px; border:1px solid var(--line); display:block; }
+figure { margin:12px 0; }
+figcaption { color:var(--muted); font-size:.9rem; margin-top:4px; }
+.opts { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; }
+.opt { border:1px solid var(--line); border-radius:10px; padding:12px; }
+.opt h3 { margin:0 0 6px; font-size:1rem; }
+.rec { color:var(--rec); font-weight:600; font-size:.85rem; }
+.meta { color:var(--muted); font-size:.85rem; }
+.risk { color:var(--risk); font-size:.85rem; }
+.against { color:var(--muted); font-size:.9rem; margin:6px 0 0; }
+ul { margin:6px 0; padding-left:20px; }
+code { font-size:.9em; }
+label.pick { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); }
+label.pick input { margin-top:5px; transform:scale(1.3); }
+#out { width:100%; min-height:60px; font:14px monospace; }
+</style>
+</head>
+<body>
+<main>
+<h1>D4: rs bar polish</h1>
+<p class="sub">Look pass (2026-11-17): "mixed GiB/GB/MiB units" and "disk io numbers unlabeled". Two choices are yours: the unit family and the disk read/write markers. Dim icons and moving the pads after the values are already picked (spec.md). Answer in the chat with the line at the bottom.</p>
+
+<section>
+<h2>Today</h2>
+<figure><img src="img/today_R.png" alt="rs bar right part today"><figcaption>Disk <code>616GB</code>, IO <code>0.00kB 796kB</code> without markers, GPU <code>1099MiB</code>; only the time icons are dim.</figcaption></figure>
+<figure><img src="img/today_L.png" alt="rs bar left part today"><figcaption>Memory <code>70GiB</code>; the freq counts sit 5 spaces away from their icon.</figcaption></figure>
+</section>
+
+<section>
+<h2>Question 1: one unit family for memory, disk, disk IO, net speed and GPU memory</h2>
+<div class="opts">
+  <div class="opt">
+    <h3>A. Decimal: GB / MB / kB <span class="rec">recommended</span></h3>
+    <figure><img src="img/units_dec.png" alt="decimal units mock"><figcaption>Memory 75GB, disk 616GB, IO kB, GPU 1.2GB.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">memory reads 75GB where free -h says 70Gi</span></span>
+  </div>
+  <div class="opt">
+    <h3>B. Binary: GiB / MiB / KiB</h3>
+    <figure><img src="img/units_bin.png" alt="binary units mock"><figcaption>Memory 70GiB, disk 574GiB, IO KiB, GPU 1.1GiB.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">IO/net width jitters by 1 char at 1000-1023 KiB</span></span>
+    <p class="against">Why the designer is against B: the bar switches binary prefixes at 1024, so values 1000-1023 print 4 digits and the block grows by a char (breaks "fixed width"); every unit is also 1 char longer.</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Question 2: disk read/write markers</h2>
+<div class="opts">
+  <div class="opt">
+    <h3>A. Dim letters R / W <span class="rec">recommended</span></h3>
+    <figure><img src="img/io_letters.png" alt="R and W letters mock"><figcaption>Dim like the icons, cannot be confused with the net arrows.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">no font risk</span></span>
+  </div>
+  <div class="opt">
+    <h3>B. Glyphs: eye (read) / pencil (write)</h3>
+    <figure><img src="img/io_glyphs.png" alt="eye and pencil glyphs mock"><figcaption>Nerd Font glyphs, render checked.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">meaning less obvious</span></span>
+    <p class="against">Why the designer is against B: three pictograms in one small block; the eye reads as "visible" rather than "read". Net-style arrows were also rejected: same arrows as the net block.</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Picks</h2>
+<label class="pick"><input type="radio" name="q1" value="Q1-A" checked><span><b>Q1-A decimal GB/MB/kB</b> <span class="rec">recommended</span><br>fixed 3-digit width everywhere</span></label>
+<label class="pick"><input type="radio" name="q1" value="Q1-B"><span><b>Q1-B binary GiB/MiB/KiB</b><br>matches free -h and nvidia-smi</span></label>
+<label class="pick"><input type="radio" name="q2" value="Q2-A" checked><span><b>Q2-A letters R/W</b> <span class="rec">recommended</span><br>dim letters before each number</span></label>
+<label class="pick"><input type="radio" name="q2" value="Q2-B"><span><b>Q2-B glyphs eye/pencil</b><br>pictograms before each number</span></label>
+</section>
+
+<section>
+<h2>What doesn't change</h2>
+<ul><li>Widget order, the colors of values (good/degraded/bad), freq color palette.</li><li>Block widths stay fixed; the DP-2 compact bar still drops disk, IO, ccusage and the IP.</li></ul>
+</section>
+
+<section>
+<h2>Your answer</h2>
+<p class="meta">Copy this line into the chat (read-only; nothing is saved from this page).</p>
+<textarea id="out" readonly></textarea>
+</section>
+</main>
+<script>
+function upd(){const p=[...document.querySelectorAll('input[type=radio]:checked')];document.getElementById('out').value='D4 picks: '+p.map(c=>c.value).join(', ');}
+document.querySelectorAll('input[type=radio]').forEach(c=>c.addEventListener('change',upd));upd();
+</script>
+</body>
+</html>

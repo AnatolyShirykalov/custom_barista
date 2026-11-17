@@ -22,7 +22,7 @@ _(no agent running)_ Done recently (2026-11-17): tray icons after Win+i (one tra
 
 ### Queued next (one agent each, in order)
 
-1. [ ] **D4 rs polish** (look pass 2026-11-17; backlog "Design (i3status-rust trial bars)" 4 items: icon color, icon-value gap, disk IO labels, units): designer spec `docs/design/D4-rs-polish/spec.md` → builder → designer review. → `bar-designer` / `widget-builder`
+1. [ ] **D4 rs polish** (look pass 2026-11-17; backlog "Design (i3status-rust trial bars)" 4 items: icon color, icon-value gap, disk IO labels, units): designer spec `docs/design/D4-rs-polish/spec.md` (spec done; 2 user picks pending: units, IO markers) → builder → designer review. → `bar-designer` / `widget-builder`
 1. [x] **Tray icons lost after Win+i** (done: tray moved between two i3bar processes -> icon hidden under another; now two fixed bars `bar-main`/`bar-small`, tray always on `bar-main`, Win+i swaps `status_command`; barcycle lock + settle; see `docs/progress/migration.md`). Telegram needed one restart; trigger of its stuck state unproven.
 0. [x] **Apply script for another user** (user 2026-11-17): `install.sh` (--dry-run, idempotent; generates configs into `~/.config/custom_barista/`, i3 bars between markers from `i3status-rust/i3/bars.conf.tmpl`); see `docs/progress/install.md`. `~/scripts/{clipboard_menu,open_calender}.sh` are outside the repo (warned).
 1. [x] **Click paths via home dir** (user 2026-11-17): `clipboard/clipboard.go:64`, `ltime/ltime.go:21` point to `/home/anatolii/scripts/…`; build with `os.UserHomeDir()`; `go install .` + `i3-msg restart`. → `widget-builder`
@@ -70,3 +70,4 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
 - Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user action, from own GitHub account). asked 2026-11-17
+- D4 units (decimal vs binary) and disk IO markers (R/W vs glyphs): `docs/design/D4-rs-polish/questions.html`; defaults = recommended. asked 2026-11-17

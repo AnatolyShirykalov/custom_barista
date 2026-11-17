@@ -82,3 +82,7 @@ Verdict: **accept with fixes** (one small builder item, 5c). Screenshot of both 
 - barcycle.sh: `flock` on `bars.conf.lock` + 0.4 s settle (`BARCYCLE_SETTLE`). The settle is needed: raw reloads a few ms apart with a command switch freeze i3bar 4.25 (`killpg` before the new child's `setpgid`, then `waitpid` forever; seen in the stress test, recovered with SIGTERM to the status child).
 - Verified: test.sh 36 pass (generator rows rewritten, new row: 3 concurrent presses, fails on the old script); `i3 -C` ok; `install.sh --dry-run` no diffs; 12 rounds of 1-5 overlapping presses: all 4 icons docked at distinct positions, right status processes, no blocked i3bar; full cycle barista -> rs -> off -> barista -> rs with 4 icons in each visible state (screenshots in scratch). Ended in rs. Backups: `~/.i3/config.bak-2026-11-17-tray`, `~/.i3/bars.conf.bak-2026-11-17-tray` (old three-bar layout).
 
+
+## D4 rs polish spec (bar-designer, 2026-11-17)
+
+Spec `docs/design/D4-rs-polish/spec.md`: global dim `icons_format`, pads after values (freq/ccusage/clip), disk IO R/W markers, one unit family with eng `w:3`. User picks in `questions.html` (Q1 units, default decimal: binary prefix switch at 1024 makes 1000-1023 print 4 digits; Q2 markers, default letters). Mock glyphs render (md-eye_outline, md-pencil). Next: widget-builder.
