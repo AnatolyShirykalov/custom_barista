@@ -2,36 +2,36 @@
 
 A custom status bar implementation for i3 window manager based on [barista](https://github.com/soumya92/barista), featuring system monitoring modules with modern styling.
 
-## Features
-
-- **System Monitoring**: CPU load, memory usage, temperature, and disk space
-- **Network Monitoring**: Network interface monitoring with traffic stats
-- **Battery Status**: Battery level and charging status
-- **Keyboard Layout**: Real-time keyboard layout indicator
-- **NVIDIA GPU**: GPU temperature and usage monitoring
-- **Clock**: Custom time display with calendar integration
-- **Custom Icons**: Material Design and Typicons support
+> Note: upstream barista.run is archived (see [docs/design/A1-alternatives/report.html](docs/design/A1-alternatives/report.html)). This repo also carries a trial i3status-rust bar, see below.
 
 ## Modules
 
-- `batt` - Battery status and charging indicator
-- `ccusage` - CPU usage monitoring
-- `dsk` - Disk space monitoring
-- `kbdlayout` - Keyboard layout switching detection
-- `load` - System load average
-- `ltime` - Time and date display
-- `mem` - Memory usage monitoring
-- `netm` - Network interface monitoring
-- `nvidia` - NVIDIA GPU monitoring
-- `temp` - Temperature sensors monitoring
+In the order wired in `main.go`:
+
+- `kbdlayout` - keyboard layout indicator
+- `load` - system load average
+- `temp` - CPU/hwmon temperature sensors
+- `freq` - CPU frequency
+- `mem` - memory usage
+- `dsk` - disk space
+- `nvidia` - NVIDIA GPU temperature and VRAM (via `nvidia-smi`)
+- `netm` - network interfaces with traffic stats
+- `batt` - battery level and charging state
+- `vol` - audio volume
+- `ccusage` - Claude Code usage (tokens, remaining time)
+- `clipboard` - clipboard contents
+- `ltime` - time and date (always last)
+
+Icons come from the Material Design and Typicons fonts.
 
 ## Installation
 
 ### Prerequisites
 
-- Go 1.18 or later
+- Go 1.23 or later (see `go.mod`)
 - i3 window manager
 - X11 environment
+- Material Design and Typicons fonts (`fonts/`, see Font Setup); `nvidia-smi` for the GPU module
 
 ### Install
 
@@ -74,6 +74,34 @@ The bar uses a custom color scheme:
 - `degraded`: #dd6 (yellow) - Warning status  
 - `bad`: #d66 (red) - Critical status
 - `dim-icon`: #777 (gray) - Inactive icons
+
+## Trial bar: i3status-rust
+
+A second bar, for comparison during a trial week. Config and scripts live in `i3status-rust/`.
+
+Install: `sudo pacman -S i3status-rust ttf-nerd-fonts-symbols-mono`
+
+- `i3status-rust/config.toml` - block config (icons `material-nf`, colors from the scheme above)
+- `i3status-rust/scripts/` - custom blocks: `freq.sh`, `ccusage.sh`, `clip.sh`, `gpu.sh`; `barcycle.sh` switches bars
+- `i3status-rust/scripts/test.sh` - script tests (fixtures in `testdata/`)
+
+i3 config snippet (ids are needed by `barcycle.sh`):
+
+```
+bar {
+    id bar-barista
+    mode dock
+    status_command exec $GOPATH/bin/custom_barista
+}
+bar {
+    id bar-rs
+    mode invisible
+    status_command i3status-rs ~/projects/custom_barista/i3status-rust/config.toml
+}
+bindsym $mod+i exec ~/projects/custom_barista/i3status-rust/scripts/barcycle.sh
+```
+
+Win+i cycles: off -> barista -> i3status-rust -> off (a restart resets to barista).
 
 ## Building from Source
 
