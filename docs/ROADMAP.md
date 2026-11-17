@@ -57,4 +57,5 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
+- Migrate to i3status-rust (staged trial, ~4-5 h) or keep barista + fixes (~2 h)? See `docs/design/A1-alternatives/report.html`. Blocks #3 icons. asked 2026-11-17
 - Keep or remove unused `weather`/`music` packages — ask when the README refresh runs.

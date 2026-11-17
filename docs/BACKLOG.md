@@ -15,3 +15,6 @@ Work items are checkboxes (`1. [ ]`): what, where, done condition, `→ agent-na
 
 - [ ] **Smoke run stdin EOF panic**: `go run . | head` panics with `EOF` at `main.go:77` when stdin closes; handle EOF gracefully, fix CLAUDE.md smoke command. → `widget-builder`
 - [ ] **gofmt**: `clipboard/clipboard.go`, `kbdlayout/mods.go`, `mem/mem.go` not gofmt'd; format + add `gofmt -l .` to checks. → `chore`
+- [ ] **ccusage polling**: `npx ccusage@latest` every 5 s (Node start each time, unpinned); pin version, poll less often. (from A1 report) → `widget-builder`
+- [ ] **Clipboard polling**: reads whole clipboard every 2 s just for size; cheaper check. (from A1 report) → `widget-builder`
+- [ ] **Dead import path**: `barista.run` domain expired, upstream archived; builds only via Go proxy cache. Vendor or replace path. Only if we keep barista. → `dep-updater`
