@@ -1,0 +1,22 @@
+# build output
+/custom_barista
+*.test
+*.out
+# logs and background-job output
+/log/
+*.log
+# backups and editor/OS files
+*.bak
+*.bak*
+*.orig
+*.swp
+*~
+.DS_Store
+# local config and secrets
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+# coverage
+coverage.out
+*.prof

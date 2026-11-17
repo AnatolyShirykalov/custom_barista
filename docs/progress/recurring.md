@@ -7,3 +7,9 @@ Dated notes from each recurring check (see the "Recurring checks" table in `docs
 Disabled for this project in `.claude/settings.local.json` (personal): claude.ai Gmail, Google Calendar and Google Drive connectors (`deniedMcpServers`); skills docx, pptx, xlsx, pdf, google-workspace, morning, concerts, import-memory, deep-research (`skillOverrides: off`). Reason: unrelated to a Go i3 status bar. Re-enable by deleting the entries.
 Kept: Claude Docs connector, web/image design skills, Chrome browser tools.
 To confirm: run `/context` in the next session — whether project `skillOverrides` hides user/plugin skills and whether denied connectors drop out of the tool list.
+
+## 2026-11-17 — Git hygiene
+
+- Repo had no `.gitignore`; added one (binary `/custom_barista`, `/log/`, `*.log`, `*.bak*`, `*.test`, `.env*`, `*.swp`, `.claude/settings.local.json`, coverage/profiles).
+- Nothing tracked needed removal: no binaries, logs, dumps, env files or keys (weather API key is passed as a parameter, not stored). Largest tracked: `i3status-rust/scripts/testdata/data_2m` (2 MB, used by test.sh clip15; kept, could be generated at test time instead), fonts (128/100 KB), PNGs all under 32 KB.
+- No `git rm --cached` needed.
