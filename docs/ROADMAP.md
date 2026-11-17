@@ -18,7 +18,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-- D3 build trial bar → `widget-builder` (sonnet), started 2026-11-17
+(none)
 
 
 ### Queued next (one agent each, in order)
@@ -26,7 +26,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 1. [x] **Fix GPU widget** (`nvidia/nvidia.go`): shows "GPU ERR" since the last upgrade. Likely cause: `nvidia-smi --query-gpu=temperature.gpu` now prints `39.70` (float), `strconv.Atoi` fails. Parse floats, add a parser table test, show a short reason on error. Done: bar shows temp + VRAM on the RTX 5070 Ti, deployed. → `widget-builder` Done 2026-11-17, see docs/progress/widgets.md.
 2. [x] **Alternatives report** (user request): challenge the custom-barista approach. Compare alternatives (i3status, i3status-rust, i3blocks, bumblebee-status, py3status, polybar, waybar/sway path, yambar, keep barista, others found) on: features we use (nvidia, hwmon temps, freq, vol, clipboard, ccusage, netm), migration cost, maintenance after upgrades, upstream activity, resources, theming. Recommendation. Done: local `docs/design/A1-alternatives/report.html`. → `researcher` Done 2026-11-17: recommends staged migration to i3status-rust (barista archived, domain expired); icon blanks = mdi provider never loaded. See docs/progress/alternatives.md.
 3. [x] **D3 i3status-rust spec**: map every barista widget (main.go order) to an i3status-rust block or custom block (ccusage, clipboard), icons via `icons = "material-nf"` + per-widget overrides (GPU must get a specific glyph), colors from our scheme, click/scroll actions; config path `i3status-rust/config.toml` in repo, i3 config snippet for a second trial bar. Options needing user choice → `docs/design/D3-i3status-rust/questions.html`. Done: `docs/design/D3-i3status-rust/spec.md`. → `bar-designer` Done 2026-11-17: spec + 3-question `questions.html`; user step `sudo pacman -S i3status-rust ttf-nerd-fonts-symbols-mono`. See docs/progress/migration.md.
-4. [ ] **D3 build trial bar**: write config + custom block scripts per spec, add second bar to i3 config, `i3-msg restart`, both bars run. → `widget-builder`
+4. [x] **D3 build trial bar**: write config + custom block scripts per spec, add second bar to i3 config, `i3-msg restart`, both bars run. → `widget-builder` Done 2026-11-17: both bars run, 17 script tests pass; nvidia_gpu block replaced by gpu.sh (float temp). See docs/progress/migration.md.
 5. [ ] **D3 review**: screenshot both bars, check spec, list gaps. → `bar-designer`
 6. [ ] **Switch to i3status-rust** after ~1 week trial (ask when 2026-11-24): remove barista bar, decide repo fate. → `widget-builder`
 7. [ ] **README refresh**: module list stale (missing clipboard, freq, vol, weather, music; ccusage described as CPU usage); Go version prereq. Done: README matches `main.go`. → `chore`
