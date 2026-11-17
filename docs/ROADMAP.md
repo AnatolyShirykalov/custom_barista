@@ -18,7 +18,6 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-- Code review (recurring) → `code-reviewer` (opus), started 2026-11-17
 ### Queued next (one agent each, in order)
 
 1. [x] **Fix GPU widget** (`nvidia/nvidia.go`): shows "GPU ERR" since the last upgrade. Likely cause: `nvidia-smi --query-gpu=temperature.gpu` now prints `39.70` (float), `strconv.Atoi` fails. Parse floats, add a parser table test, show a short reason on error. Done: bar shows temp + VRAM on the RTX 5070 Ti, deployed. → `widget-builder` Done 2026-11-17, see docs/progress/widgets.md.
@@ -54,7 +53,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 | Dependency updates | `dep-updater` | `go list -m -u all`, barista.run upstream, Go toolchain; bump what is safe, backlog the rest | never |
 | Look/usability pass | `bar-designer` | screenshot the bar; clarity, colors, stable widths, glyphs render; findings → backlog | never |
 | Widget health | `widget-builder` | every widget shows real data on this machine (`timeout 5 go run .`, grep `ERR`); after system upgrades check nvidia-smi, hwmon, pulse, sysfs formats | never |
-| Code review + docs | `code-reviewer` | review diffs since last run; README module list and CLAUDE.md match the code | never |
+| Code review + docs | `code-reviewer` | review diffs since last run; README module list and CLAUDE.md match the code | 2026-11-17 |
 
 
 ## Decisions made
