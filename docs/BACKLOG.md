@@ -12,6 +12,11 @@ Work items are checkboxes (`1. [ ]`): what, where, done condition, `→ agent-na
 ### Design
 
 
+1. [ ] **rs bars have no tray**: `bar-rs`/`bar-rs-small` set `tray_output none`; barista's tray (Telegram, Zoom) vanishes in rs mode and after the switch. Done: tray on DP-0 in rs mode, screenshot. (look pass 2026-11-17) → `chore`
+1. [ ] **rs icon color consistent**: only the time block dims its icons (`icons_format` #777); all other icons are white. Pick one rule (dim all icons, recommended: matches barista `dim-icon`). Done: one global setting, screenshot shows uniform icons. → `widget-builder`
+1. [ ] **rs gap between icon and value**: fixed-width pads sit between icon and number (freq.sh 5 spaces, ccusage.sh 5, clip.sh 2, `eng(w:N)` pads), so values float away from icons. Move pad to the far side (after value or before icon) keeping width fixed. Done: test.sh width rows pass, screenshot shows value next to icon. → `widget-builder`
+1. [ ] **rs disk io unlabeled**: `disk_iostats` shows `0.00kB 796kB` with no read/write markers and mixed decimals; net block uses up/down arrows. Add read/write glyphs and a fixed 3-digit format (or drop the block). Done: screenshot, width stable. → `widget-builder`
+1. [ ] **rs mixed size units**: mem `70GiB`, disk `616GB`, GPU mem `1099MiB` (no label for GPU mem). One unit family, GPU mem in GiB with 1 decimal. Done: config/gpu.sh changed, test.sh row. → `widget-builder`
 1. [ ] **Implement bar design audit option(s)** chosen by the user from D1 spec, then designer review. → `widget-builder` → `bar-designer`
 
 - [ ] **Smoke run stdin EOF panic**: `go run . | head` panics with `EOF` at `main.go:77` when stdin closes; handle EOF gracefully, fix CLAUDE.md smoke command. → `widget-builder`
