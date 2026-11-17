@@ -112,8 +112,10 @@ if grep -q '^# BEGIN custom_barista' "$cfg"; then
 else cat "$w" "$b" >"$tmp/new"; fi
 
 if [ $dry = 1 ]; then
-  say "[dry-run] i3 config $cfg would change:"; diff -u "$cfg" "$tmp/new" | sed 's/^/    /' || true
-  say "[dry-run] $barsconf (state $state) would change:"; { if [ -f "$barsconf" ]; then diff -u "$barsconf" "$tmp/bars.conf"; else diff -u /dev/null "$tmp/bars.conf"; fi; } | sed 's/^/    /' || true
+  if cmp -s "$cfg" "$tmp/new"; then say "[dry-run] i3 config $cfg unchanged"
+  else say "[dry-run] i3 config $cfg would change:"; diff -u "$cfg" "$tmp/new" | sed 's/^/    /' || true; fi
+  if [ -f "$barsconf" ] && cmp -s "$barsconf" "$tmp/bars.conf"; then say "[dry-run] $barsconf (state $state) unchanged"
+  else say "[dry-run] $barsconf (state $state) would change:"; { if [ -f "$barsconf" ]; then diff -u "$barsconf" "$tmp/bars.conf"; else diff -u /dev/null "$tmp/bars.conf"; fi; } | sed 's/^/    /' || true; fi
   cmp -s "$CONFDIR/bars.env" "$tmp/bars.env" || say "[dry-run] write $CONFDIR/bars.env"
   exit 0
 fi
