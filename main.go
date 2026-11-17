@@ -14,7 +14,6 @@ import (
 	"barista.run/pango/icons/typicons"
 	"github.com/AnatolyShirykalov/custom_barista/batt"
 	"github.com/AnatolyShirykalov/custom_barista/ccusage"
-	"github.com/AnatolyShirykalov/custom_barista/clipboard"
 	"github.com/AnatolyShirykalov/custom_barista/dsk"
 	"github.com/AnatolyShirykalov/custom_barista/freq"
 	"github.com/AnatolyShirykalov/custom_barista/kbdlayout"
@@ -69,7 +68,6 @@ func main() {
 
 	// Applications
 	modules = append(modules, ccusage.Get())
-	modules = append(modules, clipboard.Get())
 
 	// Time (always last)
 	modules = append(modules, ltime.Get())

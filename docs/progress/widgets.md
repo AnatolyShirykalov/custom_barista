@@ -19,3 +19,6 @@
 ## Multi-GPU csv (2026-11-17)
 
 `gpu.sh` and `nvidia.parseGpuStats` use only the first csv line when nvidia-smi prints several. Tests: `gpu_multi` fixture + `gpu3` row in test.sh; two-line row in `nvidia_test.go`. Not reproducible on this one-GPU machine beyond fixtures.
+
+## Remove barista clipboard widget (2026-11-17)
+Deleted `clipboard/`, its import and `Get()` in main.go; README module line and backlog "Clipboard polling" dropped. `utils.Script` kept (ltime). i3status-rust clip block untouched.

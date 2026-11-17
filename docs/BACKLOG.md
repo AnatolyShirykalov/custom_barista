@@ -18,7 +18,6 @@ Parked: barista is being replaced by i3status-rust after the trial.
 - [ ] **nvidia reason test**: error-to-text mapping (`GPU n/a`/`smi`/`parse`, `nvidia.go:56`) untested; extract a func, table test. → `widget-builder`
 - [ ] **Uniform error display**: widgets print bare "ERR"; show a short dim reason and log details to stderr. Done: shared helper in `utils`, used by all widgets. → `widget-builder`
 - [ ] **Smoke run stdin EOF panic**: `go run . | head` panics with `EOF` at `main.go:77` when stdin closes; handle EOF gracefully (CLAUDE.md smoke command already works around it). → `widget-builder`
-- [ ] **Clipboard polling**: reads whole clipboard every 2 s just for size; cheaper check. (from A1 report) → `widget-builder`
 - [ ] **Dead import path**: `barista.run` domain expired, upstream archived; builds only via Go proxy cache. Vendor or replace path. → `dep-updater`
 - [ ] **Widget health sweep**: run `timeout 5 go run .`, list every widget that prints ERR/empty after the upgrade (hwmon, vol, freq, batt…), one backlog item each. Done: table in `docs/progress/widgets.md`. → `widget-builder`
 - [ ] **Dependency survey + safe bumps**: go.mod (toolchain go1.24.5, system Go 1.27), barista.run, direct deps; commit safe bumps, backlog breaking ones. Done: builds, bar runs, versions in `docs/progress/deps.md`. → `dep-updater`

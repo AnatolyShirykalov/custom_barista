@@ -19,7 +19,6 @@ In the order wired in `main.go`:
 - `batt` - battery level and charging state
 - `vol` - audio volume
 - `ccusage` - Claude Code usage (tokens, remaining time)
-- `clipboard` - clipboard contents
 - `ltime` - time and date (always last)
 
 Icons come from the Material Design and Typicons fonts.
