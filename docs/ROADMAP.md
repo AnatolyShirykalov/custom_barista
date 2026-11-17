@@ -18,7 +18,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-
+- Git hygiene (recurring) → `repo-janitor` (sonnet), started 2026-11-17
 
 ### Queued next (one agent each, in order)
 
@@ -36,7 +36,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 Long detached jobs started by agents: `check` command, done when, follow-up. Main session checks between agents, removes finished items.
 
-- [ ] D3 ccusage cost sample (5 min pgrep of `npx -y ccusage@20.0.51`, ends ~19:45 2026-11-17): check `pgrep -f '[s]ample.sh' || wc -l < /tmp/claude-1000/-home-anatoly-projects-custom-barista/398ddeb7-af18-4caa-a89d-9e33f000cc79/scratchpad/ccpids.txt`; done when ≤6 PIDs (spec check 7); >6 → add to 5c.
+_(none)_
 
 ## Recurring checks
 

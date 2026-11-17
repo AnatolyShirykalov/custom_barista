@@ -44,3 +44,4 @@ Verdict: **accept with fixes** (one small builder item, 5c). Screenshot of both 
 - `gpu.sh`: `%5dMiB` (fits 16303).
 - `test.sh`: expectations updated; width rows vary tokens 5..53.3M, CH 0..100, remaining 5..299 min, GPU `99, 16303` vs `9, 5`. 22 pass, 0 fail.
 - Trial bar not restarted (5b was changing bar modes); the new text shows at the next rs restart.
+- 2026-11-17 ccusage cost sample: 3 runs/5 min on trial bar (was every 5 s). OK.
