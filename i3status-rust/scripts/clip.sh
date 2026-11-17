@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Clipboard size. Env CLIP_TARGETS / CLIP_DATA (files) replace the two xclip calls (tests).
 set -u
-emit() { jq -nc --arg s "$1" --arg t "$(printf '%5s' "$2")" '{icon:"clipboard",state:$s,text:$t}'; }
+emit() { jq -nc --arg s "$1" --arg t "$(printf '%-5s' "$2")" '{icon:"clipboard",state:$s,text:$t}'; }
 if [ -n "${CLIP_TARGETS+x}" ]; then targets=$(cat "$CLIP_TARGETS"); else
   targets=$(timeout 2 xclip -o -selection clipboard -t TARGETS 2>/dev/null); fi
 [ -z "$targets" ] && { emit Info empty; exit 0; }

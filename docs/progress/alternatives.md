@@ -7,3 +7,7 @@
 - Icon root cause: nvidia/nvidia.go:67,69 use `mdi-*` and vol/vol.go:18,30 use `ion-*`, but main.go loads only material and typicons. barista returns an empty node for an unknown provider, so those icons are blank. typicons is loaded but unused.
 - Other findings: ccusage runs `npx ccusage@latest` every 5 s (Node start, unpinned); clipboard reads the full clipboard every 2 s just to get its size.
 - Proposed backlog items (for the main session to file, depending on the user's verdict): (1) load mdi + fix GPU and volume icons; (2) rewrite or vendor the barista module path; (3) pin and slow down ccusage polling; (4) cheaper clipboard polling; (5) i3status-rust side-by-side trial if migration is approved.
+
+## D4 rs polish (builder, 2026-11-17)
+Built per `docs/design/D4-rs-polish/spec.md` (Q1 A decimal, Q2 A R/W). config.toml: global dim `icons_format`, R/W overrides, `eng(p:G|k,w:3)` for mem/disk/IO/net; compact.toml regenerated. Scripts: freq/ccusage/clip trailing pad, gpu.sh decimal GB. test.sh: rows updated, gpu4 added, 38 pass. Deployed config copies to ~/.config/custom_barista/ and cycled the bars (state left rs, as found).
+Screenshots (untracked, scratchpad d4-rs-main-L/R.png, d4-rs-small.png): icons dim, values one space after icon, main bar right edge identical over 3 shots. DP-2 small-bar crop hashes differ over time (live values); not analysed. Needs bar-designer review.

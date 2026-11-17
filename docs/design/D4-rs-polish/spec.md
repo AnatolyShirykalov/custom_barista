@@ -45,3 +45,7 @@ Against B: eng switches binary prefix at 1024, so 1000-1023 KiB/MiB print 4 digi
 - freq, ccusage, clip, gpu values start one space after the icon; block right edges fixed across the 3 shots (±0 px).
 - Disk IO shows markers and 3-digit numbers; no `kB`/`KiB`/`MiB` mix across mem/disk/IO/net/GPU.
 - test.sh pass, compact.toml in sync, no tofu, DP-2 still fits.
+
+## Decisions (user, 2026-11-17)
+- Q1 units: A, decimal GB/MB/kB with `eng(w:3)`.
+- Q2 disk IO markers: A, dim letters R/W via icon overrides `disk_read`/`disk_write`.

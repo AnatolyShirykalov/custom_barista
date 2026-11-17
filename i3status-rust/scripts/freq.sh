@@ -13,12 +13,12 @@ out=
     for (i = 1; i <= L; i++) if (c[i] >= 10) two++
     # pad: 1 space per missing digit (fixed width), counts right-aligned by the pad only
     pad = (L < 6 ? L : 6) - two
-    s = sprintf("%" pad "s", "")
+    s = ""
     for (i = 1; i <= L; i++) {
       color = i <= 6 ? col[i] : "#ff0000"
       s = s (i > 1 ? " " : "") "<span color=\047" color "\047>" c[i] + 0 "</span>"
     }
-    print s
+    print s sprintf("%" pad "s", "")
   }')
 if [ -n "$out" ]; then
   jq -nc --arg t "$out" '{icon:"cpu_freq",state:"Idle",text:$t}'

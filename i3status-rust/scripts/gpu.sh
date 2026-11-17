@@ -8,6 +8,7 @@ awk -F', *' -v l="$line" 'BEGIN {
   n = split(l, a, /, */)
   if (n < 2 || a[1] !~ /^[0-9.]+$/ || a[2] !~ /^[0-9.]+$/) { print "{\"icon\":\"gpu\",\"state\":\"Critical\",\"text\":\"GPU ERR\"}"; exit }
   t = int(a[1] + 0.5); st = t > 70 ? "Critical" : t > 60 ? "Warning" : "Idle"
-  printf "{\"icon\":\"gpu\",\"state\":\"%s\",\"text\":\"%2d° %5dMiB\"}\n", st, t, int(a[2] + 0.5)
+  v = a[2] * 1.048576 / 1000; s = (v < 9.95) ? sprintf("%.1f", v) : sprintf("%3d", int(v + 0.5)) # eng-like, decimal GB
+  printf "{\"icon\":\"gpu\",\"state\":\"%s\",\"text\":\"%2d° %sGB\"}\n", st, t, s
 }'
 exit 0
