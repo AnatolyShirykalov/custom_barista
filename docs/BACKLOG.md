@@ -11,7 +11,6 @@ Work items are checkboxes (`1. [ ]`): what, where, done condition, `→ agent-na
 
 ### Design
 
-1. [ ] **Upstream issue i3status-rust nvidia_gpu**: block shows 0° because nvidia-smi 620.x prints float temperature (`34.59`), block parses u32. File issue (user's call) so gpu.sh can go. → `researcher`
 
 1. [ ] **Implement bar design audit option(s)** chosen by the user from D1 spec, then designer review. → `widget-builder` → `bar-designer`
 

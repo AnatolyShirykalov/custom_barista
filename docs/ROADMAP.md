@@ -18,6 +18,8 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
+- Draft upstream issue → `researcher` (sonnet), started 2026-11-17
+- Code review (recurring) → `code-reviewer` (opus), started 2026-11-17
 ### Queued next (one agent each, in order)
 
 1. [x] **Fix GPU widget** (`nvidia/nvidia.go`): shows "GPU ERR" since the last upgrade. Likely cause: `nvidia-smi --query-gpu=temperature.gpu` now prints `39.70` (float), `strconv.Atoi` fails. Parse floats, add a parser table test, show a short reason on error. Done: bar shows temp + VRAM on the RTX 5070 Ti, deployed. → `widget-builder` Done 2026-11-17, see docs/progress/widgets.md.
@@ -31,6 +33,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 7. [x] **README refresh**: module list stale (missing clipboard, freq, vol, weather, music; ccusage described as CPU usage); Go version prereq. Done: README matches `main.go`. → `chore` Done 2026-11-17: also deleted unused weather/ and music/; see docs/progress/docs.md.
 8. [x] **Trial bar polish**: layout `us`/`ru` → `US`/`RU` via `[block.mappings]`; sound block shows `0.0%` on first frame. → `widget-builder` Done: mappings + alsa driver, see progress/migration.md.
 9. [x] **Generate 2 MB clip fixture**: `test.sh` now generates it in a `mktemp -d` (trap cleanup); tracked file removed. → `chore` Done 2026-11-17, 22/22.
+10. [ ] **Draft upstream nvidia_gpu issue**: text in `docs/design/D3-i3status-rust/upstream-issue.md`, user posts. → `researcher`
 
 ### Background checks
 
@@ -56,6 +59,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 ## Decisions made
 
+- 2026-11-17: upstream nvidia_gpu issue — agent drafts, user posts.
 - 2026-11-17: delete unused `weather/`, `music/`; README covers both bars during trial.
 - 2026-11-17 D3 picks: GPU md-expansion_card U+F08AE; keep freq histogram but with a better icon (cpu block's default icon or better); leave music/weather out; all numbers fixed width (no jumps 1↔2 digits). Packages installed.
 - 2026-11-17: trial i3status-rust as second bar, then switch (A1 report). Barista-only items (health sweep, dep survey, design audit, dead import path) parked in backlog.
@@ -64,4 +68,3 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
-- File upstream i3status-rust issue (nvidia_gpu block parses float temp as u32)? asked 2026-11-17
