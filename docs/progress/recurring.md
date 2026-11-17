@@ -46,3 +46,8 @@ Screenshots (scratch, untracked): bar-rs on DP-0 (3840x34 at y=2126) and bar-rs-
 | Order | kbd, load, temp, freq, mem, disk, io, gpu, net, vol, ccusage, clip, time: CPU group then memory/storage then net/audio, sensible |
 
 Findings → `docs/BACKLOG.md` Design (5): no tray on rs bars (barista tray with Telegram/Zoom disappears), only time icons dimmed, pad gap between icon and value (freq/ccusage/clip), disk io numbers unlabeled, mixed GiB/GB/MiB units.
+
+## 2026-11-17 — Backlog tidy
+
+Kept 12 (4 rs design items; 8 barista-only items regrouped under "barista (only if we keep it)"), merged 0, dropped 4.
+Dropped: "gofmt" (`gofmt -l .` clean), "ccusage polling" (pinned, 60 s), "Implement bar design audit option(s)" and "Bar design audit" (superseded by the 2026-11-17 look pass, whose findings are the rs Design items). All kept items have an agent and a done condition (some older items state the fix only; wording kept).
