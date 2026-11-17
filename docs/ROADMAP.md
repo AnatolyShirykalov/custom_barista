@@ -19,15 +19,16 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 ## In flight
 
 
-_(no agent running)_
+- Fix GPU widget → `widget-builder` (sonnet), started 2026-11-17
 
 ### Queued next (one agent each, in order)
 
 1. [ ] **Fix GPU widget** (`nvidia/nvidia.go`): shows "GPU ERR" since the last upgrade. Likely cause: `nvidia-smi --query-gpu=temperature.gpu` now prints `39.70` (float), `strconv.Atoi` fails. Parse floats, add a parser table test, show a short reason on error. Done: bar shows temp + VRAM on the RTX 5070 Ti, deployed. → `widget-builder`
-2. [ ] **Widget health sweep**: run `timeout 5 go run .`, list every widget that prints ERR/empty after the upgrade (hwmon, vol, freq, batt…), one backlog item each. Done: table in `docs/progress/widgets.md`. → `widget-builder`
-3. [ ] **Dependency survey + safe bumps**: go.mod (toolchain go1.24.5, system Go 1.27), barista.run, direct deps; commit safe bumps, backlog breaking ones. Done: builds, bar runs, versions in `docs/progress/deps.md`. → `dep-updater`
-4. [ ] **Bar design audit** (spec mode): screenshot current bar, list clarity/look issues (grouping, widths jitter, colors, icons), 2-3 options for the top issues. Done: `docs/design/D1-bar-audit-spec.md`. → `bar-designer`
-5. [ ] **README refresh**: module list stale (missing clipboard, freq, vol, weather, music; ccusage described as CPU usage); Go version prereq. Done: README matches `main.go`. → `chore`
+2. [ ] **Alternatives report** (user request): challenge the custom-barista approach. Compare alternatives (i3status, i3status-rust, i3blocks, bumblebee-status, py3status, polybar, waybar/sway path, yambar, keep barista, others found) on: features we use (nvidia, hwmon temps, freq, vol, clipboard, ccusage, netm), migration cost, maintenance after upgrades, upstream activity, resources, theming. Recommendation. Done: local `docs/design/A1-alternatives/report.html`. → `researcher`
+3. [ ] **Widget health sweep**: run `timeout 5 go run .`, list every widget that prints ERR/empty after the upgrade (hwmon, vol, freq, batt…), one backlog item each. Done: table in `docs/progress/widgets.md`. → `widget-builder`
+4. [ ] **Dependency survey + safe bumps**: go.mod (toolchain go1.24.5, system Go 1.27), barista.run, direct deps; commit safe bumps, backlog breaking ones. Done: builds, bar runs, versions in `docs/progress/deps.md`. → `dep-updater`
+5. [ ] **Bar design audit** (spec mode): screenshot current bar, list clarity/look issues (grouping, widths jitter, colors, icons), 2-3 options for the top issues. Done: `docs/design/D1-bar-audit-spec.md`. → `bar-designer`
+6. [ ] **README refresh**: module list stale (missing clipboard, freq, vol, weather, music; ccusage described as CPU usage); Go version prereq. Done: README matches `main.go`. → `chore`
 
 ### Background checks
 
