@@ -37,3 +37,8 @@ Top: hard diagnosis, second try after a failed fix, specs many items build on (m
 Rows: Agent roster, Git hygiene, Context diet, Backlog tidy (monthly), Dependency updates, Look/usability pass, Widget health, Code review + docs.
 **Why:** user chose all four optional checks at setup.
 **How to apply:** table in `docs/ROADMAP.md`, log in `docs/progress/recurring.md`.
+
+## Decision pages open in the browser (2026-11-17)
+*When a decision page (`docs/design/<code>/questions.html`) is ready, open it automatically with `xdg-open <path>` (detached) before asking.*
+**Why:** user found the HTML page much easier to answer from and asked for it to open on its own next time.
+**How to apply:** main session (or designer agent) runs `setsid xdg-open <path> >/dev/null 2>&1 &` right after writing it, then asks in chat.
