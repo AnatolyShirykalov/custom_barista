@@ -9,6 +9,7 @@ import (
 	"barista.run/modules/clock"
 	"barista.run/outputs"
 	"barista.run/pango"
+	"github.com/AnatolyShirykalov/custom_barista/utils"
 )
 
 func Get() bar.Module {
@@ -18,7 +19,7 @@ func Get() bar.Module {
 			now.Format("Mon 2006-01-02 "),
 			pango.Icon("material-access-time").Color(colors.Scheme("dim-icon")),
 			now.Format("15:04:05"),
-		).OnClick(click.RunLeft(`/home/anatolii/scripts/open_calender.sh`))
+		).OnClick(click.RunLeft(utils.Script("open_calender.sh")))
 	})
 	return time
 }

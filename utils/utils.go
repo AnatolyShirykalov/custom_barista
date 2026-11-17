@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"os"
 	"os/user"
 	"path/filepath"
 
@@ -15,4 +16,14 @@ func Home(path string) string {
 		panic(err)
 	}
 	return filepath.Join(usr.HomeDir, path)
+}
+
+// Script returns the path of a helper script in ~/scripts; without a
+// resolvable home dir it falls back to a relative path instead of panicking.
+func Script(name string) string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return filepath.Join("scripts", name)
+	}
+	return filepath.Join(home, "scripts", name)
 }

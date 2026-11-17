@@ -10,6 +10,7 @@ import (
 	"barista.run/base/click"
 	"barista.run/colors"
 	"barista.run/outputs"
+	"github.com/AnatolyShirykalov/custom_barista/utils"
 )
 
 type ClipboardModule struct{}
@@ -61,7 +62,7 @@ func (m *ClipboardModule) updateClipboard(sink bar.Sink) {
 
 	out := outputs.Text(fmt.Sprintf("📋 %s", sizeStr)).
 		Color(colors.Scheme("good")).
-		OnClick(click.RunLeft(`/home/anatolii/scripts/clipboard_menu.sh`))
+		OnClick(click.RunLeft(utils.Script("clipboard_menu.sh")))
 
 	sink.Output(out)
 }
