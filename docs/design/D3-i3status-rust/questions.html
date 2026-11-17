@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D3 i3status-rust trial bar: decisions</title>
+<style>
+:root { --bg:#f6f7f9; --fg:#1b1f24; --muted:#5b6470; --card:#fff; --line:#d9dee5; --accent:#2f6fde; --rec:#1f8a4c; --risk:#b25e09; }
+@media (prefers-color-scheme: dark) { :root { --bg:#14171c; --fg:#e6e9ee; --muted:#9aa3ae; --card:#1d2129; --line:#2e3440; --accent:#6ea0ff; --rec:#4cc47e; --risk:#e0a050; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
+main { max-width:1000px; margin:0 auto; padding:24px 16px 64px; }
+h1 { font-size:1.6rem; margin:0 0 4px; }
+h2 { font-size:1.25rem; margin:0 0 8px; }
+.sub { color:var(--muted); margin:0 0 24px; }
+section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin:0 0 20px; }
+img { max-width:100%; height:auto; border-radius:8px; border:1px solid var(--line); display:block; }
+figure { margin:12px 0; }
+figcaption { color:var(--muted); font-size:.9rem; margin-top:4px; }
+.opts { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; }
+.opt { border:1px solid var(--line); border-radius:10px; padding:12px; }
+.opt h3 { margin:0 0 6px; font-size:1rem; }
+.rec { color:var(--rec); font-weight:600; font-size:.85rem; }
+.meta { color:var(--muted); font-size:.85rem; }
+.risk { color:var(--risk); font-size:.85rem; }
+.against { color:var(--muted); font-size:.9rem; margin:6px 0 0; }
+ul { margin:6px 0; padding-left:20px; }
+code { font-size:.9em; }
+label.pick { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); }
+label.pick input { margin-top:5px; transform:scale(1.3); }
+#out { width:100%; min-height:60px; font:14px monospace; }
+</style>
+</head>
+<body>
+<main>
+<h1>D3: i3status-rust trial bar</h1>
+<p class="sub">Your note (2026-11-17): "trial i3status-rust as a second bar, then switch. Icons are not specific enough; the GPU widget had no icon." The rest is fixed in <code>spec.md</code>. This page decides the 3 points that are your choice. Answer in the chat with the line at the bottom.</p>
+
+<section>
+<h2>Today</h2>
+<figure><img src="img/today.png" alt="current barista bar"><figcaption>Current barista bar (right part, bottom of DP-0). Look at: the GPU block ("36°C 568 MiB") and the volume ("70%") have no icon; the disk IO widget is missing.</figcaption></figure>
+<figure><img src="img/proposed.png" alt="mock of the proposed i3status-rust bar"><figcaption>Mock of the trial bar with the recommended answers (PragmataPro Mono 18 + Symbols Nerd Font Mono, rendered locally). Every block has its own icon. The real bar is checked in the review.</figcaption></figure>
+</section>
+
+<section>
+<h2>Question 1: GPU icon</h2>
+<p class="meta">The default i3status-rust icon is md-monitor (a screen). That is vague, so we override it. There is no "md-gpu" glyph.</p>
+<div class="opts">
+  <div class="opt">
+    <h3>A. md-expansion_card U+F08AE <span class="rec">recommended</span></h3>
+    <figure><img src="img/gpu_a.png" alt="expansion card glyph"><figcaption>A PCIe card with a fan: the standard "graphics card" glyph in Material Design Icons.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">one config line</span></span>
+  </div>
+  <div class="opt">
+    <h3>B. md-expansion_card_variant U+F0FB2</h3>
+    <figure><img src="img/gpu_b.png" alt="expansion card variant glyph"><figcaption>The same idea with a flatter outline.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">one config line</span></span>
+    <p class="against">Why the designer is against B: at 18 pt the details are smaller and the fan is harder to read; A says "GPU" faster.</p>
+  </div>
+  <div class="opt">
+    <h3>C. md-chip U+F061A</h3>
+    <figure><img src="img/gpu_c.png" alt="chip glyph"><figcaption>A generic chip.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">one config line</span></span>
+    <p class="against">Why the designer is against C: it looks almost the same as the RAM icon (md-memory) a few blocks to the left. That is the vagueness you want to remove.</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Question 2: CPU frequency</h2>
+<div class="opts">
+  <div class="opt">
+    <h3>A. Keep the per-GHz histogram (small script) <span class="rec">recommended</span></h3>
+    <figure><img src="img/freq_a.png" alt="histogram"><figcaption>The same as today: the number of cores at 1, 2, 3 … GHz, colored from cold to hot.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">one awk script, every 2 s</span></span>
+  </div>
+  <div class="opt">
+    <h3>B. Built-in average frequency</h3>
+    <figure><img src="img/freq_b.png" alt="average frequency"><figcaption>One number: the average over the 32 threads.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">no script to maintain</span></span>
+    <p class="against">Why the designer is against B: with 32 threads the average hides the pattern you built the histogram for (a few hot cores vs. all cores busy).</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Question 3: music and weather (written in barista, never wired)</h2>
+<div class="opts">
+  <div class="opt">
+    <h3>A. Leave both out <span class="rec">recommended</span></h3>
+    <p>Same widgets as today. The bar is already wide.</p>
+    <span class="meta">S &middot; <span class="risk">no change</span></span>
+  </div>
+  <div class="opt">
+    <h3>B. Add music</h3>
+    <p>Built-in <code>music</code> block (MPRIS): title and play/pause, click to pause. Shows only an icon when no player runs.</p>
+    <span class="meta">S &middot; <span class="risk">built-in block</span></span>
+    <p class="against">Why the designer is against B: you never wired it in barista, so there is no sign you missed it; it adds width.</p>
+  </div>
+  <div class="opt">
+    <h3>C. Add music and weather</h3>
+    <p>Plus the built-in <code>weather</code> block with met.no (no API key), location found automatically, every 15 min.</p>
+    <span class="meta">M &middot; <span class="risk">network call, automatic location lookup</span></span>
+    <p class="against">Why the designer is against C: the same as B, plus an outside network call from the bar.</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Picks</h2>
+<p class="meta">One per question; the recommended ones are pre-selected.</p>
+<label class="pick"><input type="radio" name="Q1" value="Q1=A" checked><span><b>Q1=A</b> GPU md-expansion_card <span class="rec">recommended</span></span></label>
+<label class="pick"><input type="radio" name="Q1" value="Q1=B"><span><b>Q1=B</b> GPU md-expansion_card_variant</span></label>
+<label class="pick"><input type="radio" name="Q1" value="Q1=C"><span><b>Q1=C</b> GPU md-chip</span></label>
+<label class="pick"><input type="radio" name="Q2" value="Q2=A" checked><span><b>Q2=A</b> freq histogram script <span class="rec">recommended</span></span></label>
+<label class="pick"><input type="radio" name="Q2" value="Q2=B"><span><b>Q2=B</b> built-in average frequency</span></label>
+<label class="pick"><input type="radio" name="Q3" value="Q3=A" checked><span><b>Q3=A</b> no music, no weather <span class="rec">recommended</span></span></label>
+<label class="pick"><input type="radio" name="Q3" value="Q3=B"><span><b>Q3=B</b> add music</span></label>
+<label class="pick"><input type="radio" name="Q3" value="Q3=C"><span><b>Q3=C</b> add music and weather</span></label>
+</section>
+
+<section>
+<h2>What doesn't change</h2>
+<ul>
+<li>Widget order stays as in main.go (keyboard, load, temp, freq, mem, disk, GPU, net, battery, volume, ccusage, clipboard, clock). It can be revisited after the trial week.</li>
+<li>Colors: green #6d6, yellow #dd6, red #d66, dim #777.</li>
+<li>Barista keeps running at the bottom. The trial bar appears at the top while Mod3 is held, until the "Switch" item (about 2026-11-24).</li>
+<li>One-time step for you: <code>sudo pacman -S i3status-rust ttf-nerd-fonts-symbols-mono</code> (neither is installed).</li>
+</ul>
+</section>
+
+<section>
+<h2>Your answer</h2>
+<p class="meta">Copy this line into the chat (read-only; nothing is saved from this page).</p>
+<textarea id="out" readonly></textarea>
+</section>
+</main>
+<script>
+function upd(){const p=[...document.querySelectorAll('input[type=radio]:checked')];document.getElementById('out').value='D3 picks: '+p.map(c=>c.value).join(', ');}
+document.querySelectorAll('input[type=radio]').forEach(c=>c.addEventListener('change',upd));upd();
+</script>
+</body>
+</html>
