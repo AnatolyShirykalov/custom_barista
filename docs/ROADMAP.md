@@ -32,7 +32,9 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 8. [x] **Trial bar polish**: layout `us`/`ru` → `US`/`RU` via `[block.mappings]`; sound block shows `0.0%` on first frame. → `widget-builder` Done: mappings + alsa driver, see progress/migration.md.
 9. [x] **Generate 2 MB clip fixture**: `test.sh` now generates it in a `mktemp -d` (trap cleanup); tracked file removed. → `chore` Done 2026-11-17, 22/22.
 10. [x] **Draft upstream nvidia_gpu issue**: text in `docs/design/D3-i3status-rust/upstream-issue.md`, user posts. → `researcher` Done 2026-11-17: draft ready, no existing upstream issue; user posts.
-11. [ ] **Block explanations** (user asked for tooltips; i3bar has no hover): middle-click every trial-bar block → `yad` popup at mouse (`--mouse --undecorated --timeout 8`, closes on click; no notification daemon running, so no notify-send) with what it shows, units, color thresholds, click actions; one script `i3status-rust/scripts/explain.sh <block>`; check middle button unused, else pick another. → `widget-builder`
+11. [ ] **Per-monitor trial bars** (user request): DP-0 (3840, 4K) keeps all blocks; DP-2 (2560x1600) hides ccusage, disk space, disk IO, and the IP address (in the net blocks). Two i3 `bar {}` blocks with `output DP-0` / `output DP-2`, ids `bar-rs` / `bar-rs-small`, `i3status-rust/compact.toml` (keep the shared parts in one place if the 0.40 config allows it, else generate from config.toml); barista likewise per output if cheap; barcycle.sh switches all bars of a state together; backup `~/.i3/config` first. → `widget-builder`
+12. [ ] **Trial width bugs** (code review 2026-11-17): clip.sh `200.0K`/`1023.4K` overflow the 5-char pad; ccusage.sh `1000.0K` → pick the unit after rounding; test.sh counts a failed width check as a pass, trap set after mktemp, `$cj` unquoted. → `widget-builder`
+13. [ ] **Block explanations** (user asked for tooltips; i3bar has no hover): middle-click every trial-bar block → `yad` popup at mouse (`--mouse --undecorated --timeout 8`, closes on click; no notification daemon running, so no notify-send) with what it shows, units, color thresholds, click actions; one script `i3status-rust/scripts/explain.sh <block>`; check middle button unused, else pick another. → `widget-builder`
 
 ### Background checks
 
@@ -58,6 +60,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 ## Decisions made
 
+- 2026-11-17: hide on DP-2 (2.5K): ccusage, disk space, disk IO, IP address.
 - 2026-11-17: upstream nvidia_gpu issue — agent drafts, user posts.
 - 2026-11-17: delete unused `weather/`, `music/`; README covers both bars during trial.
 - 2026-11-17 D3 picks: GPU md-expansion_card U+F08AE; keep freq histogram but with a better icon (cpu block's default icon or better); leave music/weather out; all numbers fixed width (no jumps 1↔2 digits). Packages installed.
@@ -67,3 +70,5 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
+- Barista click paths `/home/anatolii/scripts/…` (your commit d6eceaa, clipboard.go:64, ltime.go:21): intended (other machine?) or should they use os.UserHomeDir()? asked 2026-11-17
+- Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user posts). asked 2026-11-17
