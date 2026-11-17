@@ -96,6 +96,7 @@ bar {
 bar {
     id bar-rs
     mode invisible
+    position bottom
     status_command i3status-rs ~/projects/custom_barista/i3status-rust/config.toml
 }
 bindsym $mod+i exec ~/projects/custom_barista/i3status-rust/scripts/barcycle.sh
