@@ -8,6 +8,7 @@ Work items are checkboxes (`1. [ ]`): what, where, done condition, `→ agent-na
 
 1. [ ] **nvidia reason test**: error-to-text mapping (`GPU n/a`/`smi`/`parse`, `nvidia.go:56`) untested; extract a func, table test. → `widget-builder`
 1. [ ] **Uniform error display**: widgets print bare "ERR"; show a short dim reason and log details to stderr. Done: shared helper in `utils`, used by all widgets. → `widget-builder`
+1. [ ] **Zoom tray icon after Win+i** (2b, 2026-11-17): Zoom's icon does not re-dock when the tray moves to bar-rs (3 of 4 icons; back in barista); check if it re-docks after a delay or needs an app restart.
 
 ### Design
 

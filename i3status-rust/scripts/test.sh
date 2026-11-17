@@ -45,4 +45,14 @@ printf '99, 16303\n' > "$cj"; o=$("$d/gpu.sh" "$cj"); printf '9, 5\n' > "$cj"; o
 "$d/gen-compact.sh" - | cmp -s - "$d/../compact.toml" && pass=$((pass+1)) || { echo "FAIL compact: out of sync, run scripts/gen-compact.sh"; fail=$((fail+1)); }
 grep -qE 'disk_space|disk_iostats|ccusage\.sh|\$ip' "$d/../compact.toml" && { echo "FAIL compact: dropped block left"; fail=$((fail+1)); } || pass=$((pass+1))
 [ "$(grep -cE 'disk_space|disk_iostats|ccusage\.sh"|\$ip ' "$d/../config.toml")" == 4 ] && pass=$((pass+1)) || { echo "FAIL compact: config.toml patterns changed, update gen-compact.sh"; fail=$((fail+1)); }
+# bars.conf generator: per state valid blocks (i3 -C when available), the tray on DP-0 only for visible bars
+printf 'BIN=/x/custom_barista\nCONFDIR=/x/conf\n' >"$gd/bars.env"
+for st in barista rs off; do
+  BARS_ENV=$gd/bars.env "$d/barsconf.sh" $st >"$gd/bars.conf" || { echo "FAIL bars $st: generator"; fail=$((fail+1)); continue; }
+  n=$(grep -c 'tray_output DP-0' "$gd/bars.conf"); want=1; [ $st = off ] && want=0
+  docks=$(grep -c 'mode dock' "$gd/bars.conf"); wd=1; [ $st = rs ] && wd=2; [ $st = off ] && wd=0
+  if [ "$(grep -c '^bar {' "$gd/bars.conf")" = 3 ] && [ "$n" = $want ] && [ "$docks" = $wd ] && ! grep -q @ "$gd/bars.conf" \
+     && { ! command -v i3 >/dev/null || { echo "include $gd/bars.conf" >"$gd/i3cfg"; i3 -C -c "$gd/i3cfg" >/dev/null 2>&1; }; }
+  then pass=$((pass+1)); else echo "FAIL bars $st: tray DP-0 $n/$want, dock $docks/$wd or i3 -C"; fail=$((fail+1)); fi
+done
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]

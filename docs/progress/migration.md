@@ -65,3 +65,10 @@ Verdict: **accept with fixes** (one small builder item, 5c). Screenshot of both 
 - Barista left as is (one bar, no `output`, on both monitors): main.go has no flags, a per-output variant would need a CLI flag and module filtering; not cheap enough for the trial.
 - `~/.i3/config` (separate git repo, no commits): `bar-rs` got `output DP-0`; new `bar-rs-small` block after it (same settings, `output DP-2`, `status_command i3status-rs ~/projects/custom_barista/i3status-rust/compact.toml`, `tray_output none`). Backup: `~/.i3/config.bak-2026-11-17-2005`. `i3 -C` clean; after restart 3 i3bars + 2 i3status-rs run, no error blocks.
 - Remaining: 2b (tray follows Win+i, bars.conf).
+
+## 2026-11-17: Tray follows Win+i (2b, widget-builder)
+- Bars moved to generated `~/.i3/bars.conf` (`include` + `$mod+i` binding between the install.sh markers). One generator `i3status-rust/scripts/barsconf.sh <barista|rs|off>` (template `i3/bars.conf.tmpl`, paths from `~/.config/custom_barista/bars.env` written by install.sh); first line `# state: X` is the state on disk. Used by install.sh (keeps the current state) and barcycle.sh (writes next state, `.prev` copy, `i3 -C` with restore, `i3-msg reload`; reload does re-read the include and applies mode + tray_output).
+- Live migration: `install.sh --yes` (backup `~/.i3/config.bak-2026-11-17-2015`, plus manual `config.bak-2026-11-17-2012`); old bar blocks removed, old binding commented, orphan DP-2 comment deleted by hand. Second `--dry-run`: no diffs.
+- Verified: cycle rs -> off -> barista -> rs -> off -> barista, get_bar_config modes/tray_outputs match each state; screenshots of the DP-0 bar end: tray in barista (4 icons) and rs (3 icons); user also saw the tray on the rs bar (relayed by the main session). Restart in rs kept rs. Ended in barista (start state).
+- Zoom's tray icon did not re-dock into the rs bar (back in barista): backlog.
+- test.sh: generator rows per state (3 bars, dock count, one `tray_output DP-0` except off, no leftover tokens, `i3 -C`): 34 pass.

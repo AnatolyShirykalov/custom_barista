@@ -1,9 +1,11 @@
-# Filled in by install.sh (tokens below in at-signs): binary, generated i3status-rs configs dir, repo checkout, modifier.
+# Filled in by scripts/barsconf.sh (tokens below in at-signs): binary, generated i3status-rs configs dir,
+# per-state bar mode and tray output. The visible bar(s) dock and hold the tray (one bar per output can).
 bar {
   id bar-barista
   hidden_state hide
-  mode dock
+  mode @BARISTA_MODE@
   status_command @BIN@
+  tray_output @BARISTA_TRAY@
 }
 
 bar {
@@ -11,10 +13,10 @@ bar {
   output DP-0
   position bottom
   hidden_state hide
-  mode invisible
+  mode @RS_MODE@
   font pango:PragmataPro Mono, Symbols Nerd Font Mono 18
   status_command i3status-rs @CONFDIR@/config.toml
-  tray_output none
+  tray_output @RS_TRAY@
 }
 
 # DP-2 (2560): compact.toml is generated from config.toml (no disk, ccusage, IP)
@@ -23,10 +25,8 @@ bar {
   output DP-2
   position bottom
   hidden_state hide
-  mode invisible
+  mode @RS_MODE@
   font pango:PragmataPro Mono, Symbols Nerd Font Mono 18
   status_command i3status-rs @CONFDIR@/compact.toml
   tray_output none
 }
-
-bindsym @MOD@+i exec --no-startup-id @REPO@/i3status-rust/scripts/barcycle.sh
