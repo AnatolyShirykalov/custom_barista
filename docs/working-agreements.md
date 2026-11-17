@@ -42,3 +42,8 @@ Rows: Agent roster, Git hygiene, Context diet, Backlog tidy (monthly), Dependenc
 *When a decision page (`docs/design/<code>/questions.html`) is ready, open it automatically with `xdg-open <path>` (detached) before asking.*
 **Why:** user found the HTML page much easier to answer from and asked for it to open on its own next time.
 **How to apply:** main session (or designer agent) runs `setsid xdg-open <path> >/dev/null 2>&1 &` right after writing it, then asks in chat.
+
+## Bar look preferences (2026-11-17)
+*Icons must be specific and descriptive per widget (top design criterion); every number fixed width (no jumps 1↔2 digits); bars at the bottom; the tray goes with the visible bar.*
+**Why:** user's main pain was vague or missing icons (GPU had none); jumping widths and a top bar bother them; they asked for the tray to follow Win+i.
+**How to apply:** every bar design/build item checks glyph choice, padding and position; designers name the exact glyph and codepoint.
