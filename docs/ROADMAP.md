@@ -18,7 +18,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-- D3 review → `bar-designer` (opus), started 2026-11-17
+_(none)_
 
 
 ### Queued next (one agent each, in order)
@@ -27,7 +27,8 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 2. [x] **Alternatives report** (user request): challenge the custom-barista approach. Compare alternatives (i3status, i3status-rust, i3blocks, bumblebee-status, py3status, polybar, waybar/sway path, yambar, keep barista, others found) on: features we use (nvidia, hwmon temps, freq, vol, clipboard, ccusage, netm), migration cost, maintenance after upgrades, upstream activity, resources, theming. Recommendation. Done: local `docs/design/A1-alternatives/report.html`. → `researcher` Done 2026-11-17: recommends staged migration to i3status-rust (barista archived, domain expired); icon blanks = mdi provider never loaded. See docs/progress/alternatives.md.
 3. [x] **D3 i3status-rust spec**: map every barista widget (main.go order) to an i3status-rust block or custom block (ccusage, clipboard), icons via `icons = "material-nf"` + per-widget overrides (GPU must get a specific glyph), colors from our scheme, click/scroll actions; config path `i3status-rust/config.toml` in repo, i3 config snippet for a second trial bar. Options needing user choice → `docs/design/D3-i3status-rust/questions.html`. Done: `docs/design/D3-i3status-rust/spec.md`. → `bar-designer` Done 2026-11-17: spec + 3-question `questions.html`; user step `sudo pacman -S i3status-rust ttf-nerd-fonts-symbols-mono`. See docs/progress/migration.md.
 4. [x] **D3 build trial bar**: write config + custom block scripts per spec, add second bar to i3 config, `i3-msg restart`, both bars run. → `widget-builder` Done 2026-11-17: both bars run, 17 script tests pass; nvidia_gpu block replaced by gpu.sh (float temp). See docs/progress/migration.md.
-5. [ ] **D3 review**: screenshot both bars, check spec, list gaps. → `bar-designer`
+5. [x] **D3 review**: screenshot both bars, check spec, list gaps. → `bar-designer` Done 2026-11-17: accept with fixes (5c); gpu.sh deviation accepted; Mod3 hold dead (virtual keycode), $mod+i works. See docs/progress/migration.md.
+5c. [ ] **D3 fix widths**: `ccusage.sh` fixed-width parts (tokens `%5.1f`+unit, remaining always `%dh%02dm`, CH `%3.0f%%`, pct `%3.0f%%`), `gpu.sh` VRAM `%5d`; add test rows. Done: text length constant across test rows. → `widget-builder`
 5b. [ ] **Win+i bar cycle** (user request): `$mod+i` cycles off (barista `hide`, rs `invisible`) → barista dock (rs invisible) → i3status-rust dock (barista invisible); script `i3status-rust/scripts/barcycle.sh`, state in `$XDG_RUNTIME_DIR`, barista bar gets `id bar-barista`, replace `bindsym $mod+i bar mode toggle` in `~/.i3/config` (backup first), drop Mod3 reveal. Done: 3 presses cycle all states, verified via `i3-msg -t get_bar_config`. → `widget-builder`
 6. [ ] **Switch to i3status-rust** after ~1 week trial (ask when 2026-11-24): remove barista bar, decide repo fate. → `widget-builder`
 7. [ ] **README refresh**: module list stale (missing clipboard, freq, vol, weather, music; ccusage described as CPU usage); Go version prereq. Done: README matches `main.go`. → `chore`
@@ -36,7 +37,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 Long detached jobs started by agents: `check` command, done when, follow-up. Main session checks between agents, removes finished items.
 
-_(none)_
+- [ ] D3 ccusage cost sample (5 min pgrep of `npx -y ccusage@20.0.51`, ends ~19:45 2026-11-17): check `pgrep -f '[s]ample.sh' || wc -l < /tmp/claude-1000/-home-anatoly-projects-custom-barista/398ddeb7-af18-4caa-a89d-9e33f000cc79/scratchpad/ccpids.txt`; done when ≤6 PIDs (spec check 7); >6 → add to 5c.
 
 ## Recurring checks
 

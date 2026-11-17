@@ -11,6 +11,9 @@ Work items are checkboxes (`1. [ ]`): what, where, done condition, `→ agent-na
 
 ### Design
 
+1. [ ] **Upstream issue i3status-rust nvidia_gpu**: block shows 0° because nvidia-smi 620.x prints float temperature (`34.59`), block parses u32. File issue (user's call) so gpu.sh can go. → `researcher`
+1. [ ] **Trial bar polish**: layout `us`/`ru` → `US`/`RU` via `[block.mappings]`; sound block shows `0.0%` on first frame. → `widget-builder`
+
 1. [ ] **Implement bar design audit option(s)** chosen by the user from D1 spec, then designer review. → `widget-builder` → `bar-designer`
 
 - [ ] **Smoke run stdin EOF panic**: `go run . | head` panics with `EOF` at `main.go:77` when stdin closes; handle EOF gracefully, fix CLAUDE.md smoke command. → `widget-builder`

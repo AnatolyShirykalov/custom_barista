@@ -16,3 +16,18 @@
 - Fixed widths: `.eng(w:N)` on temp (2), mem/disk (3), vol (3), battery (3), wifi signal (3), net/IO speeds (4), load (4); freq.sh pads leading spaces as before; clip.sh pads text to 5 chars; gpu.sh `%2d° %4dMiB`. Not fixed width: ssid, ip, ccusage text, date.
 - Deviation: the `nvidia_gpu` block showed `0°` because the new driver prints temperature as a float (`34.34`; same class as A1 finding). Replaced by `scripts/gpu.sh` (nvidia-smi, rounds, Idle/Warning>60/Critical>70). `gpu` icon override moved to `[icons.overrides]`.
 - Spec row 14 expectations for clip are compared after left-trim (padding). `i3status-rs` has no error blocks in 6 s run. Clicks (spec check 6) not exercised by hand.
+
+## D3 review (bar-designer, 2026-11-17)
+
+Verdict: **accept with fixes** (one small builder item, 5c). Screenshot of both bars docked (top 36 px of DP-0) compared with barista bar-0.
+
+| Check | Result |
+|---|---|
+| 13 widgets, order, glyphs | All present in main.go order (wifi + battery hidden as spec'd: no carrier / desktop). No tofu; GPU md-expansion_card, freq md-sine_wave, IO md-swap_vertical, ccusage sparkles, clipboard all render. Data matches barista (ip, mem, GPU °/MiB, ccusage text, clip size). |
+| Widths over 20 s (101 updates) | Text length of every block identical in all 101 updates. |
+| Unfixed widths | ip, ssid, date: fine (date is fixed by format; ip/ssid change only on reconnect). **ccusage jumps**: remaining `1h22m`→`59m`→`9m` (5/3/2 chars), tokens `999.9K`/`73.6M`/`100.0M`, `CH 100%`; it sits right of most blocks, so every change shifts everything left of it. **gpu.sh `%4dMiB`**: card has 16303 MiB, >9999 MiB used → 5 digits. |
+| Clicks (check 6) | Exercised via stdin click events on a separate instance: layout us→ru→us OK; volume wheel 70→75→70 OK, right click → `MUT` yellow and back OK. pavucontrol, clipboard menu, calendar not launched (GUI); target scripts exist and are executable. |
+| ccusage cost (check 7) | interval 60, pinned `ccusage@20.0.51`; 22 s run showed one run; 5-min pgrep sample running detached (roadmap Background checks). |
+| nvidia_gpu → gpu.sh | **Accepted.** nvidia-smi 620.70 prints `34.59`; upstream block parses temperature as u32 (docs.rs nvidia_gpu.rs), so the field fails. Upstream issue → backlog. |
+| Mod3 | `xmodmap -pm`: mod3 = ISO_Level5_Shift on keycode 203 only, a virtual key with no physical key. Hold-to-show is dead for **both** bars (pre-existing). Bars are reachable via `$mod+i` (`bar mode toggle`, toggles both); item 5b replaces this. |
+| Minor | Layout shows `us`/`ru` lowercase (barista `US`); 1st frame of sound block shows `0.0%` at startup only. Not fixed (backlog). |
