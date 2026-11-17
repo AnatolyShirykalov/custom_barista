@@ -18,6 +18,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
+- Generate 2 MB clip fixture → `chore` (sonnet), started 2026-11-17
 
 ### Queued next (one agent each, in order)
 
@@ -28,7 +29,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 5. [x] **D3 review**: screenshot both bars, check spec, list gaps. → `bar-designer` Done 2026-11-17: accept with fixes (5c); gpu.sh deviation accepted; Mod3 hold dead (virtual keycode), $mod+i works. See docs/progress/migration.md.
 5c. [x] **D3 fix widths**: `ccusage.sh` fixed-width parts (tokens `%5.1f`+unit, remaining always `%dh%02dm`, CH `%3.0f%%`, pct `%3.0f%%`), `gpu.sh` VRAM `%5d`; add test rows. Done: text length constant across test rows. → `widget-builder` Done 2026-11-17, test.sh 22/22; restart of trial bar not done (5b in flight).
 5b. [x] **Win+i bar cycle** (user request): `$mod+i` cycles off (barista `hide`, rs `invisible`) → barista dock (rs invisible) → i3status-rust dock (barista invisible); script `i3status-rust/scripts/barcycle.sh`, state in `$XDG_RUNTIME_DIR`, barista bar gets `id bar-barista`, replace `bindsym $mod+i bar mode toggle` in `~/.i3/config` (backup first), drop Mod3 reveal. Done: 3 presses cycle all states, verified via `i3-msg -t get_bar_config`. → `widget-builder`
-6. [ ] **Switch to i3status-rust** after ~1 week trial (ask when 2026-11-24): remove barista bar, decide repo fate. → `widget-builder`
+6. [ ] **Switch to i3status-rust** after ~1 week trial (ask when 2026-11-24; trial watch: sound block on alsa driver — mute/wheel and Bluetooth/headphone sink switch): remove barista bar, decide repo fate. → `widget-builder`
 7. [x] **README refresh**: module list stale (missing clipboard, freq, vol, weather, music; ccusage described as CPU usage); Go version prereq. Done: README matches `main.go`. → `chore` Done 2026-11-17: also deleted unused weather/ and music/; see docs/progress/docs.md.
 8. [x] **Trial bar polish**: layout `us`/`ru` → `US`/`RU` via `[block.mappings]`; sound block shows `0.0%` on first frame. → `widget-builder` Done: mappings + alsa driver, see progress/migration.md.
 9. [ ] **Generate 2 MB clip fixture**: `i3status-rust/scripts/testdata/data_2m` tracked; generate in `test.sh` instead. → `chore`
