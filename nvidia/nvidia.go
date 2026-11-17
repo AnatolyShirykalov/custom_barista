@@ -22,9 +22,11 @@ func Module() bar.Module {
 }
 
 // parseGpuStats parses one csv line "temp, vram" (values may be int, float
-// or "[N/A]"); a field that is not a number is an error.
-func parseGpuStats(line string) (temp, vramUsed int, err error) {
-	fields := strings.Split(strings.TrimSpace(line), ",")
+// or "[N/A]"); a field that is not a number is an error. With several GPUs
+// nvidia-smi prints one line each; only the first is used.
+func parseGpuStats(out string) (temp, vramUsed int, err error) {
+	line, _, _ := strings.Cut(strings.TrimSpace(out), "\n")
+	fields := strings.Split(line, ",")
 	if len(fields) != 2 {
 		return 0, 0, fmt.Errorf("want 2 fields, got %d", len(fields))
 	}

@@ -18,7 +18,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-_(no agent running)_ Done recently (2026-11-17): tray follows Win+i (2b), `install.sh` apply script, per-monitor trial bars (2a), trial width bugs, click paths via `utils.Script`, GPU float fix, alternatives report (→ i3status-rust trial), D3 spec/build/review, Win+i cycle, widths, README, polish, fixture, upstream issue draft, git hygiene + code review checks. Archive: `docs/roadmap-archive/2026-11.md`.
+_(no agent running)_ Done recently (2026-11-17): multi-GPU csv, tray follows Win+i (2b), `install.sh` apply script, per-monitor trial bars (2a), trial width bugs, click paths via `utils.Script`, GPU float fix, alternatives report (→ i3status-rust trial), D3 spec/build/review, Win+i cycle, widths, README, polish, fixture, upstream issue draft, git hygiene + code review checks. Archive: `docs/roadmap-archive/2026-11.md`.
 
 ### Queued next (one agent each, in order)
 
@@ -29,7 +29,7 @@ _(no agent running)_ Done recently (2026-11-17): tray follows Win+i (2b), `insta
 2. [x] **Tray follows Win+i (2b)** (done: generated `~/.i3/bars.conf` via `scripts/barsconf.sh`, used by install.sh + barcycle.sh, reload per state, tray on DP-0; live config migrated; see `docs/progress/migration.md`). Zoom icon follow-up in backlog.
 3. [x] **Trial width bugs** (code review 2026-11-17): clip.sh `200.0K`/`1023.4K` overflow the 5-char pad; ccusage.sh `1000.0K` → pick the unit after rounding; test.sh counts a failed width check as a pass, trap set after mktemp, `$cj` unquoted; also `gofmt -w kbdlayout/mods.go mem/mem.go` (pre-existing). → `widget-builder`
 4. [x] **Docs for trial bar** (README done; CLAUDE.md proposal awaiting user, see docs/progress/docs.md): README trial section lacks runtime deps (jq, xclip, node/npx, nvidia-smi, xdotool, pavucontrol); CLAUDE.md lacks i3status-rust (tree, check `bash i3status-rust/scripts/test.sh`, colors via `[theme.overrides]` mirroring the scheme, freq palette exception) and still says "go test once tests exist"; CLAUDE.md smoke command `timeout 5 go run . | head` panics on stdin EOF — use `(sleep 6) | timeout 6 go run . 2>&1 | head -c 4000`. Main session edits CLAUDE.md with user. → `chore`
-5. [ ] **Multi-GPU csv**: `gpu.sh:5` and `nvidia/nvidia.go:44` give ERR when nvidia-smi prints >1 line; use first line, add test row each. Low (one GPU here). → `widget-builder`
+5. [x] **Multi-GPU csv** (done: first line only in gpu.sh and nvidia.go, test rows added): `gpu.sh:5` and `nvidia/nvidia.go:44` give ERR when nvidia-smi prints >1 line; use first line, add test row each. Low (one GPU here). → `widget-builder`
 6. [ ] **Block explanations** (user asked for tooltips; i3bar has no hover): middle-click every trial-bar block → `yad` popup at mouse (`--mouse --undecorated --timeout 8`, closes on click; no notification daemon running, so no notify-send) with what it shows, units, color thresholds, click actions; one script `i3status-rust/scripts/explain.sh <block>`; check middle button unused, else pick another. → `widget-builder`
 7. [ ] **Switch to i3status-rust** after ~1 week trial (ask when 2026-11-24; trial watch: sound block on alsa driver — mute/wheel and Bluetooth/headphone sink switch): remove barista bar, decide repo fate. → `widget-builder`
 

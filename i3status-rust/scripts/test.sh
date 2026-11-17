@@ -32,6 +32,7 @@ for sz in 204800 1048000 1048575 102300; do head -c $sz /dev/zero | tr '\0' a >"
 check clip15 "$(cl targets_text "$gd/data_2m")" ">1M" Idle
 check gpu1 "$("$d/gpu.sh" "$t/gpu_ok")" "34°  4781MiB" Idle
 check gpu2 "$("$d/gpu.sh" "$t/gpu_bad")" "GPU ERR" Critical
+check gpu3 "$("$d/gpu.sh" "$t/gpu_multi")" "34°  4781MiB" Idle
 # constant text length across small/large values
 len() { jq -r .text <<<"$1" | strip | awk '{print length($0)}'; }
 base=$(len "$(cc cc_100m.json)")

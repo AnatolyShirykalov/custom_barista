@@ -3,6 +3,7 @@
 # Arg 1 (tests): file with the nvidia-smi csv line.
 set -u
 line=$( [ -n "${1:-}" ] && cat "$1" || timeout 3 nvidia-smi --query-gpu=temperature.gpu,memory.used --format=csv,noheader,nounits 2>/dev/null)
+line=${line%%$'\n'*} # several GPUs: first line only
 awk -F', *' -v l="$line" 'BEGIN {
   n = split(l, a, /, */)
   if (n < 2 || a[1] !~ /^[0-9.]+$/ || a[2] !~ /^[0-9.]+$/) { print "{\"icon\":\"gpu\",\"state\":\"Critical\",\"text\":\"GPU ERR\"}"; exit }

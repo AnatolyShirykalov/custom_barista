@@ -14,6 +14,7 @@ func TestParseGpuStats(t *testing.T) {
 		{"  41 ,  500  ", 41, 500, false},
 		{"[N/A], 500", 0, 0, true},
 		{"41, [N/A]", 0, 0, true},
+		{"41, 500\n52, 7000\n", 41, 500, false},
 		{"41", 0, 0, true},
 		{"", 0, 0, true},
 	}
