@@ -49,3 +49,16 @@ Against B: eng switches binary prefix at 1024, so 1000-1023 KiB/MiB print 4 digi
 ## Decisions (user, 2026-11-17)
 - Q1 units: A, decimal GB/MB/kB with `eng(w:3)`.
 - Q2 disk IO markers: A, dim letters R/W via icon overrides `disk_read`/`disk_write`.
+
+## Review (designer, 2026-11-17): accepted
+Commit e884777 + review fix (test.sh). Checks:
+| Check | Result |
+|---|---|
+| Icons #777 (incl. net arrows, R/W) | pass: JSON shows every icon in `<span color='#777777'>`; screenshots dim |
+| Load/temp red when hot | pass: block `color` #DD6666 (load 74/32 cores > critical 0.5; temp 80°), icon stays #777 |
+| freq/ccusage/clip/gpu one space after icon | pass |
+| Right edges fixed across 3 shots | pass: separator x identical on DP-0 (12) and DP-2 (9) |
+| Disk IO markers, 3-digit numbers, one unit family | pass: `R 0.0kB W 2.0kB`, mem 74GB, disk 616GB, net kB, GPU 1.2GB |
+| test.sh, compact sync, no tofu, DP-2 fits | pass: 38/0 after fix; gen-compact in sync; no tofu; DP-2 has free room left |
+Fix made in review: the freq3 last-color check counted only failures (builder 38 vs rerun 37); now counts a pass. R/W only on DP-0 is intended (compact drops disk_iostats). Live configs equal install.sh output.
+Cosmetic note (no fix): on DP-2 freq's trailing pad plus mem's right-aligned ` 74GB` leave a wide gap between the two; per spec (eng has no right pad).

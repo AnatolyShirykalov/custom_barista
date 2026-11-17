@@ -11,7 +11,7 @@ check() { # name json expected_text expected_state
 check freq1 "$("$d/freq.sh" "$t/freq1")" "1 0 0 2 1 0      " Idle
 check freq2 "$("$d/freq.sh" "$t/freq2")" "0 12 0 0 0 0     " Idle
 o=$("$d/freq.sh" "$t/freq3"); check freq3 "$o" "0 0 0 0 0 0 1      " Idle
-grep -q "#ff0000'>1</span> *\"" <<<"$o" || { echo "FAIL freq3: last color"; fail=$((fail+1)); }
+grep -q "#ff0000'>1</span> *\"" <<<"$o" && pass=$((pass+1)) || { echo "FAIL freq3: last color"; fail=$((fail+1)); }
 check freq4 "$("$d/freq.sh" "$t/freq4")" "FREQ ERR" Critical
 cc() { CCUSAGE_JSON=$t/$1 "$d/ccusage.sh"; }
 check cc5 "$(cc cc_null.json)" "53.3M CH  96% 1h46m      " Good

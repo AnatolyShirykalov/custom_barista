@@ -11,3 +11,9 @@
 ## D4 rs polish (builder, 2026-11-17)
 Built per `docs/design/D4-rs-polish/spec.md` (Q1 A decimal, Q2 A R/W). config.toml: global dim `icons_format`, R/W overrides, `eng(p:G|k,w:3)` for mem/disk/IO/net; compact.toml regenerated. Scripts: freq/ccusage/clip trailing pad, gpu.sh decimal GB. test.sh: rows updated, gpu4 added, 38 pass. Deployed config copies to ~/.config/custom_barista/ and cycled the bars (state left rs, as found).
 Screenshots (untracked, scratchpad d4-rs-main-L/R.png, d4-rs-small.png): icons dim, values one space after icon, main bar right edge identical over 3 shots. DP-2 small-bar crop hashes differ over time (live values); not analysed. Needs bar-designer review.
+
+## D4 rs polish (designer review, 2026-11-17): accepted
+- All acceptance checks pass (details in spec Review section). Red when hot: load (32 cores, load 74 > 0.5/core) and temp 80° render #dd6666 values with #777 icons in the live bar.
+- R/W only on DP-0 by design: gen-compact.sh drops disk_iostats for DP-2 (D3/2a); the unused `disk_read/disk_write` overrides in compact.toml are harmless.
+- test.sh 37 vs 38: the freq3 last-color grep only incremented fail, never pass (no hidden skip; 37 rows counted). Fixed to count a pass: 38 pass, 0 fail.
+- Live `~/.config/custom_barista/{config,compact}.toml` byte-equal to what install.sh generates (same `~/projects/custom_barista` -> repo substitution).
