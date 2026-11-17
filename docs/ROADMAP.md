@@ -18,7 +18,7 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-(none)
+- D3 review → `bar-designer` (opus), started 2026-11-17
 
 
 ### Queued next (one agent each, in order)
