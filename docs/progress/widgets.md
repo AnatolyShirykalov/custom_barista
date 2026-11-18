@@ -27,3 +27,6 @@ Deleted `clipboard/`, its import and `Get()` in main.go; README module line and 
 - Problem: freq.sh padded up to 6 trailing spaces (assumed 6 two-digit buckets) and mem eng(w:3) added a leading pad, a 6+ space gap on bar-small.
 - Fix: freq.sh pad = int(cpus/10) - present two-digit counts (cpu count is constant, so width stays fixed; 32 threads: max 3, now 0-3 spaces); mem `w:3`→`w:2` (avail < 100 GB). test.sh freq rows lose trailing pad (fixtures have few cpus). 38/38 pass, both bars run clean, deployed.
 - Caveat: a host with >=100 GB available would show 3 digits (width +1).
+
+## Block explanations (2026-11-18)
+Middle click on every block runs `scripts/explain.sh <name>` (names: kbd load temp freq mem disk io gpu net wifi battery sound ccusage clip time) -> detached `yad --mouse --undecorated --timeout 8` popup with an OK button. Middle button was unused on all blocks. `EXPLAIN_DRY=1` prints the text (used by test.sh: every name in config.toml known, <=6 lines, every block has one). Thresholds in the texts are copied from config.toml/scripts; update explain.sh when they change.

@@ -30,6 +30,9 @@ format = " ^icon_keyboard $layout "
 [[block.click]]
 button = "left"
 cmd = "xdotool key ISO_Next_Group"
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh kbd"
 
 [[block]]
 block = "load"
@@ -40,6 +43,9 @@ warning = 0.25
 critical = 0.5
 [block.icons_overrides]
 cogs = "\U000F029A"       # md-gauge
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh load"
 
 [[block]]
 block = "temperature"
@@ -52,12 +58,18 @@ good = 0
 idle = 60
 info = 60
 warning = 70
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh temp"
 
 [[block]]
 block = "custom"
 command = "~/projects/custom_barista/scripts/freq.sh"
 json = true
 interval = 2
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh freq"
 
 [[block]]
 block = "memory"
@@ -65,12 +77,18 @@ format = " $icon $mem_avail.eng(prefix:G,w:2) "
 interval = 3
 warning_mem = 97.8
 critical_mem = 98.9
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh mem"
 
 [[block]]
 block = "custom"
 command = "~/projects/custom_barista/scripts/gpu.sh"
 json = true
 interval = 2
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh gpu"
 
 [[block]]
 block = "net"
@@ -79,6 +97,9 @@ format = " $icon ^icon_net_up $speed_up.eng(prefix:k,w:3) ^icon_net_down $speed_
 inactive_format = " $icon down "
 missing_format = ""
 interval = 2
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh net"
 
 [[block]]
 block = "net"
@@ -87,12 +108,18 @@ format = " $icon $ssid $signal_strength.eng(w:3) ^icon_net_up $speed_up.eng(pref
 inactive_format = ""
 missing_format = ""
 interval = 2
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh wifi"
 
 [[block]]
 block = "battery"
 format = " $icon $percentage.eng(w:3) "
 missing_format = ""
 interval = 60
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh battery"
 
 [[block]]
 block = "sound"
@@ -102,6 +129,9 @@ max_vol = 100
 [[block.click]]
 button = "left"
 cmd = "pavucontrol"
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh sound"
 
 [[block]]
 block = "custom"
@@ -112,6 +142,9 @@ interval = 5
 button = "left"
 cmd = "~/scripts/clipboard_menu.sh"
 update = true
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh clip"
 
 [[block]]
 block = "time"
@@ -120,3 +153,6 @@ interval = 1
 [[block.click]]
 button = "left"
 cmd = "~/scripts/open_calender.sh"
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh time"
