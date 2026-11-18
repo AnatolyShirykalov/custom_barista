@@ -34,7 +34,7 @@ No agent running (Switch 7b done). Done recently (2026-11-17): tray icons after 
 5. [x] **Multi-GPU csv** (done: first line only in gpu.sh and nvidia.go, test rows added): `gpu.sh:5` and `nvidia/nvidia.go:44` give ERR when nvidia-smi prints >1 line; use first line, add test row each. Low (one GPU here). → `widget-builder`
 6. [x] **Switch 7a: remove barista** (user 2026-11-18, trial accepted): delete Go bar (packages, main.go, go.mod/sum, fonts/ if unused by rs, barista bits of install.sh/README/CLAUDE.md/docs); Win+i toggles off <-> rs (barcycle.sh/barsconf.sh/bars.conf.tmpl drop barista state); live bars migrated; test.sh green. → `widget-builder` Done 2026-11-18, see `docs/progress/migration.md`.
 7. [x] **Switch 7b: flatten rs to root** (user 2026-11-18): move `i3status-rust/*` to repo root; fix install.sh, test.sh, gen-compact.sh, barsconf paths, README, CLAUDE.md; rerun install.sh; repo keeps its name. → `widget-builder` Done, see `docs/progress/migration.md`.
-8. [ ] **Agent roster after switch**: retire/rewrite Go-only agents (widget-builder, dep-updater), recurring checks table (Widget health, Dependency updates) for the rs setup. → `agent-curator`
+8. [x] **Agent roster after switch**: widget-builder, dep-updater, bar-designer, code-reviewer rewritten for rs; Widget health (→ `chore`) and Dependency updates rows rewritten. → `agent-curator` Done 2026-11-18, see `docs/progress/recurring.md`.
 9. [ ] **Block explanations** (user asked for tooltips; i3bar has no hover): middle-click every trial-bar block → `yad` popup at mouse (`--mouse --undecorated --timeout 8`, closes on click; no notification daemon running, so no notify-send) with what it shows, units, color thresholds, click actions; one script `scripts/explain.sh <block>`; check middle button unused, else pick another. → `widget-builder`
 
 ### Background checks
@@ -49,14 +49,14 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 | Check | Agent | What | Last run |
 |---|---|---|---|
-| Agent roster | `agent-curator` | revise `.claude/agents/*`: tighten, split, merge, add specialists for upcoming work no agent fits, retire unused; evidence from recent reports and items that lacked a specialist | 2026-11-17 (set up) |
+| Agent roster | `agent-curator` | revise `.claude/agents/*`: tighten, split, merge, add specialists for upcoming work no agent fits, retire unused; evidence from recent reports and items that lacked a specialist | 2026-11-18 |
 | Context diet | `context-auditor` | tools, MCP servers, connectors, plugins, skills, user agents loaded here but unused/unrelated; context cost; main session asks the user which to disable per project, applies, checks `/context` | 2026-11-17 (set up) |
 | Git hygiene | `repo-janitor` | anything tracked that shouldn't be (build output, logs, dumps, caches, large binaries, local config, secrets); `.gitignore` gaps; safe `git rm --cached` | 2026-11-17 |
 | Backlog tidy | `chore` | monthly: drop or merge stale, superseded or duplicate backlog items, check each still has an agent and a done condition; never touch the roadmap's queue | 2026-11-17 |
-| Dependency updates | `dep-updater` | `go list -m -u all`, barista.run upstream, Go toolchain; bump what is safe, backlog the rest | never |
+| Dependency updates | `dep-updater` | i3status-rs installed vs latest release, changelog breaking config changes grep'd in config.toml/scripts, script deps (jq, xclip, yad, nvidia-smi, xdotool, node) present and formats unchanged; fix keys, backlog the rest | never |
 | Look/usability pass | `bar-designer` | screenshot the bar; clarity, colors, stable widths, glyphs render; findings → backlog | 2026-11-17 |
-| Widget health | `widget-builder` | every widget shows real data on this machine (`timeout 5 go run .`, grep `ERR`); after system upgrades check nvidia-smi, hwmon, pulse, sysfs formats | never |
-| Code review + docs | `code-reviewer` | review diffs since last run; README module list and CLAUDE.md match the code | 2026-11-17 |
+| Widget health | `chore` | every block shows real data on this machine: `bash scripts/test.sh`, smoke `(sleep 6) \| timeout 6 i3status-rs $PWD/config.toml` (and compact.toml), grep `ERR`/`not found`/`error`; after system upgrades check nvidia-smi, hwmon, pulse, sysfs formats; failures → backlog for `widget-builder` | never |
+| Code review + docs | `code-reviewer` | review diffs since last run; README block list and CLAUDE.md match the code | 2026-11-17 |
 
 
 ## Decisions made

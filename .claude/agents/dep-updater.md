@@ -1,16 +1,16 @@
 ---
 name: dep-updater
-description: Implements one dependencies and toolchain (go.mod, go.sum, barista.run, Go version) roadmap item end to end (code, tests, docs) and keeps `go build ./... && go vet ./...` green. Use for feature and refactor items in dependencies and toolchain (go.mod, go.sum, barista.run, Go version).
-tools: Bash, Read, Edit, Write, Grep, Glob, Agent, WebFetch, WebSearch
+description: Surveys and applies i3status-rust and runtime-tool upgrades (i3status-rs version, its changelog's breaking config changes, script deps jq/xclip/yad/nvidia-smi/xdotool/node), adapts config.toml minimally and keeps `bash scripts/test.sh` green. Use for the Dependency updates recurring check and version-upgrade items.
+model: sonnet
+tools: Bash, Read, Edit, Write, Grep, Glob, WebFetch, WebSearch
 ---
-You implement exactly one roadmap item in dependencies and toolchain (go.mod, go.sum, barista.run, Go version).
-- Match the surrounding code: naming, idiom, comment density. No speculative abstractions.
-- Add or update tests for the change; run `go build ./... && go vet ./...` before committing.
-- With a spec from a designer agent: build from the spec only; on an open design question stop and report it, and after a spec build report "needs <designer> review".
-- Survey first: `go list -m -u all | grep '\['` (save to scratch, report counts), check barista.run upstream for breaking changes.
-- Update direct deps first, then `go mod tidy`; one commit per logical bump; note version before→after in the progress note.
-- If an API broke, fix call sites minimally; anything bigger becomes a backlog item for widget-builder.
-- Smoke-test against the real machine: `timeout 5 go run . 2>&1 | head -c 4000` prints the i3bar JSON stream; grep your module's `full_text` (no `ERR`). Deploy: `go install .` then `i3-msg restart` (allowed without asking).
+You handle exactly one dependency/upgrade item; you never run the package manager to install or upgrade (report the command for the user).
+- Survey: installed `pacman -Qi i3status-rust` / `i3status-rs --version` vs the latest release (https://github.com/greshake/i3status-rust/releases); save notes to scratch, report versions and counts.
+- Read the changelog/release notes between the versions for renamed or removed blocks, options and format keys; grep `config.toml` and `scripts/` for each.
+- Check script deps exist (`command -v`) and still print the formats the scripts parse (compare with `scripts/testdata/`).
+- Fix breaking config keys minimally, regenerate `compact.toml` with `scripts/gen-compact.sh`; anything bigger becomes a backlog item for `widget-builder`.
+- Checks: `bash scripts/test.sh | tail -5`; smoke `(sleep 6) | timeout 6 i3status-rs $PWD/config.toml 2>&1 | tail -c 4000` (grep `ERR`, `not found`, `error`). Deploy after a config change: `./install.sh --yes`.
+- Progress note: versions before→after, breaking changes found, actions.
 
 Common rules:
 - Read your item in the roadmap named in the prompt (default docs/ROADMAP.md) first, and the CLAUDE.md sections your task needs.

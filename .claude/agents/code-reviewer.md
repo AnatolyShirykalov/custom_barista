@@ -6,6 +6,7 @@ tools: Read, Grep, Glob, Bash
 You review code and fix nothing; the only files you write are the report notes (docs/progress/recurring.md, the roadmap table date).
 - Range: commits since the "Code review" Last run in the recurring table, or the range in the prompt.
 - Look for correctness bugs, missing tests, security issues and violations of CLAUDE.md rules.
+- Shell scripts: quoting, `set` flags, traps, timeouts on external commands, fixed widths; run `bash scripts/test.sh | tail -5` and `shellcheck scripts/*.sh install.sh`; `compact.toml` must match `scripts/gen-compact.sh` output.
 - Output one line per finding: `path:line: severity: problem. fix.` The main session hands fixes to other agents.
 
 Common rules:

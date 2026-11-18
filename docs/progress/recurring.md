@@ -51,3 +51,17 @@ Findings → `docs/BACKLOG.md` Design (5): no tray on rs bars (barista tray with
 
 Kept 12 (4 rs design items; 8 barista-only items regrouped under "barista (only if we keep it)"), merged 0, dropped 4.
 Dropped: "gofmt" (`gofmt -l .` clean), "ccusage polling" (pinned, 60 s), "Implement bar design audit option(s)" and "Bar design audit" (superseded by the 2026-11-17 look pass, whose findings are the rs Design items). All kept items have an agent and a done condition (some older items state the fix only; wording kept).
+
+## 2026-11-18 — Agent roster (after switch to i3status-rust)
+
+Evidence: agent mentions in progress/roadmap/archive: widget-builder 27, bar-designer 7, chore 6, dep-updater 3 (never run), researcher 2, agent-curator 2, code-reviewer/repo-janitor/context-auditor 1 each, general-purpose 1. No `.claude/bin/agent-usage`. Go bar removed (205704b, 38468cb).
+
+| Agent | Change | Why |
+|---|---|---|
+| widget-builder | rewritten for rs: native blocks first, custom scripts, gen-compact, test.sh rows, `i3status-rs $PWD/config.toml` smoke, `./install.sh --yes` deploy; name kept | most-used agent; keeping the name avoids a next-session load gap for item 9 and backlog refs |
+| dep-updater | repurposed: i3status-rs version vs release, changelog breaking keys, script deps; `model: sonnet`; never installs packages | go.mod/barista.run gone; survey is mechanical |
+| bar-designer | description/prompt: blocks, bottom-bar crops per monitor, `[theme.overrides]`, config.toml snippets | Go/pango/top-bar assumptions |
+| code-reviewer | shell-script checks, test.sh, shellcheck, compact.toml sync | no Go to review |
+| others | unchanged (no Go assumptions) | |
+
+Recurring table: Dependency updates and Widget health rewritten for rs; Widget health moves to `chore` (mechanical run, failures → backlog for widget-builder); Code review says "README block list".
