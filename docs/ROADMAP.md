@@ -27,6 +27,8 @@ No agent running. Done recently (2026-11-18): switched to i3status-rust (Go bari
 2. [x] **Block explanations** (user asked for tooltips; i3bar has no hover): middle-click every trial-bar block → `yad` popup at mouse (`--mouse --undecorated --timeout 8`, closes on click; no notification daemon running, so no notify-send) with what it shows, units, color thresholds, click actions; one script `scripts/explain.sh <block>`; check middle button unused, else pick another. → `widget-builder` DONE 2026-11-18: middle button was free everywhere; see progress/widgets.md.
 3. [ ] **D5 bar design review**: questions page ready `docs/design/D5-bar-review/questions.html` (options A polish / B regroup, rec. / C quiet; picks P1-P5); freq gap now 1 cell, keep. Awaits user pick → widget-builder. Detail: `docs/progress/design.md`. → `bar-designer`
 4. [x] **U1 Claude usage block**: done a10e615, review accepted (no fixes; notes docs/progress/design.md, widgets.md).
+5. [ ] **D5 page v2, picture per proposal** (user 2026-11-18: page hard to work with, needs many more pictures): rebuild questions.html so every finding F1-F8 and every fix P1-P5 and option A/B/C has its own before/after image of the real bar (full-size, readable), one decision per section. → `bar-designer`
+6. [ ] **U1b 7-day limit mark** (user yes 2026-11-18): usage block shows a mark (degraded colour) when seven_day utilization > 70 %, bad > 90 %; fixed width; test rows; explain.sh text. → `widget-builder`
 
 ### Background checks
 

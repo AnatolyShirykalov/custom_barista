@@ -8,4 +8,3 @@ _(empty: add new items here)_
 
 ## Bar blocks
 
-- **U1 follow-up: 7-day limit indicator**: the tap and API already carry `seven_day` (U1 spec stores it); a mark when 7d > 70 % would warn before a weekly lockout the 5h colour cannot show.
