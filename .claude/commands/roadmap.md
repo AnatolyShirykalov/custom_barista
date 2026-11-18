@@ -21,6 +21,6 @@ Let's continue to follow it: "In flight", "Queued next", "Background checks"; op
 - If a decision is genuinely mine, add it to "Open decisions" and ask me; don't block other items on it.
 - When the context hook warns, finish the current item, make sure everything is committed and pushed and the roadmap is current, then tell me it's a good moment to `/clear` + `/roadmap <name>`.
 - Context diet results come back as a list: ask me with AskUserQuestion (multiSelect) which to disable, apply them to `.claude/settings.local.json` (or `settings.json` if I say shared), and set the row date.
-- After a widget or design change is merged: `go install .` + `i3-msg restart` (no need to ask), then check the bar shows no ERR.
+- After a block or design change is merged: `./install.sh --yes` (no need to ask), then check both bars run i3status-rs with no error blocks.
 
 $ARGUMENTS
