@@ -65,3 +65,6 @@ Evidence: agent mentions in progress/roadmap/archive: widget-builder 27, bar-des
 | others | unchanged (no Go assumptions) | |
 
 Recurring table: Dependency updates and Widget health rewritten for rs; Widget health moves to `chore` (mechanical run, failures → backlog for widget-builder); Code review says "README block list".
+
+## Widget health 2026-11-18
+test.sh pass=87 fail=0. Smoke config.toml and compact.toml (6 s): no ERR/not found/error. All blocks show plausible data: kbd US, load, temp 60-71C, cpu, mem 85GB, disk 595GB, io, gpu 33C/1.1GB (nvidia-smi 0%, 33.22C, 1013MiB matches), net, sound 100% (pactl 100%, pulseaudio driver ok), claude-usage 57% $69.1 cache 96%, clip, clock. hwmon0-9 present; no battery supply, block hidden. No failures, no backlog items.
