@@ -62,3 +62,8 @@ Rows: Agent roster, Git hygiene, Context diet, Backlog tidy (monthly), Dependenc
 *"Tooltip" = text on mouse hover; a click-to-open popup does not count.*
 **Why:** middle-click popups were built and the user still saw "no tooltips".
 **How to apply:** check what an interaction word means on this desktop (i3bar has no hover) and say so before building a substitute.
+
+## After /wrapup: queue, don't start (2026-11-18)
+*Once the session is wrapped up, new requests are only added to the roadmap/backlog; no new agents are started.*
+**Why:** user wanted a post-wrapup request scheduled, and an agent was launched instead.
+**How to apply:** after `/wrapup`, write the item into "Queued next" (or backlog), commit, push, and say it is queued for the next session.
