@@ -1,7 +1,3 @@
-# build output
-/custom_barista
-*.test
-*.out
 # logs and background-job output
 /log/
 *.log
@@ -17,6 +13,3 @@
 .env.*
 !.env.example
 .claude/settings.local.json
-# coverage
-coverage.out
-*.prof
