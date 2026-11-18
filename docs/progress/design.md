@@ -15,3 +15,11 @@
 - Measured: local log scan of the 5h window (77 files of 1.4 GB) about 0.1 s with find -newermt + grep + one jq pass; 1140 duplicate msg/req groups, all identical usage, so keep-first dedupe is exact.
 - Bar screenshot not possible this run (fullscreen window over the DP-0 bar); review takes before/after crops.
 - Remaining: widget-builder implements, bar-designer review.
+
+### U1 review (bar-designer, 2026-11-18): accepted, no fixes
+- Tests 87/87; live `time claude-usage.sh` 0.15 s; strip width 33 for live, stale, unknown (`?%`) and max values.
+- Bar crops 3 min apart (img/review-width.png): separators and neighbours aligned, `cache` dim, icon and glyphs render.
+- Token: no part of the access token in ~/.cache/claude-usage (api.json, rate_limits.json, lock); no `set -x`/`Bearer $` in argv; header fed by builtin printf to `curl -H @-`.
+- Statusline output identical to `.bak-u1` for the same input; second `./install.sh --yes` keeps exactly one marker line.
+- Acceptance 6 replaced by an independent jq recompute (group_by dedupe, own price lookup): 118.95M / $67.34 vs bar 119.0M / $67.4 (gap = haiku >100K tier, which the one-off ignored).
+- Deviation, accepted: dim on API `stale` only when the newest data is also older than 300 s (fresh tap data is not dimmed by an old 401); better than the spec's literal rule.

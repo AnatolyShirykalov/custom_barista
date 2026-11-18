@@ -26,7 +26,7 @@ No agent running. Done recently (2026-11-18): switched to i3status-rust (Go bari
 1. [x] **DP-2 gap freq→mem**: freq pad now = (cpu count/10) minus present two-digit counts (was fixed 6), mem eng w:3→w:2. Gap 6+ spaces → ~2-3. See progress/widgets.md.
 2. [x] **Block explanations** (user asked for tooltips; i3bar has no hover): middle-click every trial-bar block → `yad` popup at mouse (`--mouse --undecorated --timeout 8`, closes on click; no notification daemon running, so no notify-send) with what it shows, units, color thresholds, click actions; one script `scripts/explain.sh <block>`; check middle button unused, else pick another. → `widget-builder` DONE 2026-11-18: middle button was free everywhere; see progress/widgets.md.
 3. [ ] **D5 bar design review**: questions page ready `docs/design/D5-bar-review/questions.html` (options A polish / B regroup, rec. / C quiet; picks P1-P5); freq gap now 1 cell, keep. Awaits user pick → widget-builder. Detail: `docs/progress/design.md`. → `bar-designer`
-4. [ ] **U1 Claude usage block**: built, awaiting `bar-designer` review (spec `docs/design/U1-usage-block/spec.md`; tap in ~/.claude/bin/claude-statusline, backup `.bak-u1`; notes docs/progress/widgets.md).
+4. [x] **U1 Claude usage block**: done a10e615, review accepted (no fixes; notes docs/progress/design.md, widgets.md).
 
 ### Background checks
 
