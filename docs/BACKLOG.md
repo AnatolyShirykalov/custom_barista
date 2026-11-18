@@ -5,3 +5,7 @@ Open work items that are not next. **Not read at session start**: `/roadmap` rea
 Work items are checkboxes (`1. [ ]`): what, where, done condition, `→ agent-name`. The status line shows their count as "+N backlog".
 
 _(empty: add new items here)_
+
+## Bar blocks
+
+- **U1 follow-up: 7-day limit indicator**: the tap and API already carry `seven_day` (U1 spec stores it); a mark when 7d > 70 % would warn before a weekly lockout the 5h colour cannot show.
