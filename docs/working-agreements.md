@@ -47,3 +47,18 @@ Rows: Agent roster, Git hygiene, Context diet, Backlog tidy (monthly), Dependenc
 *Icons must be specific and descriptive per widget (top design criterion); every number fixed width (no jumps 1↔2 digits); bars at the bottom; the tray goes with the visible bar.*
 **Why:** user's main pain was vague or missing icons (GPU had none); jumping widths and a top bar bother them; they asked for the tray to follow Win+i.
 **How to apply:** every bar design/build item checks glyph choice, padding and position; designers name the exact glyph and codepoint.
+
+## Decision pages: a picture per proposal (2026-11-18)
+*Every finding, fix and option on a decision page gets its own readable before/after image of the real bar (rendered, not hand-drawn where possible), one decision per section.*
+**Why:** user found a text-heavy page with few mocks "hard to work with" and could not pick from it.
+**How to apply:** designers render AFTER images (Xvfb + temporary config copies, see `docs/design/D5-bar-review/render/`), zoom small regions 2x, click to enlarge.
+
+## Don't push back a request the user is waiting on (2026-11-18)
+*A request the user already asked for and is waiting on keeps its place; new requests don't jump ahead of it without asking.*
+**Why:** user had to remind twice about the tooltips after a new design request was put ahead of them.
+**How to apply:** when re-ranking, a waited-on item stays first unless the user agrees; run independent new work alongside it instead.
+
+## Tooltips mean hover (2026-11-18)
+*"Tooltip" = text on mouse hover; a click-to-open popup does not count.*
+**Why:** middle-click popups were built and the user still saw "no tooltips".
+**How to apply:** check what an interaction word means on this desktop (i3bar has no hover) and say so before building a substitute.

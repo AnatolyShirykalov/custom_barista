@@ -18,20 +18,13 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-No agent running. Done recently (2026-11-18): switched to i3status-rust (Go barista bar removed, rs setup flattened to repo root, Win+i toggles off <-> rs), agent roster rewritten for rs; 2026-11-17: D4 polish, tray fix, install.sh, per-monitor bars, clipboard removal. Archive: `docs/roadmap-archive/2026-11.md`.
+No agent running. Done recently (2026-11-18, session 2): sound block on pulseaudio (frees ALSA card 3 for smart_speaker), DP-2 freq→mem gap, middle-click explain popups, Claude usage block U1 (statusline tap + OAuth fallback, real 5h %, 7d mark), D5 design review v2, clipboard block removed, D5-R regrouping built (review pending), hover tooltips researched; widget health check ok. Earlier 2026-11-18: switched to i3status-rust. Archive: `docs/roadmap-archive/2026-11.md`.
 
 ### Queued next (one agent each, in order)
 
-0. [x] **S1 sound block off ALSA**: `driver = "alsa"` makes each bar spawn `alsactl monitor`, which holds ALSA card 3 (ALC1220) open and blocks HDA codec reconfig; switch to `pulseaudio` (follows default sink, needed for the planned Line Out/Headphones sink split). See progress/widgets.md.
-1. [x] **DP-2 gap freq→mem**: freq pad now = (cpu count/10) minus present two-digit counts (was fixed 6), mem eng w:3→w:2. Gap 6+ spaces → ~2-3. See progress/widgets.md.
-2. [x] **Block explanations** (user asked for tooltips; i3bar has no hover): middle-click every trial-bar block → `yad` popup at mouse (`--mouse --undecorated --timeout 8`, closes on click; no notification daemon running, so no notify-send) with what it shows, units, color thresholds, click actions; one script `scripts/explain.sh <block>`; check middle button unused, else pick another. → `widget-builder` DONE 2026-11-18: middle button was free everywhere; see progress/widgets.md.
-3. [x] **D5 bar design review** (picked 2026-11-18: regrouping only, P4 = remove clipboard): questions page ready `docs/design/D5-bar-review/questions.html` (options A polish / B regroup, rec. / C quiet; picks P1-P5); freq gap now 1 cell, keep. Awaits user pick → widget-builder. Detail: `docs/progress/design.md`. → `bar-designer`
-4. [x] **U1 Claude usage block**: done a10e615, review accepted (no fixes; notes docs/progress/design.md, widgets.md).
-5. [x] **D5 page v2, picture per proposal**: v2 ready, `docs/design/D5-bar-review/questions.html` (real BEFORE crops + Xvfb-rendered AFTER per F/P/option; F1/F2 resolved by U1). Awaits user pick (item 3). Detail: `docs/progress/design.md`.
-6. [x] **U1b 7-day limit mark** (user yes 2026-11-18): usage block shows a mark (degraded colour) when seven_day utilization > 70 %, bad > 90 %; fixed width; test rows; explain.sh text. → `widget-builder` Done: claude-usage.sh `7d NN%` mark (tap or OAuth cache seven_day), fixed width, rows u18-u21.
-7. [x] **D5-P4 remove clipboard block** (user 2026-11-18, replaces P4 padding fix): drop clip block from config.toml (compact regenerated), its script/click/explain text/tests if unused elsewhere; install.sh leftovers. → `widget-builder` Done: block, clip.sh, fixtures, test rows, explain case, xclip/clipboard_menu deps removed.
-8. [ ] **D5-R regrouping** (BUILT, awaiting bar-designer review; tests 94 pass, deployed, after-crops img/live-after-*.png; detail docs/progress/widgets.md) (user 2026-11-18: "regrouping only"; no P2/P3/P5 — "we have enough space"; 7d mark "don't hide it" = always show `7d NN%`, colour only above 70/90): spec from the D5 option B regrouping part only (merge_with_next groups, 6 separators; clipboard now gone) + 7d always visible. Spec ready: `docs/design/D5-bar-review/spec-regroup.md` (gen-compact rule, test rows, renders). Next → `widget-builder`, then `bar-designer` review.
-9. [ ] **T1 hover tooltips research** (user 2026-11-18: middle-click popups are not what they want, "need hover"): i3bar has no hover; compare (a) hover daemon beside i3bar (pointer watch over bar window + block extents from i3status-rs JSON / pango widths, show explain.sh text in yad after ~600 ms), (b) other X11 bar with tooltips (eww, others) fed by i3status-rs or ported blocks, (c) anything else; cost, robustness, pick. Output: decision page if user must choose. → `researcher` then `bar-designer`
+1. [ ] **D5-R regrouping review**: built 5959269 per `docs/design/D5-bar-review/spec-regroup.md` (7 merge flags, gen-compact merge rule, 7d mark always shown dim ≤70); tests 94 pass, deployed; crops `docs/design/D5-bar-review/img/live-after-dp0.png`, `live-after-dp2.png`. Review vs spec, click each block's middle-click explain (stdin click JSON), mark [x]. → `bar-designer` (review)
+2. [ ] **T1 hover tooltips spike** (user 2026-11-18: wants real hover, middle-click popups are not it): research done `docs/design/T1-hover/research.md`, recommended (a) hover daemon beside i3bar (python-xlib Enter/Leave/Motion on i3bar windows, block extents from tee'd i3status-rs JSON + gi Pango widths, GTK popup with explain.sh text after ~600 ms). Spike: needs `python-xlib` (user installs: `sudo pacman -S python-xlib`); compute block edges for both bars, compare with click-reported edges (x − relative_x, width); done = error table per block + go/no-go. Then spec → build → review. → `widget-builder` (spike)
+3. [ ] **Recurring: Dependency updates** (last run never; due after U1b, P4, D5-R). → `dep-updater`
 
 ### Background checks
 
@@ -57,6 +50,9 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 ## Decisions made
 
+- 2026-11-18: D5 picks: regrouping only (from option B), no P2/P3/P5 ("enough space"), clipboard block removed entirely; 7d usage mark always visible.
+- 2026-11-18: Claude usage block: statusline rate_limits cache + OAuth usage endpoint fallback; show window tokens, colour from real 5h %, reset time, window cost, cache ratio; ccusage dropped.
+- 2026-11-18: tooltips must appear on hover (middle-click popup is only a stopgap); sound block uses pulseaudio driver.
 - 2026-11-18: switch to i3status-rust now; flatten rs setup to repo root; Win+i toggles off <-> rs; repo keeps name custom_barista.
 - 2026-11-17: barista clipboard widget removed for both users.
 - 2026-11-17: barista click paths → `os.UserHomeDir()`; tray follows Win+i (generated `~/.i3/bars.conf`); both bars at bottom.
@@ -70,5 +66,4 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
-- D5 bar review: pick direction A/B/C and P1-P5 on `docs/design/D5-bar-review/questions.html`. asked 2026-11-18
 - Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user action, from own GitHub account). asked 2026-11-17
