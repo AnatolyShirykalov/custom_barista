@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs the spec test table against testdata/. Prints failures and a summary line.
 d=$(cd "$(dirname "$0")" && pwd); t=$d/testdata; pass=0; fail=0
-gd=$(mktemp -d); cj=$(mktemp); trap 'rm -f "$cj"; rm -rf "$gd"' EXIT; head -c 2097152 /dev/zero | tr '\0' a >"$gd/data_2m"
+gd=$(mktemp -d); cj=$(mktemp); trap 'rm -f "$cj"; rm -rf "$gd"' EXIT
 strip() { sed 's/<[^>]*>//g'; }
 check() { # name json expected_text expected_state
   jq -e . >/dev/null 2>&1 <<<"$2" || { echo "FAIL $1: invalid JSON: $2"; fail=$((fail+1)); return; }
@@ -52,16 +52,6 @@ rm -f "$ucache"; o=$(CU_CACHE=$ucache "$d/claude-rl-tap.sh" <"$U/sl_rl.json")
 [ -z "$o" ] && [ "$(jq -c '[.five_hour.pct,.five_hour.resets_at,(.ts|type)]' "$ucache")" == '[53,1795009560,"number"]' ] && pass=$((pass+1)) || { echo "FAIL u15: tap"; fail=$((fail+1)); }
 sum=$(cksum <"$ucache"); o=$(CU_CACHE=$ucache "$d/claude-rl-tap.sh" <"$U/sl_norl.json")
 [ -z "$o" ] && [ "$(cksum <"$ucache")" == "$sum" ] && pass=$((pass+1)) || { echo "FAIL u15: tap without rate_limits"; fail=$((fail+1)); }
-# clip text is right-padded to 5 chars (fixed width), so compare after trimming
-cl() { CLIP_TARGETS=$t/$1 CLIP_DATA=${2:-/dev/null} "$d/clip.sh" | jq -c '.text |= gsub(" +$";"")'; }
-check clip11 "$(cl targets_empty)" "empty" Info
-check clip12 "$(cl targets_text $t/data_5)" "5B" Idle
-check clip13 "$(cl targets_text $t/data_2k)" "2.0K" Idle
-check clip14 "$(CLIP_TARGETS=$t/targets_img "$d/clip.sh" | jq -c '.text |= gsub(" +$";"")')" "img" Idle
-for sz in 204800 1048000 1048575 102300; do head -c $sz /dev/zero | tr '\0' a >"$gd/d_$sz"
-  o=$(CLIP_TARGETS=$t/targets_text CLIP_DATA=$gd/d_$sz "$d/clip.sh"); l=$(jq -r .text <<<"$o" | awk '{print length($0)}')
-  [ "$l" == 5 ] && pass=$((pass+1)) || { echo "FAIL clipwidth $sz: '$(jq -r .text <<<"$o")'"; fail=$((fail+1)); }; done
-check clip15 "$(cl targets_text "$gd/data_2m")" ">1M" Idle
 check gpu1 "$("$d/gpu.sh" "$t/gpu_ok")" "34° 5.0GB" Idle
 check gpu2 "$("$d/gpu.sh" "$t/gpu_bad")" "GPU ERR" Critical
 check gpu3 "$("$d/gpu.sh" "$t/gpu_multi")" "34° 5.0GB" Idle

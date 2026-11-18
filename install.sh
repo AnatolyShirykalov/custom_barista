@@ -34,11 +34,11 @@ fi
 
 # 2. dependencies
 command -v i3status-rs >/dev/null || warn "missing: i3status-rs (required for the bars)"
-for c in jq flock curl xclip node npx nvidia-smi xdotool pavucontrol; do
+for c in jq flock curl node npx nvidia-smi xdotool pavucontrol; do
   command -v "$c" >/dev/null || warn "missing: $c (used by bar blocks/click actions)"
 done
-command -v yad >/dev/null || warn "missing: yad (optional, calendar/clipboard popups)"
-for s in clipboard_menu.sh open_calender.sh; do
+command -v yad >/dev/null || warn "missing: yad (optional, calendar popup)"
+for s in open_calender.sh; do
   [ -e "$HOME/scripts/$s" ] || warn "missing ~/scripts/$s (click action of a bar block; not part of this repo, copy it from the original user)"
 done
 

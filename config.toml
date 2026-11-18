@@ -15,7 +15,6 @@ icons = "material-nf"
 cpu_freq = "\U000F095B"   # md-sine_wave (frequency); better than md-flash, distinct from the load gauge
 gpu = "\U000F08AE"        # md-expansion_card
 ccusage = "\U000F0674"    # md-creation
-clipboard = "\U000F0A38"  # md-clipboard_text_outline
 disk_read = "R"
 disk_write = "W"
 
@@ -168,19 +167,6 @@ update = true
 [[block.click]]
 button = "middle"
 cmd = "~/projects/custom_barista/scripts/explain.sh ccusage"
-
-[[block]]
-block = "custom"
-command = "~/projects/custom_barista/scripts/clip.sh"
-json = true
-interval = 5
-[[block.click]]
-button = "left"
-cmd = "~/scripts/clipboard_menu.sh"
-update = true
-[[block.click]]
-button = "middle"
-cmd = "~/projects/custom_barista/scripts/explain.sh clip"
 
 [[block]]
 block = "time"
