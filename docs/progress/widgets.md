@@ -30,3 +30,7 @@ Deleted `clipboard/`, its import and `Get()` in main.go; README module line and 
 
 ## Block explanations (2026-11-18)
 Middle click on every block runs `scripts/explain.sh <name>` (names: kbd load temp freq mem disk io gpu net wifi battery sound ccusage clip time) -> detached `yad --mouse --undecorated --timeout 8` popup with an OK button. Middle button was unused on all blocks. `EXPLAIN_DRY=1` prints the text (used by test.sh: every name in config.toml known, <=6 lines, every block has one). Thresholds in the texts are copied from config.toml/scripts; update explain.sh when they change.
+
+## S1 sound block off ALSA (2026-11-18)
+- `driver = "alsa"` -> `"pulseaudio"` (PipeWire-pulse, follows default sink). Reason: alsa driver ran `alsactl monitor` per bar, holding card 3 open and blocking HDA codec reconfig. After deploy `pgrep -a alsactl` is empty.
+- Old "first frame 0.0%" still occurs: 10 startup frames show the 0% icon, all within ~30 ms of start, then the real volume. Accepted, no hack. explain.sh text unchanged (still accurate). test.sh 54/54, both bars clean.

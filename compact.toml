@@ -123,7 +123,7 @@ cmd = "~/projects/custom_barista/scripts/explain.sh battery"
 
 [[block]]
 block = "sound"
-driver = "alsa"   # pulseaudio/auto driver emits a first frame of 0.0% before the real volume
+driver = "pulseaudio"   # follows the default sink; alsa driver spawned `alsactl monitor`, holding the HDA card open
 format = " $icon {$volume.eng(w:3)|MUT} "
 max_vol = 100
 [[block.click]]

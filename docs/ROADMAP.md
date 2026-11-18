@@ -22,6 +22,7 @@ No agent running. Done recently (2026-11-18): switched to i3status-rust (Go bari
 
 ### Queued next (one agent each, in order)
 
+0. [x] **S1 sound block off ALSA**: `driver = "alsa"` makes each bar spawn `alsactl monitor`, which holds ALSA card 3 (ALC1220) open and blocks HDA codec reconfig; switch to `pulseaudio` (follows default sink, needed for the planned Line Out/Headphones sink split). See progress/widgets.md.
 1. [x] **DP-2 gap freq→mem**: freq pad now = (cpu count/10) minus present two-digit counts (was fixed 6), mem eng w:3→w:2. Gap 6+ spaces → ~2-3. See progress/widgets.md.
 2. [x] **Block explanations** (user asked for tooltips; i3bar has no hover): middle-click every trial-bar block → `yad` popup at mouse (`--mouse --undecorated --timeout 8`, closes on click; no notification daemon running, so no notify-send) with what it shows, units, color thresholds, click actions; one script `scripts/explain.sh <block>`; check middle button unused, else pick another. → `widget-builder` DONE 2026-11-18: middle button was free everywhere; see progress/widgets.md.
 3. [ ] **D5 bar design review**: questions page ready `docs/design/D5-bar-review/questions.html` (options A polish / B regroup, rec. / C quiet; picks P1-P5); freq gap now 1 cell, keep. Awaits user pick → widget-builder. Detail: `docs/progress/design.md`. → `bar-designer`
