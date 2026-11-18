@@ -1,0 +1,127 @@
+<!doctype html>
+<!-- D5 decision page. Local file only: never publish. Mocks rendered with pango (PragmataPro Mono + Symbols Nerd Font Mono 18),
+     generator kept out of the repo; today-*.png are crops of the real bars (import -window root, 2026-11-18 20:03). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D5 Bar design review: decisions</title>
+<style>
+:root { --bg:#f6f7f9; --fg:#1b1f24; --muted:#5b6470; --card:#fff; --line:#d9dee5; --accent:#2f6fde; --rec:#1f8a4c; --risk:#b25e09; }
+@media (prefers-color-scheme: dark) { :root { --bg:#14171c; --fg:#e6e9ee; --muted:#9aa3ae; --card:#1d2129; --line:#2e3440; --accent:#6ea0ff; --rec:#4cc47e; --risk:#e0a050; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
+main { max-width:1000px; margin:0 auto; padding:24px 16px 64px; }
+h1 { font-size:1.6rem; margin:0 0 4px; }
+h2 { font-size:1.25rem; margin:0 0 8px; }
+.sub { color:var(--muted); margin:0 0 24px; }
+section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin:0 0 20px; }
+img { max-width:100%; height:auto; border-radius:8px; border:1px solid var(--line); display:block; }
+figure { margin:12px 0; }
+figcaption { color:var(--muted); font-size:.9rem; margin-top:4px; }
+.opts { display:grid; grid-template-columns:1fr; gap:16px; }
+.opt { border:1px solid var(--line); border-radius:10px; padding:12px; }
+.opt h3 { margin:0 0 6px; font-size:1rem; }
+.rec { color:var(--rec); font-weight:600; font-size:.85rem; }
+.meta { color:var(--muted); font-size:.85rem; }
+.risk { color:var(--risk); font-size:.85rem; }
+.against { color:var(--muted); font-size:.9rem; margin:6px 0 0; }
+ul { margin:6px 0; padding-left:20px; }
+code, pre { font-size:.85em; }
+pre { background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:8px; overflow-x:auto; }
+table { border-collapse:collapse; width:100%; font-size:.9rem; }
+td, th { border-top:1px solid var(--line); padding:4px 6px; text-align:left; vertical-align:top; }
+label.pick { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); }
+label.pick input { margin-top:5px; transform:scale(1.3); }
+#out { width:100%; min-height:60px; font:14px monospace; }
+</style>
+</head>
+<body>
+<main>
+<h1>D5: Bar design review</h1>
+<p class="sub">Your note (2026-11-18): "make a design investigation what can be done better in the bar, propose me a couple of options". This page picks one overall direction (A, B or C) and which small fixes (P1-P5) to build. Answer in the chat with the line at the bottom.</p>
+
+<section>
+<h2>Today</h2>
+<figure><img src="img/today-dp0.png" alt="DP-0 bar today, status part"><figcaption>DP-0 (config.toml), status part (crop of the real 4K bar). Look at the all-green ccusage block, the IP address, the "GB/kB" suffixes and the 13 equal separators.</figcaption></figure>
+<figure><img src="img/today-dp2.png" alt="DP-2 compact bar today"><figcaption>DP-2 (compact.toml). Look at the extra space after the clipboard "67B" and the year in the date.</figcaption></figure>
+<h3>Findings</h3>
+<table>
+<tr><th>#</th><th>Problem (evidence)</th><th>Why fixing helps</th></tr>
+<tr><td>F1</td><td>ccusage text is all green: <code>ccusage.sh</code> sets <code>state: Good</code> when the token limit is unknown (<code>$pct == null</code>), which is the case now (no % shown).</td><td>Green should mean "measured and fine"; here nothing is measured. One accent per state.</td></tr>
+<tr><td>F2</td><td>"CH 96%" label is cryptic and in the same colour as the values.</td><td>A dim label reads as a label, the number stands out.</td></tr>
+<tr><td>F3</td><td>Unit suffix "B" repeated on 6 values (90GB, 602GB, 0.0kB, 131kB, 0.6GB, 4.3kB, 7.8kB): about 7 cells on DP-0.</td><td>The prefix (G/k) is enough; <code>eng(hide_unit:true)</code> is verified to work on 0.40.1 (prints "89G").</td></tr>
+<tr><td>F4</td><td>LAN IP 192.168.178.69 always shown: 15 cells of static text.</td><td>Rarely needed at a glance; one click away is enough.</td></tr>
+<tr><td>F5</td><td>clipboard pads to 5 cells: 41 px before the separator vs 17 px for every other block (2 empty cells).</td><td>Even spacing; "1023B" is the only 5-char value and can become "1.0K".</td></tr>
+<tr><td>F6</td><td>Order: keyboard layout first, sound between net and ccusage; controls are scattered among monitors.</td><td>Monitors left, things you click (layout, volume) next to the clock: shorter mouse travel, easier scan.</td></tr>
+<tr><td>F7</td><td>13 separators on DP-0, all equal: CPU (load/temp/freq) and storage (mem/disk/io) do not read as groups.</td><td><code>merge_with_next</code> (accepted by 0.40.1) removes separators inside a group.</td></tr>
+<tr><td>F8</td><td>DP-2 date shows the year: 5 cells on the compact bar.</td><td>Year is never news; DP-0 keeps it.</td></tr>
+</table>
+<p class="meta">OK as is: all glyphs render (no tofu), icons dim #777 consistently, values white, widths stable (<code>w:</code> pads), freq palette is the agreed exception.</p>
+<h3>DP-2 freq to mem gap (fix b5c2eb5)</h3>
+<figure><img src="img/gap-dp2.png" alt="freq to mem gap on DP-2, 3x zoom"><figcaption>3x zoom. Last freq digit to separator: 29 px; every other block: 17 px. Extra = 12 px = 1 space (pad 1: counts 12 and 15 are two-digit, 32 threads allow 3).</figcaption></figure>
+<p>Result: fixed from 6+ spaces to 1 now; worst case 3 spaces (36 px) when all six counts are below 10. 12 px is a bit more than i3's 9 px separator gap, but it is the price of a fixed freq width (without it, everything left of freq jitters). Recommendation: keep as is.</p>
+</section>
+
+<section>
+<h2>Question 1: overall direction</h2>
+<div class="opts">
+  <div class="opt">
+    <h3>B. Polish + regroup (P1-P5, new order, groups without inner separators) <span class="rec">recommended</span></h3>
+    <figure><img src="img/B-dp0.png" alt="Mock B DP-0"><figcaption>DP-0: CPU group | storage group | GPU | net | ccusage+clip | layout+volume | clock. 6 separators instead of 13.</figcaption></figure>
+    <figure><img src="img/B-dp2.png" alt="Mock B DP-2"><figcaption>DP-2: same order, date without year.</figcaption></figure>
+    <span class="meta">M (config order + <code>merge_with_next</code>, gen-compact keeps flags consistent) &middot; <span class="risk">layout change: muscle memory for kbd/sound position</span></span>
+    <pre>[[block]]  # load, temperature, memory, disk_space, ccusage, keyboard_layout get:
+merge_with_next = true
+# order: load temp freq | mem disk io | gpu | net(en) net(wl) | ccusage clip | kbd sound battery | time</pre>
+  </div>
+  <div class="opt">
+    <h3>A. Polish only (P1-P5, same order and separators)</h3>
+    <figure><img src="img/A-dp0.png" alt="Mock A DP-0"><figcaption>DP-0: same blocks, no "B" units, no IP, ccusage white with dim "ch".</figcaption></figure>
+    <figure><img src="img/A-dp2.png" alt="Mock A DP-2"><figcaption>DP-2.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">low: text-only changes</span></span>
+    <p class="against">Why the designer is against A as the end state: it fixes the noise (F1-F5, F8) but leaves the flat 13-separator row where groups do not read (F6, F7); B costs little more.</p>
+  </div>
+  <div class="opt">
+    <h3>C. Quiet bar: idle values dim, no separators, colour only on alerts</h3>
+    <figure><img src="img/C-dp0.png" alt="Mock C DP-0"><figcaption>DP-0: idle values grey #aaa, groups separated by space, disk space and IO labels dropped, date dim. ccusage shown yellow as an example of a warning: only non-idle states are bright.</figcaption></figure>
+    <span class="meta">L (theme idle_fg change, all formats, scripts' state logic, disk_space shown only when low) &middot; <span class="risk">bigger: less readable at a glance on 4K, hide-when-ok blocks change bar width</span></span>
+    <p class="against">Why the designer is against C: dim values are harder to read on the 4K bar, and hiding disk space until it is low breaks the stable-width rule; the gain over B is mostly taste.</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Picks</h2>
+<label class="pick"><input type="checkbox" name="B" checked><span><b>B Polish + regroup</b> <span class="rec">recommended</span><br>New order with groups, includes the ticked P items.<br><span class="meta">M &middot; layout change</span></span></label>
+<label class="pick"><input type="checkbox" name="A"><span><b>A Polish only</b><br>P items only, order unchanged.<br><span class="meta">S &middot; low</span></span></label>
+<label class="pick"><input type="checkbox" name="C"><span><b>C Quiet bar</b><br>Dim idle values, no separators.<br><span class="meta">L &middot; readability, width changes</span></span></label>
+<label class="pick"><input type="checkbox" name="P1" checked><span><b>P1 ccusage state Idle when no limit</b> <span class="rec">recommended</span><br><code>ccusage.sh</code>: <code>$pct == null</code> gives "Idle" (white), not "Good" (green). F1.<br><span class="meta">S &middot; test.sh row update</span></span></label>
+<label class="pick"><input type="checkbox" name="P2" checked><span><b>P2 Drop the "B" unit, dim the "ch" label</b> <span class="rec">recommended</span><br><code>hide_unit:true</code> on mem, disk, io, net; gpu.sh "GB" to "G"; ccusage "CH 96%" to dim "ch" + 96%. F2, F3.<br><span class="meta">S &middot; low</span></span></label>
+<label class="pick"><input type="checkbox" name="P3" checked><span><b>P3 IP to format_alt</b> <span class="rec">recommended</span><br>Wired net shows speeds only; left click shows the IP. F4.<br><span class="meta">S &middot; low</span></span></label>
+<label class="pick"><input type="checkbox" name="P4" checked><span><b>P4 Clipboard width 4</b> <span class="rec">recommended</span><br><code>clip.sh</code>: pad 5 to 4, switch to K at 1000 B (max "999B"), "empty" to dim "none". F5.<br><span class="meta">S &middot; test.sh rows</span></span></label>
+<label class="pick"><input type="checkbox" name="P5" checked><span><b>P5 DP-2 date without year</b> <span class="rec">recommended</span><br><code>gen-compact.sh</code> rewrites <code>%a %Y-%m-%d</code> to <code>%a %m-%d</code>. F8.<br><span class="meta">S &middot; low</span></span></label>
+</section>
+
+<section>
+<h2>What doesn't change</h2>
+<ul>
+<li>Block set and their thresholds, the freq histogram and its palette, the freq pad (gap result above).</li>
+<li>Colours: <code>[theme.overrides]</code> good/degraded/bad/dim-icon (C would only change idle_fg).</li>
+<li>Click actions, the middle-click explanation popups, fonts and icons.</li>
+<li>DP-2 keeps dropping disk, io, IP and ccusage.</li>
+</ul>
+</section>
+
+<section>
+<h2>Your answer</h2>
+<p class="meta">Copy this line into the chat (read-only; nothing is saved from this page).</p>
+<textarea id="out" readonly></textarea>
+</section>
+</main>
+<script>
+function upd(){const p=[...document.querySelectorAll('input[type=checkbox]')];document.getElementById('out').value='D5 picks: '+(p.filter(c=>c.checked).map(c=>c.name).join(', ')||'none')+'; no: '+(p.filter(c=>!c.checked).map(c=>c.name).join(', ')||'none');}
+document.querySelectorAll('input[type=checkbox]').forEach(c=>c.addEventListener('change',upd));upd();
+</script>
+</body>
+</html>
