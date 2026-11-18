@@ -1,0 +1,13 @@
+{
+  "_doc": "USD per MTok (platform.claude.com/docs/en/about-claude/pricing, 2026-11-18). Longest model-id prefix wins; big = tier when prompt (input+cache_creation+cache_read) > 100000. w5/w1 = cache write 5m/1h.",
+  "default": {"in": 8, "w5": 10, "w1": 16, "r": 0.20, "out": 40},
+  "models": {
+    "claude-fable-5-2":  {"in": 8,    "w5": 10,    "w1": 16,   "r": 0.20, "out": 40},
+    "claude-opus-5-5":   {"in": 4,    "w5": 5,     "w1": 8,    "r": 0.20, "out": 20},
+    "claude-opus-5":     {"in": 5,    "w5": 6.25,  "w1": 10,   "r": 0.50, "out": 25},
+    "claude-sonnet-5-5": {"in": 2,    "w5": 2.50,  "w1": 4,    "r": 0.10, "out": 10},
+    "claude-sonnet-5":   {"in": 2,    "w5": 2.50,  "w1": 4,    "r": 0.20, "out": 10},
+    "claude-haiku-5-5":  {"in": 0.10, "w5": 0.125, "w1": 0.20, "r": 0.01, "out": 0.50,
+                          "big": {"in": 0.50, "w5": 0.625, "w1": 1, "r": 0.05, "out": 2.50}}
+  }
+}

@@ -34,3 +34,8 @@ Middle click on every block runs `scripts/explain.sh <name>` (names: kbd load te
 ## S1 sound block off ALSA (2026-11-18)
 - `driver = "alsa"` -> `"pulseaudio"` (PipeWire-pulse, follows default sink). Reason: alsa driver ran `alsactl monitor` per bar, holding card 3 open and blocking HDA codec reconfig. After deploy `pgrep -a alsactl` is empty.
 - Old "first frame 0.0%" still occurs: 10 startup frames show the 0% icon, all within ~30 ms of start, then the real volume. Accepted, no hack. explain.sh text unchanged (still accurate). test.sh 54/54, both bars clean.
+
+## U1 Claude usage block built (2026-11-18)
+- `scripts/claude-usage.sh` replaces ccusage.sh (spec option A); `claude-rl-tap.sh` + install.sh step 3b insert one marked line after `input=$(cat)` in ~/.claude/bin/claude-statusline (backup `.bak-u1`, rerun adds nothing); `claude-prices.json`; ccusage.sh and cc_*.json removed; explain text, gen-compact pattern, test.sh rows u1-u17 (87/87 pass, no network).
+- Live: one real OAuth call succeeded during verification (56%, gate next_at = +180 s); bar shows `56% 117.0M $66.3 cache 96% 0h28m`, run time 0.16 s. After crop: `docs/design/U1-usage-block/img/after.png` (bar is at the bottom of DP-0). No before crop (old script needed npx, 30 s).
+- Deviations: none in behaviour; test rows u17 (explain) and u18 (compact) are the existing explain/compact checks plus the renamed pattern; install.sh also warns on missing flock/curl. Acceptance 6 (ccusage comparison) not done.

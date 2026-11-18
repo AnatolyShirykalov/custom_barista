@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Generates compact.toml (DP-2 bar) from config.toml: drops disk_space, disk_iostats, ccusage and the net $ip.
+# Generates compact.toml (DP-2 bar) from config.toml: drops disk_space, disk_iostats, the usage block and the net $ip.
 # Usage: gen-compact.sh [out]   (default: ../compact.toml; "-" for stdout). test.sh checks it is in sync.
 d=$(cd "$(dirname "$0")/.." && pwd); out=${1:-$d/compact.toml}
 gen() {
@@ -7,7 +7,7 @@ gen() {
   awk '
     function flush() { if (buf != "" && !drop) printf "%s", buf; buf = ""; drop = 0 }
     /^\[\[block\]\]$/ { flush() }
-    /^block = "(disk_space|disk_iostats)"/ || /^command = .*ccusage\.sh"/ { drop = 1 }
+    /^block = "(disk_space|disk_iostats)"/ || /^command = .*claude-usage\.sh"/ { drop = 1 }
     /^format = .*\$ip/ { sub(/ \$ip /, " ") }
     { buf = buf $0 "\n" }
     END { flush() }' "$d/config.toml"

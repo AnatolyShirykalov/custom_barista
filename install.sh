@@ -34,7 +34,7 @@ fi
 
 # 2. dependencies
 command -v i3status-rs >/dev/null || warn "missing: i3status-rs (required for the bars)"
-for c in jq xclip node npx nvidia-smi xdotool pavucontrol; do
+for c in jq flock curl xclip node npx nvidia-smi xdotool pavucontrol; do
   command -v "$c" >/dev/null || warn "missing: $c (used by bar blocks/click actions)"
 done
 command -v yad >/dev/null || warn "missing: yad (optional, calendar/clipboard popups)"
@@ -49,6 +49,19 @@ for f in config.toml compact.toml; do
   if [ $dry = 1 ]; then say "[dry-run] generate $CONFDIR/$f (~/projects/custom_barista -> $REPO)"
   else c=$(<"$REPO/$f"); printf '%s\n' "${c//'~/projects/custom_barista'/$REPO}" >"$CONFDIR/$f"; fi
 done
+
+# 3b. U1: tap Claude Code's statusline JSON (rate_limits) for scripts/claude-usage.sh; idempotent, marker-detected
+SL=$HOME/.claude/bin/claude-statusline
+if [ -f "$SL" ] && grep -q '^input=\$(cat)' "$SL"; then
+  if grep -q 'custom_barista: rate_limits tap' "$SL"; then say "U1: statusline tap already installed"
+  elif [ $dry = 1 ]; then say "[dry-run] insert the rate_limits tap into $SL"
+  else
+    [ -e "$SL.bak-u1" ] || cp -p "$SL" "$SL.bak-u1"
+    SLR=$(readlink -f "$SL"); line="\"$REPO/scripts/claude-rl-tap.sh\" <<<\"\$input\" >/dev/null 2>&1 || true  # custom_barista: rate_limits tap"
+    awk -v l="$line" '{ print } !done && /^input=\$\(cat\)/ { print l; done = 1 }' "$SLR" >"$SLR.tmp.$$" && cat "$SLR.tmp.$$" >"$SLR" && rm -f "$SLR.tmp.$$"
+    say "U1: statusline tap installed"
+  fi
+else say "U1: statusline tap not installed (no ~/.claude/bin/claude-statusline input line); bar uses the API fallback"; fi
 
 # 4. i3 config
 cfg=

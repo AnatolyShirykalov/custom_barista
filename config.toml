@@ -158,7 +158,7 @@ cmd = "~/projects/custom_barista/scripts/explain.sh sound"
 
 [[block]]
 block = "custom"
-command = "~/projects/custom_barista/scripts/ccusage.sh"
+command = "~/projects/custom_barista/scripts/claude-usage.sh"
 json = true
 interval = 60
 hide_when_empty = true

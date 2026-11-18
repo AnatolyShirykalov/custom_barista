@@ -14,7 +14,7 @@ case ${1:-} in
   wifi)    t='Wi-Fi: SSID, signal %, upload / download kB/s.\nHidden when not connected.' ;;
   battery) t='Battery charge, %. Hidden without a battery.' ;;
   sound)   t='Output volume, %; MUT = muted.\nLeft click: open pavucontrol.' ;;
-  ccusage) t='Claude Code usage of the active 5h block:\nlimit %, tokens, cache hit (CH), time left.\nGreen, yellow above 70%, red above 90%.\nLeft click: refresh. DP-0 bar only.' ;;
+  ccusage) t='Claude usage in the current 5h limit window:\nlimit % used, tokens, cost (list price),\ncache = share of input read from cache, time to reset.\nGreen; yellow above 70%; red above 90%; white = no fresh data.\nLeft click: refresh. DP-0 bar only.' ;;
   clip)    t='Clipboard content size (B / K / >1M, img, empty).\nLeft click: open the clipboard menu.' ;;
   time)    t='Date and time.\nLeft click: open the calendar.' ;;
   *) echo "explain.sh: unknown block '${1:-}'" >&2; exit 1 ;;
