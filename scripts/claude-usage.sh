@@ -20,7 +20,7 @@ render() { # stdin {pct,tok,cost,ch,left,stale,w} -> block JSON
     def dim: "<span foreground=\"#777777\">" + . + "</span>";
     .pct as $p | .tok as $t | .cost as $c | .left as $l | .w as $w
     | (if $p == null or .stale then "Idle" elif $p > 90 or ($w != null and $w > 90) then "Critical" elif $p > 70 then "Warning" else "Good" end) as $st
-    | (if $w != null and $w > 70 then "<span foreground=\"" + (if $w > 90 then "#dd6666" else "#dddd66" end) + "\">7d " + (([$w + 0.5 | floor, 99] | min | tostring) | pad(2)) + "%</span>" else " " * 6 end) as $wm
+    | (if $w == null then ("7d  ?%" | dim) else (([$w + 0.5 | floor, 99] | min | tostring) | pad(2)) as $v | if $w > 90 then "<span foreground=\"#dd6666\">7d " + $v + "%</span>" elif $w > 70 then "<span foreground=\"#dddd66\">7d " + $v + "%</span>" else ("7d " + $v + "%" | dim) end end) as $wm
     | ((if $p == null then "?%" else ($p | r0) + "%" end) as $s | (" " * (4 - ($s | length))) + (if .stale or $p == null then ($s | dim) else $s end)) as $pt
     | { icon: "ccusage", state: $st,
         text: ([ $pt,

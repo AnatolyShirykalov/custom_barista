@@ -19,18 +19,22 @@ fresh() { usd=$(mktemp -d -p "$gd"); }
 wc_() { printf '{"ts":%s,"five_hour":{"pct":%s,"resets_at":%s},"seven_day":%s}\n' "$1" "$2" "$3" "${4:-null}" >"$ucache"; }
 un() { CU_NOW=$NOW CU_PROJECTS=$U/proj CU_CREDS=${CRED:-$U/creds.json} CU_CACHE=$ucache CU_STATE_DIR=$usd CU_API_FIXTURE=${FX:-$U/api_000} "$d/claude-usage.sh"; }
 body=" 3.4M \$1.85 cache 90% 1h46m"
-sp7="        "
+sp7=" 7d  ?% "
 fresh; wc_ $((NOW-60)) 53 $RES; o=$(un); check u1 "$o" "53%  $body$sp7" Good
+jq -r .text <<<"$o" | grep -q '#777777">7d  ?%' && pass=$((pass+1)) || { echo "FAIL u1: 7d unknown dim"; fail=$((fail+1)); }
 jq -r .text <<<"$o" | grep -q '#777777">cache</span>' && pass=$((pass+1)) || { echo "FAIL u1: cache label not dim"; fail=$((fail+1)); }
 wc_ $((NOW-60)) 70 $RES; check u2 "$(un)" "70%  $body$sp7" Good
 wc_ $((NOW-60)) 70.4 $RES; check u3 "$(un)" "70%  $body$sp7" Warning
 w7() { wc_ $((NOW-60)) 53 $RES "{\"pct\":$1,\"resets_at\":$((NOW+86400))}"; }
-w7 70; check u18 "$(un)" "53%  $body$sp7" Good
+w7 70; o=$(un); check u18 "$o" "53%  $body 7d 70% " Good
+jq -r .text <<<"$o" | grep -q '#777777">7d 70%' && pass=$((pass+1)) || { echo "FAIL u18: 7d dim"; fail=$((fail+1)); }
 w7 71; o=$(un); check u19 "$o" "53%  $body 7d 71% " Good
 jq -r .text <<<"$o" | grep -q '#dddd66">7d 71%' && pass=$((pass+1)) || { echo "FAIL u19: 7d colour"; fail=$((fail+1)); }
 w7 91; o=$(un); check u20 "$o" "53%  $body 7d 91% " Critical
 jq -r .text <<<"$o" | grep -q '#dd6666">7d 91%' && pass=$((pass+1)) || { echo "FAIL u20: 7d colour"; fail=$((fail+1)); }
 wc_ $((NOW-60)) 53 $RES '{"pct":91,"resets_at":1}'; check u21 "$(un)" "53%  $body$sp7" Good
+w7 0.3; check u22 "$(un)" "53%  $body 7d  0% " Good
+w7 100; check u23 "$(un)" "53%  $body 7d 99% " Critical
 wc_ $((NOW-60)) 90 $RES; check u4a "$(un)" "90%  $body$sp7" Warning
 wc_ $((NOW-60)) 95 $RES; check u4b "$(un)" "95%  $body$sp7" Critical
 fresh; wc_ $((NOW-600)) 53 $RES; check u5 "$(FX=$U/api_200 un)" "37%  $body$sp7" Good
@@ -45,7 +49,7 @@ jq -r .text <<<"$o" | grep -q '#777777">53%</span>' && [ "$(jq -r .status "$usd/
 check u9 "$(FX=$U/api_200 CRED=$gd/creds un)" "53%  $body$sp7" Idle
 touch -d "@$NOW" "$gd/creds"; check u10 "$(FX=$U/api_200 CRED=$gd/creds un)" "37%  $body$sp7" Good
 fresh; wc_ $((NOW-60)) 53 $((NOW-60)); check u11 "$(un)" "" ""
-fresh; rm -f "$ucache"; check u12 "$(un)" "?%   4.4M \$5.85 cache 69% -h--m         " Idle
+fresh; rm -f "$ucache"; check u12 "$(un)" "?%   4.4M \$5.85 cache 69% -h--m 7d  ?%  " Idle
 fresh; wc_ $((NOW-1200)) 53 $RES; check u13 "$(FX=$gd/nonexistent CRED=$U/creds_expired.json un)" "53%  $body$sp7" Idle
 ! grep -rq TESTTOKEN-u1 "$gd"/tmp.* && pass=$((pass+1)) || { echo "FAIL u14: token leaked into state"; fail=$((fail+1)); }
 rm -f "$ucache"; o=$(CU_CACHE=$ucache "$d/claude-rl-tap.sh" <"$U/sl_rl.json")
@@ -70,6 +74,9 @@ printf '99, 16303\n' > "$cj"; o=$("$d/gpu.sh" "$cj"); printf '9, 5\n' > "$cj"; o
 "$d/gen-compact.sh" - | cmp -s - "$d/../compact.toml" && pass=$((pass+1)) || { echo "FAIL compact: out of sync, run scripts/gen-compact.sh"; fail=$((fail+1)); }
 grep -qE 'disk_space|disk_iostats|claude-usage\.sh|\$ip' "$d/../compact.toml" && { echo "FAIL compact: dropped block left"; fail=$((fail+1)); } || pass=$((pass+1))
 [ "$(grep -cE 'disk_space|disk_iostats|claude-usage\.sh"|\$ip ' "$d/../config.toml")" == 4 ] && pass=$((pass+1)) || { echo "FAIL compact: config.toml patterns changed, update gen-compact.sh"; fail=$((fail+1)); }
+# D5-R groups: 7 merge flags on DP-0 (6 separators), 5 on DP-2; memory must not glue onto gpu on DP-2
+[ "$(grep -c '^merge_with_next = true$' "$d/../config.toml")" == 7 ] && [ "$(grep -c '^merge_with_next = true$' "$d/../compact.toml")" == 5 ] && pass=$((pass+1)) || { echo "FAIL groups: merge_with_next count"; fail=$((fail+1)); }
+awk '/^\[\[block\]\]$/ { b = "" } /^block = / { b = $0 } /^merge_with_next/ && b ~ /memory/ { f = 1 } END { exit f }' "$d/../compact.toml" && pass=$((pass+1)) || { echo "FAIL compact: memory still merged"; fail=$((fail+1)); }
 # bars.conf generator: per state valid blocks (i3 -C when available); the tray never moves (bar-main, DP-0)
 printf 'CONFDIR=/x/conf\n' >"$gd/bars.env"
 for st in barista rs off; do  # barista = migrated to rs

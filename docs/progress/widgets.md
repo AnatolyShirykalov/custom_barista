@@ -46,3 +46,8 @@ Middle click on every block runs `scripts/explain.sh <name>` (names: kbd load te
 
 ## D5-P4 clipboard block removed (2026-11-18)
 - Removed clip block + clipboard icon from config.toml, scripts/clip.sh, its fixtures (targets_*, data_*), test rows clip11-15 and width loop, explain.sh `clip` case; install.sh/README drop xclip and clipboard_menu.sh (xclip used nowhere else). Usage block untouched.
+
+## D5-R regrouping built (2026-11-18)
+- Built per docs/design/D5-bar-review/spec-regroup.md: config.toml reordered (14 blocks, 7 merge_with_next), gen-compact.sh awk drops the merge flag before a dropped group end (compact.toml: 5 flags), claude-usage.sh 7d mark always shown (dim up to 70), explain.sh ccusage text, test.sh u1/u12/u18 edits + u22/u23 + groups/compact rows.
+- test.sh pass=94 fail=0; both configs smoke clean; deployed with install.sh --yes; middle-click on a merged block raises no error (all 14 blocks keep their explain click).
+- After crops: docs/design/D5-bar-review/img/live-after-dp0.png, live-after-dp2.png. Awaiting bar-designer review.

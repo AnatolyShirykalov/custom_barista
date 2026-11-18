@@ -19,21 +19,8 @@ disk_read = "R"
 disk_write = "W"
 
 [[block]]
-block = "keyboard_layout"
-driver = "xkbevent"
-format = " ^icon_keyboard $layout "
-[block.mappings]   # keys are "layout (variant)"; xkbevent reports variant N/A
-"us (N/A)" = "US"
-"ru (N/A)" = "RU"
-[[block.click]]
-button = "left"
-cmd = "xdotool key ISO_Next_Group"
-[[block.click]]
-button = "middle"
-cmd = "~/projects/custom_barista/scripts/explain.sh kbd"
-
-[[block]]
 block = "load"
+merge_with_next = true
 format = " $icon $1m.eng(w:4) $15m.eng(w:4) "
 interval = 3
 info = 0.25
@@ -47,6 +34,7 @@ cmd = "~/projects/custom_barista/scripts/explain.sh load"
 
 [[block]]
 block = "temperature"
+merge_with_next = true
 chip = "k10temp-*"
 inputs = ["Tctl", "Tccd1", "Tccd2"]
 format = " $icon $max.eng(w:2) "
@@ -71,6 +59,7 @@ cmd = "~/projects/custom_barista/scripts/explain.sh freq"
 
 [[block]]
 block = "memory"
+merge_with_next = true
 format = " $icon $mem_avail.eng(prefix:G,w:2) "
 interval = 3
 warning_mem = 97.8
@@ -81,6 +70,7 @@ cmd = "~/projects/custom_barista/scripts/explain.sh mem"
 
 [[block]]
 block = "disk_space"
+merge_with_next = true
 path = "/"
 format = " $icon $available.eng(prefix:G,w:3) "
 info_type = "available"
@@ -114,17 +104,7 @@ cmd = "~/projects/custom_barista/scripts/explain.sh gpu"
 
 [[block]]
 block = "net"
-device = "^en"
-format = " $icon ^icon_net_up $speed_up.eng(prefix:k,w:3) ^icon_net_down $speed_down.eng(prefix:k,w:3) $ip "
-inactive_format = " $icon down "
-missing_format = ""
-interval = 2
-[[block.click]]
-button = "middle"
-cmd = "~/projects/custom_barista/scripts/explain.sh net"
-
-[[block]]
-block = "net"
+merge_with_next = true
 device = "^wl"
 format = " $icon $ssid $signal_strength.eng(w:3) ^icon_net_up $speed_up.eng(prefix:k,w:3) ^icon_net_down $speed_down.eng(prefix:k,w:3) "
 inactive_format = ""
@@ -135,7 +115,47 @@ button = "middle"
 cmd = "~/projects/custom_barista/scripts/explain.sh wifi"
 
 [[block]]
+block = "net"
+device = "^en"
+format = " $icon ^icon_net_up $speed_up.eng(prefix:k,w:3) ^icon_net_down $speed_down.eng(prefix:k,w:3) $ip "
+inactive_format = " $icon down "
+missing_format = ""
+interval = 2
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh net"
+
+[[block]]
+block = "custom"
+command = "~/projects/custom_barista/scripts/claude-usage.sh"
+json = true
+interval = 60
+hide_when_empty = true
+[[block.click]]
+button = "left"
+update = true
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh ccusage"
+
+[[block]]
+block = "keyboard_layout"
+merge_with_next = true
+driver = "xkbevent"
+format = " ^icon_keyboard $layout "
+[block.mappings]   # keys are "layout (variant)"; xkbevent reports variant N/A
+"us (N/A)" = "US"
+"ru (N/A)" = "RU"
+[[block.click]]
+button = "left"
+cmd = "xdotool key ISO_Next_Group"
+[[block.click]]
+button = "middle"
+cmd = "~/projects/custom_barista/scripts/explain.sh kbd"
+
+[[block]]
 block = "battery"
+merge_with_next = true
 format = " $icon $percentage.eng(w:3) "
 missing_format = ""
 interval = 60
@@ -154,19 +174,6 @@ cmd = "pavucontrol"
 [[block.click]]
 button = "middle"
 cmd = "~/projects/custom_barista/scripts/explain.sh sound"
-
-[[block]]
-block = "custom"
-command = "~/projects/custom_barista/scripts/claude-usage.sh"
-json = true
-interval = 60
-hide_when_empty = true
-[[block.click]]
-button = "left"
-update = true
-[[block.click]]
-button = "middle"
-cmd = "~/projects/custom_barista/scripts/explain.sh ccusage"
 
 [[block]]
 block = "time"
