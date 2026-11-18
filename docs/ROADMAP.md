@@ -29,6 +29,7 @@ No agent running. Done recently (2026-11-18): switched to i3status-rust (Go bari
 4. [x] **U1 Claude usage block**: done a10e615, review accepted (no fixes; notes docs/progress/design.md, widgets.md).
 5. [x] **D5 page v2, picture per proposal**: v2 ready, `docs/design/D5-bar-review/questions.html` (real BEFORE crops + Xvfb-rendered AFTER per F/P/option; F1/F2 resolved by U1). Awaits user pick (item 3). Detail: `docs/progress/design.md`.
 6. [x] **U1b 7-day limit mark** (user yes 2026-11-18): usage block shows a mark (degraded colour) when seven_day utilization > 70 %, bad > 90 %; fixed width; test rows; explain.sh text. → `widget-builder` Done: claude-usage.sh `7d NN%` mark (tap or OAuth cache seven_day), fixed width, rows u18-u21.
+7. [ ] **D5-P4 remove clipboard block** (user 2026-11-18, replaces P4 padding fix): drop clip block from config.toml (compact regenerated), its script/click/explain text/tests if unused elsewhere; install.sh leftovers. → `widget-builder`
 
 ### Background checks
 
