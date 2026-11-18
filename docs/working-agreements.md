@@ -22,7 +22,7 @@ Push about every 5 reviewed items, and always before `/clear`, at wrapup, before
 
 ## Deploy freely (`deploy-freely`, deploy; 2026-11-17)
 *Installing and restarting the live bar needs no confirmation.*
-After checks pass: `go install .` then `i3-msg restart`; verify the bar shows no ERR.
+After checks pass: `./install.sh --yes` (config-only edits: `i3-msg restart`); verify both bars run i3status-rs with no error blocks.
 **Why:** user picked "Batched push, deploy freely".
 **How to apply:** builders deploy their own finished item. [[batched-push]]
 
