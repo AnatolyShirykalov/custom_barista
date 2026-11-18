@@ -1,5 +1,10 @@
 # Design workstream
 
+## 2026-11-18 D5-R regroup spec
+- Spec `docs/design/D5-bar-review/spec-regroup.md`: option B order without clip, 7 merge flags (DP-0 11 → 6 separators, −45 px; DP-2 8 → 5, −27 px); gen-compact gets a generic rule (dropped group end strips the kept block's flag: memory on DP-2); 7d mark always shown, dim ≤70 (M1), `7d  ?%` unknown.
+- Verified on 0.40.1: merged blocks keep their own `instance`, middle-click cmd runs per block; an empty next block passes the merge on (laptop without `^en`: wifi glues onto usage, accepted).
+- Whole change applied in a scratch repo copy: test.sh pass=94 fail=0 (sp7, u12, u18 edits, u22/u23, 2 group rows). Renders `img/r-dp0-1.png`, `img/r-dp0-2.png`, `img/r-dp2.png`.
+
 ## 2026-11-18 D5 page v2 (picture per proposal)
 - User: old page hard to work with, needs more pictures. Rebuilt `docs/design/D5-bar-review/questions.html`: one section per decision (F1-F8 with their P fix, options B/A/C), BEFORE/AFTER pairs for DP-0 and DP-2, full bars as two 1x halves, small regions 2x, click to enlarge; radio for A/B/C + checkboxes P2-P5 feed the answer line.
 - BEFORE: live crops 21:10 (bar up 5 min after the U1b redeploy, no restart caught). AFTER: real i3bar + i3status-rs in Xvfb with temp config copies (`render/render.sh CFG WIDTH OUT`, status_command `env DISPLAY=:0` so kbd/clip/sound read the real session; i3 needs its own `ipc-socket` and `env -u I3SOCK`). No hand mocks.
