@@ -1,5 +1,5 @@
 #!/bin/bash
-# Win+i: cycle bars off -> barista -> rs -> off by rewriting bars.conf (included by the i3 config) and
+# Win+i: cycle bars off <-> rs by rewriting bars.conf (included by the i3 config) and
 # reloading i3: the two bars (bar-main on DP-0 with the tray, bar-small on DP-2) switch mode and
 # status_command together, the tray never changes owner, and the state survives an i3 restart.
 d=$(cd "$(dirname "$0")" && pwd)
@@ -12,9 +12,8 @@ exec 9>"$BARSCONF.lock" && flock 9 || exit 1
 
 cur=$(sed -n 's/^# state: \([a-z]*\).*/\1/p' "$BARSCONF" 2>/dev/null | head -1)
 case "$cur" in
-  off)     next=barista ;;
-  barista) next=rs ;;
-  *)       next=off ;;
+  rs|barista) next=off ;;  # a leftover barista state counts as rs
+  *)          next=rs ;;
 esac
 "$d/barsconf.sh" "$next" >"$BARSCONF.new" || exit 1
 cp -p "$BARSCONF" "$BARSCONF.prev" 2>/dev/null; mv "$BARSCONF.new" "$BARSCONF"

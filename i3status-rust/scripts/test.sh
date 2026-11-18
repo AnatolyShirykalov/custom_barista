@@ -48,22 +48,21 @@ printf '99, 16303\n' > "$cj"; o=$("$d/gpu.sh" "$cj"); printf '9, 5\n' > "$cj"; o
 grep -qE 'disk_space|disk_iostats|ccusage\.sh|\$ip' "$d/../compact.toml" && { echo "FAIL compact: dropped block left"; fail=$((fail+1)); } || pass=$((pass+1))
 [ "$(grep -cE 'disk_space|disk_iostats|ccusage\.sh"|\$ip ' "$d/../config.toml")" == 4 ] && pass=$((pass+1)) || { echo "FAIL compact: config.toml patterns changed, update gen-compact.sh"; fail=$((fail+1)); }
 # bars.conf generator: per state valid blocks (i3 -C when available); the tray never moves (bar-main, DP-0)
-printf 'BIN=/x/custom_barista\nCONFDIR=/x/conf\n' >"$gd/bars.env"
-for st in barista rs off; do
+printf 'CONFDIR=/x/conf\n' >"$gd/bars.env"
+for st in barista rs off; do  # barista = migrated to rs
   BARS_ENV=$gd/bars.env "$d/barsconf.sh" $st >"$gd/bars.conf" || { echo "FAIL bars $st: generator"; fail=$((fail+1)); continue; }
   n=$(grep -c 'tray_output DP-0' "$gd/bars.conf"); tb=$(grep -B8 'tray_output DP-0' "$gd/bars.conf" | grep -c 'id bar-main')
   docks=$(grep -c 'mode dock' "$gd/bars.conf"); wd=2; [ $st = off ] && wd=0
-  rs=$(grep -c 'status_command i3status-rs /x/conf/' "$gd/bars.conf"); wr=0; [ $st = rs ] && wr=2
+  rs=$(grep -c 'status_command i3status-rs /x/conf/' "$gd/bars.conf"); wr=2
   if [ "$(grep -c '^bar {' "$gd/bars.conf")" = 2 ] && [ "$n$tb" = 11 ] && [ "$docks" = $wd ] && [ "$rs" = $wr ] && ! grep -q @ "$gd/bars.conf" \
-     && [ "$(grep -c 'status_command /x/custom_barista$' "$gd/bars.conf")" = $((2-wr)) ] \
      && { ! command -v i3 >/dev/null || { echo "include $gd/bars.conf" >"$gd/i3cfg"; i3 -C -c "$gd/i3cfg" >/dev/null 2>&1; }; }
   then pass=$((pass+1)); else echo "FAIL bars $st: tray on bar-main $n/$tb, dock $docks/$wd, rs commands $rs/$wr or i3 -C"; fail=$((fail+1)); fi
 done
-# barcycle: concurrent presses are serialized, each one counts (3 presses = full cycle), one reload per press
+# barcycle: concurrent presses are serialized, each one counts (3 presses = off -> rs -> off -> rs), one reload per press
 mkdir "$gd/bin"; printf '#!/bin/sh\necho "$@" >>"%s/i3msg.log"\n' "$gd" >"$gd/bin/i3-msg"; chmod +x "$gd/bin/i3-msg"
 printf 'BARSCONF=%s/cyc.conf\nI3CFG=%s/cyccfg\n' "$gd" "$gd" >>"$gd/bars.env"; echo "include $gd/cyc.conf" >"$gd/cyccfg"
 BARS_ENV=$gd/bars.env "$d/barsconf.sh" off >"$gd/cyc.conf"
 for i in 1 2 3; do PATH=$gd/bin:$PATH BARS_ENV=$gd/bars.env BARCYCLE_SETTLE=0 "$d/barcycle.sh" 2>>"$gd/cyc.err" & done; wait
-if [ "$(head -1 "$gd/cyc.conf" | cut -d' ' -f3)" = off ] && [ "$(grep -c reload "$gd/i3msg.log")" = 3 ] && [ ! -s "$gd/cyc.err" ]
+if [ "$(head -1 "$gd/cyc.conf" | cut -d" " -f3)" = rs ] && [ "$(grep -c reload "$gd/i3msg.log")" = 3 ] && [ ! -s "$gd/cyc.err" ]
 then pass=$((pass+1)); else echo "FAIL barcycle: 3 concurrent presses -> $(head -1 "$gd/cyc.conf" | cut -c1-20), reloads $(grep -c reload "$gd/i3msg.log"), stderr: $(head -2 "$gd/cyc.err")"; fail=$((fail+1)); fi
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]

@@ -86,3 +86,12 @@ Verdict: **accept with fixes** (one small builder item, 5c). Screenshot of both 
 ## D4 rs polish spec (bar-designer, 2026-11-17)
 
 Spec `docs/design/D4-rs-polish/spec.md`: global dim `icons_format`, pads after values (freq/ccusage/clip), disk IO R/W markers, one unit family with eng `w:3`. User picks in `questions.html` (Q1 units, default decimal: binary prefix switch at 1024 makes 1000-1023 print 4 digits; Q2 markers, default letters). Mock glyphs render (md-eye_outline, md-pencil). Next: widget-builder.
+
+## 7a: remove barista (2026-11-18)
+
+- Removed via `git rm`: widget packages (batt ccusage dsk freq kbdlayout load ltime mem netm nvidia temp utils vol), main.go, go.mod, go.sum, their tests, `fonts/` (nothing in i3status-rust/ or install.sh referenced it; rs uses system PragmataPro/Nerd Symbols). `log/` is empty and gitignored (left).
+- barsconf.sh: states rs|off only; `barista` is accepted and mapped to rs (migration); off keeps the rs commands on an invisible bar. barcycle.sh: off <-> rs. bars.env no longer has BIN. install.sh: no go/build step, default state rs.
+- test.sh updated (pass=38); README and CLAUDE.md rewritten for the rs bar only.
+- Backlog: dropped the whole "barista" section (nvidia reason test, uniform ERR display, stdin EOF panic, dead import path, widget health sweep, dep survey, diskio click paths).
+- Live: install.sh run, backup ~/.i3/bars.conf.bak-2026-11-18-7a; bar-main/bar-small run i3status-rs; barcycle twice toggled off and back to rs; tray stays on bar-main (DP-0).
+- Left: `.claude/agents/` widget-builder/dep-updater and `.gitignore` still mention Go; 7b flattens i3status-rust/.
