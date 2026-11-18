@@ -22,3 +22,8 @@
 
 ## Remove barista clipboard widget (2026-11-17)
 Deleted `clipboard/`, its import and `Get()` in main.go; README module line and backlog "Clipboard polling" dropped. `utils.Script` kept (ltime). i3status-rust clip block untouched.
+
+## 2026-11-18 DP-2 gap freq→mem
+- Problem: freq.sh padded up to 6 trailing spaces (assumed 6 two-digit buckets) and mem eng(w:3) added a leading pad, a 6+ space gap on bar-small.
+- Fix: freq.sh pad = int(cpus/10) - present two-digit counts (cpu count is constant, so width stays fixed; 32 threads: max 3, now 0-3 spaces); mem `w:3`→`w:2` (avail < 100 GB). test.sh freq rows lose trailing pad (fixtures have few cpus). 38/38 pass, both bars run clean, deployed.
+- Caveat: a host with >=100 GB available would show 3 digits (width +1).

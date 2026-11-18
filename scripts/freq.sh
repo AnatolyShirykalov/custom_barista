@@ -11,8 +11,9 @@ out=
     if (!n) exit 1
     L = max < 6 ? 6 : max
     for (i = 1; i <= L; i++) if (c[i] >= 10) two++
-    # pad: 1 space per missing digit (fixed width), counts right-aligned by the pad only
-    pad = (L < 6 ? L : 6) - two
+    # pad: 1 space per two-digit count that the cpu count allows but is absent (fixed width, n is constant)
+    mx = int(n / 10); if (mx > L) mx = L
+    pad = mx - two; if (pad < 0) pad = 0
     s = ""
     for (i = 1; i <= L; i++) {
       color = i <= 6 ? col[i] : "#ff0000"

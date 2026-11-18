@@ -8,9 +8,9 @@ check() { # name json expected_text expected_state
   local txt st; txt=$(jq -r .text <<<"$2" | strip); st=$(jq -r '.state // ""' <<<"$2")
   if [ "$txt" == "$3" ] && { [ -z "$4" ] || [ "$st" == "$4" ]; }; then pass=$((pass+1))
   else echo "FAIL $1: got '$txt' [$st], want '$3' [$4]"; fail=$((fail+1)); fi; }
-check freq1 "$("$d/freq.sh" "$t/freq1")" "1 0 0 2 1 0      " Idle
-check freq2 "$("$d/freq.sh" "$t/freq2")" "0 12 0 0 0 0     " Idle
-o=$("$d/freq.sh" "$t/freq3"); check freq3 "$o" "0 0 0 0 0 0 1      " Idle
+check freq1 "$("$d/freq.sh" "$t/freq1")" "1 0 0 2 1 0" Idle
+check freq2 "$("$d/freq.sh" "$t/freq2")" "0 12 0 0 0 0" Idle
+o=$("$d/freq.sh" "$t/freq3"); check freq3 "$o" "0 0 0 0 0 0 1" Idle
 grep -q "#ff0000'>1</span> *\"" <<<"$o" && pass=$((pass+1)) || { echo "FAIL freq3: last color"; fail=$((fail+1)); }
 check freq4 "$("$d/freq.sh" "$t/freq4")" "FREQ ERR" Critical
 cc() { CCUSAGE_JSON=$t/$1 "$d/ccusage.sh"; }

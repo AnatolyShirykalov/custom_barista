@@ -22,7 +22,7 @@ No agent running. Done recently (2026-11-18): switched to i3status-rust (Go bari
 
 ### Queued next (one agent each, in order)
 
-1. [ ] **DP-2 gap freq→mem** (D4 review 2026-11-17): freq's trailing pad plus mem's right-aligned eng(w:3) leave a wide gap on bar-small. Done: gap ≤ one separator width, test.sh widths still pass. → `widget-builder` (quick fix first)
+1. [x] **DP-2 gap freq→mem**: freq pad now = (cpu count/10) minus present two-digit counts (was fixed 6), mem eng w:3→w:2. Gap 6+ spaces → ~2-3. See progress/widgets.md.
 2. [ ] **Block explanations** (user asked for tooltips; i3bar has no hover): middle-click every trial-bar block → `yad` popup at mouse (`--mouse --undecorated --timeout 8`, closes on click; no notification daemon running, so no notify-send) with what it shows, units, color thresholds, click actions; one script `scripts/explain.sh <block>`; check middle button unused, else pick another. → `widget-builder`
 
 ### Background checks
