@@ -24,6 +24,7 @@ No agent running. Done recently (2026-11-18): switched to i3status-rust (Go bari
 
 1. [x] **DP-2 gap freq→mem**: freq pad now = (cpu count/10) minus present two-digit counts (was fixed 6), mem eng w:3→w:2. Gap 6+ spaces → ~2-3. See progress/widgets.md.
 2. [ ] **Block explanations** (user asked for tooltips; i3bar has no hover): middle-click every trial-bar block → `yad` popup at mouse (`--mouse --undecorated --timeout 8`, closes on click; no notification daemon running, so no notify-send) with what it shows, units, color thresholds, click actions; one script `scripts/explain.sh <block>`; check middle button unused, else pick another. → `widget-builder`
+3. [ ] **D5 bar design review** (user asked 2026-11-18): screenshot both bars, find what can be better (clarity, grouping, colors, icons, widths; also verify DP-2 freq→mem gap ≤ one separator), propose 2-3 options on decision page `docs/design/D5-bar-review/questions.html`; user picks in chat; picked option → backlog/queue for widget-builder. Runs alongside #2 (writes only docs/design/). → `bar-designer`
 
 ### Background checks
 
