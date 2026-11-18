@@ -16,29 +16,37 @@ check freq4 "$("$d/freq.sh" "$t/freq4")" "FREQ ERR" Critical
 # claude-usage.sh (u1-u17): fixtures in testdata/u1, fixed NOW, CU_API_FIXTURE always set (no network)
 U=$t/u1; NOW=1795003200; RES=1795009560; ucache=$gd/rl.json; find "$U/proj" -name '*.jsonl' -exec touch -d "@$NOW" {} +
 fresh() { usd=$(mktemp -d -p "$gd"); }
-wc_() { printf '{"ts":%s,"five_hour":{"pct":%s,"resets_at":%s},"seven_day":null}\n' "$1" "$2" "$3" >"$ucache"; }
+wc_() { printf '{"ts":%s,"five_hour":{"pct":%s,"resets_at":%s},"seven_day":%s}\n' "$1" "$2" "$3" "${4:-null}" >"$ucache"; }
 un() { CU_NOW=$NOW CU_PROJECTS=$U/proj CU_CREDS=${CRED:-$U/creds.json} CU_CACHE=$ucache CU_STATE_DIR=$usd CU_API_FIXTURE=${FX:-$U/api_000} "$d/claude-usage.sh"; }
-body=" 3.4M \$1.85 cache 90% 1h46m "
-fresh; wc_ $((NOW-60)) 53 $RES; o=$(un); check u1 "$o" "53%  $body" Good
+body=" 3.4M \$1.85 cache 90% 1h46m"
+sp7="        "
+fresh; wc_ $((NOW-60)) 53 $RES; o=$(un); check u1 "$o" "53%  $body$sp7" Good
 jq -r .text <<<"$o" | grep -q '#777777">cache</span>' && pass=$((pass+1)) || { echo "FAIL u1: cache label not dim"; fail=$((fail+1)); }
-wc_ $((NOW-60)) 70 $RES; check u2 "$(un)" "70%  $body" Good
-wc_ $((NOW-60)) 70.4 $RES; check u3 "$(un)" "70%  $body" Warning
-wc_ $((NOW-60)) 90 $RES; check u4a "$(un)" "90%  $body" Warning
-wc_ $((NOW-60)) 95 $RES; check u4b "$(un)" "95%  $body" Critical
-fresh; wc_ $((NOW-600)) 53 $RES; check u5 "$(FX=$U/api_200 un)" "37%  $body" Good
+wc_ $((NOW-60)) 70 $RES; check u2 "$(un)" "70%  $body$sp7" Good
+wc_ $((NOW-60)) 70.4 $RES; check u3 "$(un)" "70%  $body$sp7" Warning
+w7() { wc_ $((NOW-60)) 53 $RES "{\"pct\":$1,\"resets_at\":$((NOW+86400))}"; }
+w7 70; check u18 "$(un)" "53%  $body$sp7" Good
+w7 71; o=$(un); check u19 "$o" "53%  $body 7d 71% " Good
+jq -r .text <<<"$o" | grep -q '#dddd66">7d 71%' && pass=$((pass+1)) || { echo "FAIL u19: 7d colour"; fail=$((fail+1)); }
+w7 91; o=$(un); check u20 "$o" "53%  $body 7d 91% " Critical
+jq -r .text <<<"$o" | grep -q '#dd6666">7d 91%' && pass=$((pass+1)) || { echo "FAIL u20: 7d colour"; fail=$((fail+1)); }
+wc_ $((NOW-60)) 53 $RES '{"pct":91,"resets_at":1}'; check u21 "$(un)" "53%  $body$sp7" Good
+wc_ $((NOW-60)) 90 $RES; check u4a "$(un)" "90%  $body$sp7" Warning
+wc_ $((NOW-60)) 95 $RES; check u4b "$(un)" "95%  $body$sp7" Critical
+fresh; wc_ $((NOW-600)) 53 $RES; check u5 "$(FX=$U/api_200 un)" "37%  $body$sp7" Good
 [ "$(jq .next_at "$usd/api.json")" == $((NOW+180)) ] && pass=$((pass+1)) || { echo "FAIL u5: next_at"; fail=$((fail+1)); }
 fresh; printf '{"ts_ok":%s,"next_at":%s,"status":"ok","five_hour":null}\n' $((NOW-900)) $((NOW+100)) >"$usd/api.json"
-check u6 "$(FX=$U/api_200 un)" "53%  $body" Good
-fresh; check u7 "$(FX=$U/api_429 un)" "53%  $body" Good
+check u6 "$(FX=$U/api_200 un)" "53%  $body$sp7" Good
+fresh; check u7 "$(FX=$U/api_429 un)" "53%  $body$sp7" Good
 [ "$(jq .next_at "$usd/api.json")" == $((NOW+600)) ] && pass=$((pass+1)) || { echo "FAIL u7: next_at"; fail=$((fail+1)); }
 fresh; cp "$U/creds.json" "$gd/creds"; touch -d @1000000000 "$gd/creds"; wc_ $((NOW-1200)) 53 $RES
-o=$(FX=$U/api_401 CRED=$gd/creds un); check u8 "$o" "53%  $body" Idle
+o=$(FX=$U/api_401 CRED=$gd/creds un); check u8 "$o" "53%  $body$sp7" Idle
 jq -r .text <<<"$o" | grep -q '#777777">53%</span>' && [ "$(jq -r .status "$usd/api.json")" == stale ] && pass=$((pass+1)) || { echo "FAIL u8: dim pct / stale status"; fail=$((fail+1)); }
-check u9 "$(FX=$U/api_200 CRED=$gd/creds un)" "53%  $body" Idle
-touch -d "@$NOW" "$gd/creds"; check u10 "$(FX=$U/api_200 CRED=$gd/creds un)" "37%  $body" Good
+check u9 "$(FX=$U/api_200 CRED=$gd/creds un)" "53%  $body$sp7" Idle
+touch -d "@$NOW" "$gd/creds"; check u10 "$(FX=$U/api_200 CRED=$gd/creds un)" "37%  $body$sp7" Good
 fresh; wc_ $((NOW-60)) 53 $((NOW-60)); check u11 "$(un)" "" ""
-fresh; rm -f "$ucache"; check u12 "$(un)" "?%   4.4M \$5.85 cache 69% -h--m  " Idle
-fresh; wc_ $((NOW-1200)) 53 $RES; check u13 "$(FX=$gd/nonexistent CRED=$U/creds_expired.json un)" "53%  $body" Idle
+fresh; rm -f "$ucache"; check u12 "$(un)" "?%   4.4M \$5.85 cache 69% -h--m         " Idle
+fresh; wc_ $((NOW-1200)) 53 $RES; check u13 "$(FX=$gd/nonexistent CRED=$U/creds_expired.json un)" "53%  $body$sp7" Idle
 ! grep -rq TESTTOKEN-u1 "$gd"/tmp.* && pass=$((pass+1)) || { echo "FAIL u14: token leaked into state"; fail=$((fail+1)); }
 rm -f "$ucache"; o=$(CU_CACHE=$ucache "$d/claude-rl-tap.sh" <"$U/sl_rl.json")
 [ -z "$o" ] && [ "$(jq -c '[.five_hour.pct,.five_hour.resets_at,(.ts|type)]' "$ucache")" == '[53,1795009560,"number"]' ] && pass=$((pass+1)) || { echo "FAIL u15: tap"; fail=$((fail+1)); }
@@ -60,10 +68,10 @@ check gpu3 "$("$d/gpu.sh" "$t/gpu_multi")" "34° 5.0GB" Idle
 printf '99, 16303\n' > "$cj"; check gpu4 "$("$d/gpu.sh" "$cj")" "99°  17GB" Critical
 # constant text length across small/large values
 len() { jq -r .text <<<"$1" | strip | awk '{print length($0)}'; }
-ub='{"pct":53,"tok":3400000,"cost":1.85,"ch":90,"left":6360,"stale":false}'; base=$(len "$("$d/claude-usage.sh" --render "$ub")")
-for kv in pct:0 pct:5 pct:100 pct:null tok:0 tok:5 tok:999 tok:999950 tok:200000 tok:53300000 cost:0 cost:9.994 cost:9.995 cost:99.96 cost:999.6 cost:1234 cost:12345 ch:0 ch:100 left:0 left:59 left:299 left:300; do
+ub='{"pct":53,"tok":3400000,"cost":1.85,"ch":90,"left":6360,"stale":false,"w":null}'; base=$(len "$("$d/claude-usage.sh" --render "$ub")")
+for kv in pct:0 pct:5 pct:100 pct:null tok:0 tok:5 tok:999 tok:999950 tok:200000 tok:53300000 cost:0 cost:9.994 cost:9.995 cost:99.96 cost:999.6 cost:1234 cost:12345 ch:0 ch:100 left:0 left:59 left:299 left:300 w:null w:70 w:71 w:99 w:150; do
   o=$("$d/claude-usage.sh" --render "$(jq -c --arg k "${kv%%:*}" --argjson v "${kv#*:}" '.[$k]=$v' <<<"$ub")")
-  [ "$(len "$o")" == "$base" ] && [ "$base" == 33 ] && pass=$((pass+1)) || { echo "FAIL u16 $kv: '$(jq -r .text <<<"$o" | strip)' len $(len "$o")"; fail=$((fail+1)); }
+  [ "$(len "$o")" == "$base" ] && [ "$base" == 40 ] && pass=$((pass+1)) || { echo "FAIL u16 $kv: '$(jq -r .text <<<"$o" | strip)' len $(len "$o")"; fail=$((fail+1)); }
 done
 o=$(EXPLAIN_DRY=1 "$d/explain.sh" ccusage); grep -q cache <<<"$o" && ! grep -q 'CH' <<<"$o" && pass=$((pass+1)) || { echo "FAIL u17: explain text"; fail=$((fail+1)); }
 printf '99, 16303\n' > "$cj"; o=$("$d/gpu.sh" "$cj"); printf '9, 5\n' > "$cj"; o2=$("$d/gpu.sh" "$cj")

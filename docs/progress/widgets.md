@@ -39,3 +39,7 @@ Middle click on every block runs `scripts/explain.sh <name>` (names: kbd load te
 - `scripts/claude-usage.sh` replaces ccusage.sh (spec option A); `claude-rl-tap.sh` + install.sh step 3b insert one marked line after `input=$(cat)` in ~/.claude/bin/claude-statusline (backup `.bak-u1`, rerun adds nothing); `claude-prices.json`; ccusage.sh and cc_*.json removed; explain text, gen-compact pattern, test.sh rows u1-u17 (87/87 pass, no network).
 - Live: one real OAuth call succeeded during verification (56%, gate next_at = +180 s); bar shows `56% 117.0M $66.3 cache 96% 0h28m`, run time 0.16 s. After crop: `docs/design/U1-usage-block/img/after.png` (bar is at the bottom of DP-0). No before crop (old script needed npx, 30 s).
 - Deviations: none in behaviour; test rows u17 (explain) and u18 (compact) are the existing explain/compact checks plus the renamed pattern; install.sh also warns on missing flock/curl. Acceptance 6 (ccusage comparison) not done.
+
+## U1b 7-day limit mark (2026-11-18)
+- `claude-usage.sh`: new field `w` (seven_day pct from the newest of tap/API cache; ignored when its resets_at passed). Mark `7d NN%` as the last 6-char slot (spaces when <= 70 or unknown), yellow > 70, red > 90 (hex = theme warning/critical); block state Critical when 7d > 90 (not when Idle). API cache now also stores seven_day from the same response (no extra calls). Block width 33 -> 40.
+- explain.sh text updated; test.sh rows u18-u21 (70, 71, 91, expired), u16 width loop includes w values; 98/98 pass. Deployed; bars show no errors.

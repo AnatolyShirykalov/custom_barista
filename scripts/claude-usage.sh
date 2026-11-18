@@ -2,7 +2,7 @@
 # Claude usage in the real 5h rate-limit window: limit %, tokens, cost, cache ratio, time to reset.
 # Window: statusline tap cache (claude-rl-tap.sh), else the gated OAuth usage endpoint; tokens/cost from the local logs.
 # Env (tests): CU_NOW CU_CACHE CU_STATE_DIR CU_PROJECTS CU_CREDS CU_PRICES CU_API_FIXTURE (no curl when set).
-# `--render '<json {pct,tok,cost,ch,left,stale}>'` prints the block JSON for those values.
+# `--render '<json {pct,tok,cost,ch,left,stale,w}>'` prints the block JSON for those values.
 set -u
 d=$(cd "$(dirname "$0")" && pwd)
 err='{"icon":"ccusage","state":"Critical","text":"cc err"}'
@@ -12,14 +12,15 @@ sdir=${CU_STATE_DIR:-$HOME/.cache/claude-usage}
 creds=${CU_CREDS:-$HOME/.claude/.credentials.json}
 prices=${CU_PRICES:-$d/claude-prices.json}
 
-render() { # stdin {pct,tok,cost,ch,left,stale} -> block JSON
+render() { # stdin {pct,tok,cost,ch,left,stale,w} -> block JSON
   jq -c '
     def r0: (. + 0.5 | floor | tostring);
     def f1: (. * 10 + 0.5 | floor / 10 | tostring) as $s | if ($s | test("\\.")) then $s else $s + ".0" end;
     def pad($n): tostring | (($n - length) as $k | if $k > 0 then (" " * $k) + . else . end);
     def dim: "<span foreground=\"#777777\">" + . + "</span>";
-    .pct as $p | .tok as $t | .cost as $c | .left as $l
-    | (if $p == null or .stale then "Idle" elif $p > 90 then "Critical" elif $p > 70 then "Warning" else "Good" end) as $st
+    .pct as $p | .tok as $t | .cost as $c | .left as $l | .w as $w
+    | (if $p == null or .stale then "Idle" elif $p > 90 or ($w != null and $w > 90) then "Critical" elif $p > 70 then "Warning" else "Good" end) as $st
+    | (if $w != null and $w > 70 then "<span foreground=\"" + (if $w > 90 then "#dd6666" else "#dddd66" end) + "\">7d " + (([$w + 0.5 | floor, 99] | min | tostring) | pad(2)) + "%</span>" else " " * 6 end) as $wm
     | ((if $p == null then "?%" else ($p | r0) + "%" end) as $s | (" " * (4 - ($s | length))) + (if .stale or $p == null then ($s | dim) else $s end)) as $pt
     | { icon: "ccusage", state: $st,
         text: ([ $pt,
@@ -32,7 +33,7 @@ render() { # stdin {pct,tok,cost,ch,left,stale} -> block JSON
           ("cache" | dim),
           (([.ch | r0 | tonumber, 99] | min | tostring) + "%" | pad(3)),
           (if $l == null then "-h--m" else ((($l / 60) | floor) as $m | (($m / 60 | floor | tostring) + "h" + (($m % 60) | tostring | pad(2) | gsub(" "; "0")) + "m")) end)
-        ] | join(" ") | length as $n | sub("^ +"; "") | . + (" " * ($n - length))) }'
+        ] + [$wm] | join(" ") | length as $n | sub("^ +"; "") | . + (" " * ($n - length))) }'
 }
 
 if [ "${1:-}" = --render ]; then printf '%s' "${2:-}" | render || echo "$err"; exit 0; fi
@@ -69,7 +70,8 @@ api_refresh() {
     200) jq -c --argjson now "$now" --argjson st "$st" '
            ((.five_hour.resets_at // null) | if . == null then null else (sub("\\.[0-9]+"; "") | sub("\\+00:00$"; "Z") | fromdateiso8601) end) as $r
            | $st + {ts_ok: $now, next_at: ($now + 180), backoff: 0, status: "ok",
-                    five_hour: {pct: .five_hour.utilization, resets_at: $r}}' "$tmp/body" >"$tmp/st" 2>/dev/null && mv "$tmp/st" "$sdir/api.json" ;;
+                    five_hour: {pct: .five_hour.utilization, resets_at: $r},
+                    seven_day: (if .seven_day.utilization == null then null else {pct: .seven_day.utilization, resets_at: ((.seven_day.resets_at // null) | if . == null then null else (sub("\\.[0-9]+"; "") | sub("\\+00:00$"; "Z") | fromdateiso8601) end)} end)}' "$tmp/body" >"$tmp/st" 2>/dev/null && mv "$tmp/st" "$sdir/api.json" ;;
     429) backoff=$(jq -r '.backoff // 0' <<<"$st"); nb=$((backoff * 2)); [ "$nb" -gt 0 ] || nb=360
          [ "${ra:-0}" -gt "$nb" ] && nb=$ra; [ "$nb" -gt 1800 ] && nb=1800
          jq -c --argjson b "$nb" --argjson n "$((now + nb))" '.backoff = $b | .next_at = $n' <<<"$st" >"$tmp/st" && mv "$tmp/st" "$sdir/api.json" ;;
@@ -84,20 +86,20 @@ if [ "$((now - ${tap_ts%.*}))" -gt 300 ]; then api_refresh 2>/dev/null; fi
 # --- pick the window: newer of tap cache and API data ---
 sel=$(jq -nc --argjson now "$now" --slurpfile t <(cat "$cache" 2>/dev/null; true) --slurpfile a <(cat "$sdir/api.json" 2>/dev/null; true) '
   ($t[0] // {}) as $t | ($a[0] // {}) as $a
-  | [ (if $t.five_hour != null and $t.ts != null then {ts: $t.ts, pct: $t.five_hour.pct, resets: $t.five_hour.resets_at, api: false} else empty end),
-      (if ($a.ts_ok // null) != null and $a.five_hour != null then {ts: $a.ts_ok, pct: $a.five_hour.pct, resets: $a.five_hour.resets_at, api: true} else empty end) ]
+  | [ (if $t.five_hour != null and $t.ts != null then {ts: $t.ts, pct: $t.five_hour.pct, resets: $t.five_hour.resets_at, w: $t.seven_day, api: false} else empty end),
+      (if ($a.ts_ok // null) != null and $a.five_hour != null then {ts: $a.ts_ok, pct: $a.five_hour.pct, resets: $a.five_hour.resets_at, w: $a.seven_day, api: true} else empty end) ]
   | sort_by(.ts) | last as $s
   | if $s == null then {none: true}
-    else {none: false, pct: $s.pct, resets: $s.resets, age: ($now - $s.ts),
+    else {none: false, pct: $s.pct, resets: $s.resets, w: (if ($s.w.pct // null) != null and (($s.w.resets_at // $now + 1) > $now) then $s.w.pct else null end), age: ($now - $s.ts),
           astale: (($a.status // "") == "stale")} end' 2>/dev/null) || { echo "$err"; exit 0; }
 
 none=$(jq -r .none <<<"$sel")
 if [ "$none" = true ]; then
-  start=$((now - 18000)); end=$((now + 1)); pct=null; left=null; stale=true
+  start=$((now - 18000)); end=$((now + 1)); pct=null; left=null; stale=true; w=null
 else
   resets=$(jq -r '.resets // 0' <<<"$sel"); resets=${resets%.*}
   if [ "$resets" -le "$now" ]; then echo '{"text":""}'; exit 0; fi
-  start=$((resets - 18000)); end=$resets; pct=$(jq -c .pct <<<"$sel"); left=$((resets - now))
+  start=$((resets - 18000)); end=$resets; pct=$(jq -c .pct <<<"$sel"); left=$((resets - now)); w=$(jq -c .w <<<"$sel")
   stale=$(jq -r '(.age > 900) or (.astale and .age > 300)' <<<"$sel")
 fi
 siso=$(date -u -d "@$start" +%FT%T.000Z); eiso=$(date -u -d "@$end" +%FT%T.000Z)
@@ -128,5 +130,5 @@ if [ ${#dirs[@]} -gt 0 ]; then
 fi
 [ -n "$sums" ] || { echo "$err"; exit 0; }
 
-jq -c --argjson p "$pct" --argjson l "$left" --argjson st "$stale" '. + {pct: $p, left: $l, stale: $st}' <<<"$sums" | render || echo "$err"
+jq -c --argjson p "$pct" --argjson l "$left" --argjson st "$stale" --argjson w "$w" '. + {pct: $p, left: $l, stale: $st, w: $w}' <<<"$sums" | render || echo "$err"
 exit 0
