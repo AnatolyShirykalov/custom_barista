@@ -1,127 +1,81 @@
 <!doctype html>
-<!-- D5 decision page. Local file only: never publish. Mocks rendered with pango (PragmataPro Mono + Symbols Nerd Font Mono 18),
-     generator kept out of the repo; today-*.png are crops of the real bars (import -window root, 2026-11-18 20:03). -->
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>D5 Bar design review: decisions</title>
+<!-- D5 decision page v2. Local file only: never publish. BEFORE = crops of the real bars (import -window root, 2026-11-18 21:10).
+     AFTER = real i3bar + i3status-rs 0.40.1 in a throwaway Xvfb from temp config copies (scratch, not the repo config), same font. -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D5 Bar design review v2: decisions</title>
 <style>
 :root { --bg:#f6f7f9; --fg:#1b1f24; --muted:#5b6470; --card:#fff; --line:#d9dee5; --accent:#2f6fde; --rec:#1f8a4c; --risk:#b25e09; }
 @media (prefers-color-scheme: dark) { :root { --bg:#14171c; --fg:#e6e9ee; --muted:#9aa3ae; --card:#1d2129; --line:#2e3440; --accent:#6ea0ff; --rec:#4cc47e; --risk:#e0a050; } }
 * { box-sizing:border-box; }
 body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
-main { max-width:1000px; margin:0 auto; padding:24px 16px 64px; }
-h1 { font-size:1.6rem; margin:0 0 4px; }
-h2 { font-size:1.25rem; margin:0 0 8px; }
-.sub { color:var(--muted); margin:0 0 24px; }
+main { max-width:1680px; margin:0 auto; padding:24px 16px 64px; }
+h1 { font-size:1.6rem; margin:0 0 4px; } h2 { font-size:1.25rem; margin:0 0 8px; }
+.sub { color:var(--muted); margin:0 0 16px; max-width:1000px; }
 section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin:0 0 20px; }
-img { max-width:100%; height:auto; border-radius:8px; border:1px solid var(--line); display:block; }
-figure { margin:12px 0; }
-figcaption { color:var(--muted); font-size:.9rem; margin-top:4px; }
-.opts { display:grid; grid-template-columns:1fr; gap:16px; }
-.opt { border:1px solid var(--line); border-radius:10px; padding:12px; }
-.opt h3 { margin:0 0 6px; font-size:1rem; }
+.shot { margin:6px 0; }
+.shot img { max-width:100%; height:auto; display:block; border:1px solid var(--line); image-rendering:pixelated; }
+.tag { display:inline-block; font-size:.75rem; font-weight:700; letter-spacing:.03em; padding:1px 6px; border-radius:4px; margin-bottom:2px; }
+.tag.before, .tag.now { background:#5b6470; color:#fff; } .tag.after { background:var(--accent); color:#fff; }
+figure { margin:12px 0 18px; } figcaption { max-width:1000px; margin-top:4px; }
+.st { font-size:.8rem; font-weight:600; padding:2px 8px; border-radius:10px; border:1px solid var(--line); color:var(--muted); vertical-align:middle; }
+.st.resolved { color:var(--rec); border-color:var(--rec); }
 .rec { color:var(--rec); font-weight:600; font-size:.85rem; }
-.meta { color:var(--muted); font-size:.85rem; }
-.risk { color:var(--risk); font-size:.85rem; }
-.against { color:var(--muted); font-size:.9rem; margin:6px 0 0; }
-ul { margin:6px 0; padding-left:20px; }
-code, pre { font-size:.85em; }
-pre { background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:8px; overflow-x:auto; }
-table { border-collapse:collapse; width:100%; font-size:.9rem; }
-td, th { border-top:1px solid var(--line); padding:4px 6px; text-align:left; vertical-align:top; }
-label.pick { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); }
-label.pick input { margin-top:5px; transform:scale(1.3); }
+.meta { color:var(--muted); font-size:.9rem; max-width:1000px; }
+pre { background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:8px; overflow-x:auto; font-size:.85em; max-width:1000px; }
+table { border-collapse:collapse; font-size:.9rem; } td, th { border-top:1px solid var(--line); padding:4px 8px; text-align:left; vertical-align:top; }
+label.pick { display:flex; gap:10px; align-items:flex-start; padding:10px 0 0; border-top:1px solid var(--line); margin-top:10px; font-size:1.05rem; }
+label.pick input { margin-top:6px; transform:scale(1.4); }
 #out { width:100%; min-height:60px; font:14px monospace; }
-</style>
-</head>
-<body>
-<main>
-<h1>D5: Bar design review</h1>
-<p class="sub">Your note (2026-11-18): "make a design investigation what can be done better in the bar, propose me a couple of options". This page picks one overall direction (A, B or C) and which small fixes (P1-P5) to build. Answer in the chat with the line at the bottom.</p>
-
-<section>
-<h2>Today</h2>
-<figure><img src="img/today-dp0.png" alt="DP-0 bar today, status part"><figcaption>DP-0 (config.toml), status part (crop of the real 4K bar). Look at the all-green ccusage block, the IP address, the "GB/kB" suffixes and the 13 equal separators.</figcaption></figure>
-<figure><img src="img/today-dp2.png" alt="DP-2 compact bar today"><figcaption>DP-2 (compact.toml). Look at the extra space after the clipboard "67B" and the year in the date.</figcaption></figure>
-<h3>Findings</h3>
-<table>
-<tr><th>#</th><th>Problem (evidence)</th><th>Why fixing helps</th></tr>
-<tr><td>F1</td><td>ccusage text is all green: <code>ccusage.sh</code> sets <code>state: Good</code> when the token limit is unknown (<code>$pct == null</code>), which is the case now (no % shown).</td><td>Green should mean "measured and fine"; here nothing is measured. One accent per state.</td></tr>
-<tr><td>F2</td><td>"CH 96%" label is cryptic and in the same colour as the values.</td><td>A dim label reads as a label, the number stands out.</td></tr>
-<tr><td>F3</td><td>Unit suffix "B" repeated on 6 values (90GB, 602GB, 0.0kB, 131kB, 0.6GB, 4.3kB, 7.8kB): about 7 cells on DP-0.</td><td>The prefix (G/k) is enough; <code>eng(hide_unit:true)</code> is verified to work on 0.40.1 (prints "89G").</td></tr>
-<tr><td>F4</td><td>LAN IP 192.168.178.69 always shown: 15 cells of static text.</td><td>Rarely needed at a glance; one click away is enough.</td></tr>
-<tr><td>F5</td><td>clipboard pads to 5 cells: 41 px before the separator vs 17 px for every other block (2 empty cells).</td><td>Even spacing; "1023B" is the only 5-char value and can become "1.0K".</td></tr>
-<tr><td>F6</td><td>Order: keyboard layout first, sound between net and ccusage; controls are scattered among monitors.</td><td>Monitors left, things you click (layout, volume) next to the clock: shorter mouse travel, easier scan.</td></tr>
-<tr><td>F7</td><td>13 separators on DP-0, all equal: CPU (load/temp/freq) and storage (mem/disk/io) do not read as groups.</td><td><code>merge_with_next</code> (accepted by 0.40.1) removes separators inside a group.</td></tr>
-<tr><td>F8</td><td>DP-2 date shows the year: 5 cells on the compact bar.</td><td>Year is never news; DP-0 keeps it.</td></tr>
-</table>
-<p class="meta">OK as is: all glyphs render (no tofu), icons dim #777 consistently, values white, widths stable (<code>w:</code> pads), freq palette is the agreed exception.</p>
-<h3>DP-2 freq to mem gap (fix b5c2eb5)</h3>
-<figure><img src="img/gap-dp2.png" alt="freq to mem gap on DP-2, 3x zoom"><figcaption>3x zoom. Last freq digit to separator: 29 px; every other block: 17 px. Extra = 12 px = 1 space (pad 1: counts 12 and 15 are two-digit, 32 threads allow 3).</figcaption></figure>
-<p>Result: fixed from 6+ spaces to 1 now; worst case 3 spaces (36 px) when all six counts are below 10. 12 px is a bit more than i3's 9 px separator gap, but it is the price of a fixed freq width (without it, everything left of freq jitters). Recommendation: keep as is.</p>
+nav a { margin-right:10px; }
+</style></head><body><main>
+<h1>D5: Bar design review (v2, a picture per proposal)</h1>
+<p class="sub">Your notes (2026-11-18): "make a design investigation what can be done better in the bar, propose me a couple of options" and "I need much more pictures for each part of the proposal". One section per decision, each with the real bar today and the result. Pick in each section; the answer line at the bottom collects the picks. Answer in the chat.</p>
+<p class="meta"><span class="tag before">BEFORE live</span> crop of your real bar (21:10). <span class="tag after">AFTER rendered</span> the real i3bar and i3status-rs with a modified copy of the config, run in a hidden X server with the same font: not drawn by hand. Values are live, so numbers differ by a few seconds between pictures. Click any picture to open it full-size; small regions are zoomed 2x.</p>
+<nav class="meta">Jump: <a href="#today">Today</a><a href="#f1">F1</a><a href="#f2">F2</a><a href="#f3">F3·P2</a><a href="#f4">F4·P3</a><a href="#f5">F5·P4</a><a href="#f6">F6</a><a href="#f7">F7</a><a href="#f8">F8·P5</a><a href="#optb">Option B</a><a href="#opta">A</a><a href="#optc">C</a><a href="#answer">Answer</a></nav>
+<section id="today"><h2>Today</h2>
+<figure><div class="shot"><span class="tag dp-0">DP-0 live 21:10</span><a href="img/live-dp0-1.png" target="_blank"><img src="img/live-dp0-1.png" width="1237" height="26" alt="DP-0 bar today (left half)"></a></div><div class="shot"><a href="img/live-dp0-2.png" target="_blank"><img src="img/live-dp0-2.png" width="1581" height="26" alt="DP-0 bar today (right half)"></a></div><figcaption>DP-0 (config.toml), status part, two halves at 1x.</figcaption></figure>
+<figure><div class="shot"><span class="tag dp-2">DP-2 live 21:10</span><a href="img/live-dp2-1.png" target="_blank"><img src="img/live-dp2-1.png" width="871" height="26" alt="DP-2 bar today (left half)"></a></div><div class="shot"><a href="img/live-dp2-2.png" target="_blank"><img src="img/live-dp2-2.png" width="856" height="26" alt="DP-2 bar today (right half)"></a></div><figcaption>DP-2 (compact.toml: no disk, IO, IP, usage).</figcaption></figure>
+<table><tr><th>#</th><th>Problem (evidence)</th><th>Status / fix</th></tr>
+<tr><td><a href="#f1">F1</a></td><td>usage block green when the limit was unknown</td><td>resolved by U1 (P1 dropped)</td></tr>
+<tr><td><a href="#f2">F2</a></td><td>"CH 96%" label cryptic, value colour</td><td>resolved by U1 (dim "cache")</td></tr>
+<tr><td><a href="#f3">F3</a></td><td>"B" on 7 values, about 7 cells on DP-0</td><td>P2</td></tr>
+<tr><td><a href="#f4">F4</a></td><td>LAN IP always shown, 15 static cells</td><td>P3</td></tr>
+<tr><td><a href="#f5">F5</a></td><td>clipboard pads to 5 cells, 1 empty cell before the separator</td><td>P4</td></tr>
+<tr><td><a href="#f6">F6</a></td><td>layout first, volume among monitors</td><td>option B or C</td></tr>
+<tr><td><a href="#f7">F7</a></td><td>12 equal separators on DP-0, no visible groups</td><td>option B or C</td></tr>
+<tr><td><a href="#f8">F8</a></td><td>year in the DP-2 date, 5 cells</td><td>P5</td></tr></table>
+<p class="meta">OK as is: all glyphs render (no tofu), icons dim #777, values white, widths stable, freq palette is the agreed exception.</p>
 </section>
-
-<section>
-<h2>Question 1: overall direction</h2>
-<div class="opts">
-  <div class="opt">
-    <h3>B. Polish + regroup (P1-P5, new order, groups without inner separators) <span class="rec">recommended</span></h3>
-    <figure><img src="img/B-dp0.png" alt="Mock B DP-0"><figcaption>DP-0: CPU group | storage group | GPU | net | ccusage+clip | layout+volume | clock. 6 separators instead of 13.</figcaption></figure>
-    <figure><img src="img/B-dp2.png" alt="Mock B DP-2"><figcaption>DP-2: same order, date without year.</figcaption></figure>
-    <span class="meta">M (config order + <code>merge_with_next</code>, gen-compact keeps flags consistent) &middot; <span class="risk">layout change: muscle memory for kbd/sound position</span></span>
-    <pre>[[block]]  # load, temperature, memory, disk_space, ccusage, keyboard_layout get:
-merge_with_next = true
-# order: load temp freq | mem disk io | gpu | net(en) net(wl) | ccusage clip | kbd sound battery | time</pre>
-  </div>
-  <div class="opt">
-    <h3>A. Polish only (P1-P5, same order and separators)</h3>
-    <figure><img src="img/A-dp0.png" alt="Mock A DP-0"><figcaption>DP-0: same blocks, no "B" units, no IP, ccusage white with dim "ch".</figcaption></figure>
-    <figure><img src="img/A-dp2.png" alt="Mock A DP-2"><figcaption>DP-2.</figcaption></figure>
-    <span class="meta">S &middot; <span class="risk">low: text-only changes</span></span>
-    <p class="against">Why the designer is against A as the end state: it fixes the noise (F1-F5, F8) but leaves the flat 13-separator row where groups do not read (F6, F7); B costs little more.</p>
-  </div>
-  <div class="opt">
-    <h3>C. Quiet bar: idle values dim, no separators, colour only on alerts</h3>
-    <figure><img src="img/C-dp0.png" alt="Mock C DP-0"><figcaption>DP-0: idle values grey #aaa, groups separated by space, disk space and IO labels dropped, date dim. ccusage shown yellow as an example of a warning: only non-idle states are bright.</figcaption></figure>
-    <span class="meta">L (theme idle_fg change, all formats, scripts' state logic, disk_space shown only when low) &middot; <span class="risk">bigger: less readable at a glance on 4K, hide-when-ok blocks change bar width</span></span>
-    <p class="against">Why the designer is against C: dim values are harder to read on the 4K bar, and hiding disk space until it is low breaks the stable-width rule; the gain over B is mostly taste.</p>
-  </div>
-</div>
-</section>
-
-<section>
-<h2>Picks</h2>
-<label class="pick"><input type="checkbox" name="B" checked><span><b>B Polish + regroup</b> <span class="rec">recommended</span><br>New order with groups, includes the ticked P items.<br><span class="meta">M &middot; layout change</span></span></label>
-<label class="pick"><input type="checkbox" name="A"><span><b>A Polish only</b><br>P items only, order unchanged.<br><span class="meta">S &middot; low</span></span></label>
-<label class="pick"><input type="checkbox" name="C"><span><b>C Quiet bar</b><br>Dim idle values, no separators.<br><span class="meta">L &middot; readability, width changes</span></span></label>
-<label class="pick"><input type="checkbox" name="P1" checked><span><b>P1 ccusage state Idle when no limit</b> <span class="rec">recommended</span><br><code>ccusage.sh</code>: <code>$pct == null</code> gives "Idle" (white), not "Good" (green). F1.<br><span class="meta">S &middot; test.sh row update</span></span></label>
-<label class="pick"><input type="checkbox" name="P2" checked><span><b>P2 Drop the "B" unit, dim the "ch" label</b> <span class="rec">recommended</span><br><code>hide_unit:true</code> on mem, disk, io, net; gpu.sh "GB" to "G"; ccusage "CH 96%" to dim "ch" + 96%. F2, F3.<br><span class="meta">S &middot; low</span></span></label>
-<label class="pick"><input type="checkbox" name="P3" checked><span><b>P3 IP to format_alt</b> <span class="rec">recommended</span><br>Wired net shows speeds only; left click shows the IP. F4.<br><span class="meta">S &middot; low</span></span></label>
-<label class="pick"><input type="checkbox" name="P4" checked><span><b>P4 Clipboard width 4</b> <span class="rec">recommended</span><br><code>clip.sh</code>: pad 5 to 4, switch to K at 1000 B (max "999B"), "empty" to dim "none". F5.<br><span class="meta">S &middot; test.sh rows</span></span></label>
-<label class="pick"><input type="checkbox" name="P5" checked><span><b>P5 DP-2 date without year</b> <span class="rec">recommended</span><br><code>gen-compact.sh</code> rewrites <code>%a %Y-%m-%d</code> to <code>%a %m-%d</code>. F8.<br><span class="meta">S &middot; low</span></span></label>
-</section>
-
-<section>
-<h2>What doesn't change</h2>
-<ul>
-<li>Block set and their thresholds, the freq histogram and its palette, the freq pad (gap result above).</li>
-<li>Colours: <code>[theme.overrides]</code> good/degraded/bad/dim-icon (C would only change idle_fg).</li>
-<li>Click actions, the middle-click explanation popups, fonts and icons.</li>
-<li>DP-2 keeps dropping disk, io, IP and ccusage.</li>
-</ul>
-</section>
-
-<section>
-<h2>Your answer</h2>
+<section id="f1"><h2>F1 · P1: usage block green when nothing is measured <span class="st resolved">resolved by U1</span></h2><figure><div class="shot"><span class="tag before">BEFORE old bar 20:03 (ccusage.sh)</span><a href="img/f1-old.png" target="_blank"><img src="img/f1-old.png" width="768" height="52" alt="old ccusage block, all green, no percent"></a></div><div class="shot"><span class="tag now">NOW live 21:10 (claude-usage.sh)</span><a href="img/f1-live.png" target="_blank"><img src="img/f1-live.png" width="1128" height="52" alt="new claude-usage block"></a></div><figcaption>Old: green text although the limit was unknown (no %). Now (U1, a10e615): the 5-hour % is measured, so green means "measured and fine"; stale or unknown data shows white (Idle) or <code>?%</code>. P1 is dropped, nothing to decide. The empty cells after <code>0h09m</code> are the fixed-width slot for the new U1b "7d NN%" mark (shown only above 70 %).</figcaption></figure><p class="meta">2x zoom. Nothing to pick.</p></section><section id="f2"><h2>F2: cryptic "CH" label <span class="st resolved">resolved by U1</span></h2><figure><div class="shot"><span class="tag before">BEFORE old bar 20:03</span><a href="img/f1-old.png" target="_blank"><img src="img/f1-old.png" width="768" height="52" alt="old CH label"></a></div><div class="shot"><span class="tag now">NOW live 21:10</span><a href="img/f1-live.png" target="_blank"><img src="img/f1-live.png" width="1128" height="52" alt="dim cache label"></a></div><figcaption>"CH 96%" in value colour became a dim grey <code>cache</code> label before <code>96%</code>: it reads as a label, the number stands out. Nothing to pick.</figcaption></figure></section><section id="f3"><h2>F3 · P2: drop the "B" unit <span class="st decision">decision</span></h2><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/f3-live-dp0.png" target="_blank"><img src="img/f3-live-dp0.png" width="1110" height="26" alt="DP-0 mem to net today"></a></div><div class="shot"><span class="tag after">AFTER rendered</span><a href="img/f3-p2-dp0.png" target="_blank"><img src="img/f3-p2-dp0.png" width="1026" height="26" alt="DP-0 mem to net without B"></a></div><figcaption>DP-0, memory, disk, IO, GPU, wired net (1x). <b>Changes:</b> 86GB to 86G, 596GB to 596G, kB to k on IO and net, GPU 1.1GB to 1.1G: 7 cells (84 px) shorter. <b>Cost:</b> S, <code>hide_unit:true</code> in 6 formats + gpu.sh printf. <b>Recommended:</b> the prefix (G, k, M) already says the size; "B" is on every value, so it carries no information.</figcaption></figure><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/f3-live-dp2.png" target="_blank"><img src="img/f3-live-dp2.png" width="1128" height="52" alt="DP-2 mem gpu net today"></a></div><div class="shot"><span class="tag after">AFTER rendered</span><a href="img/f3-p2-dp2.png" target="_blank"><img src="img/f3-p2-dp2.png" width="1032" height="52" alt="DP-2 without B"></a></div><figcaption>DP-2 (2x zoom): memory, GPU, net. Same change, 4 cells shorter. Clipboard keeps "B" for counts below 1000 (see F5): it counts bytes, not a rate or a size prefix.</figcaption></figure><pre># memory, disk_space, disk_iostats, net (both): add hide_unit:true to every .eng(prefix:...)
+format = " $icon $mem_avail.eng(prefix:G,w:2,hide_unit:true) "
+# scripts/gpu.sh: printf "...%sGB" -> "...%sG"</pre><label class="pick"><input type="checkbox" name="P2" value="P2" checked><span><b>P2</b> <span class="rec">recommended</span>: drop the "B" unit (mem, disk, IO, net, GPU)</span></label></section><section id="f4"><h2>F4 · P3: LAN IP always shown <span class="st decision">decision</span></h2><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/f4-live.png" target="_blank"><img src="img/f4-live.png" width="924" height="52" alt="wired net with IP"></a></div><div class="shot"><span class="tag after">AFTER rendered</span><a href="img/f4-p3.png" target="_blank"><img src="img/f4-p3.png" width="564" height="52" alt="wired net without IP"></a></div><figcaption>DP-0 wired net (2x zoom). <b>Changes:</b> the IP (15 cells, static) moves to <code>format_alt</code>: left click on the block shows it (looks like the BEFORE picture), click again hides it. <b>Cost:</b> S, one config line. <b>Recommended:</b> the address never changes during a day; one click away is enough. DP-2 already hides the IP (gen-compact) and is unchanged.</figcaption></figure><pre>[[block]]
+block = "net"
+device = "^en"
+format = " $icon ^icon_net_up $speed_up.eng(prefix:k,w:3) ^icon_net_down $speed_down.eng(prefix:k,w:3) "
+format_alt = " $icon ^icon_net_up $speed_up.eng(prefix:k,w:3) ^icon_net_down $speed_down.eng(prefix:k,w:3) $ip "</pre><label class="pick"><input type="checkbox" name="P3" value="P3" checked><span><b>P3</b> <span class="rec">recommended</span>: IP behind a left click (format_alt)</span></label></section><section id="f5"><h2>F5 · P4: clipboard block pads to 5 cells <span class="st decision">decision</span></h2><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/f5-live-dp0.png" target="_blank"><img src="img/f5-live-dp0.png" width="1004" height="52" alt="DP-0 clipboard and clock today"></a></div><div class="shot"><span class="tag after">AFTER rendered</span><a href="img/f5-p4-dp0.png" target="_blank"><img src="img/f5-p4-dp0.png" width="980" height="52" alt="DP-0 clipboard width 4"></a></div><figcaption>DP-0 clipboard and clock (2x zoom). <b>Changes:</b> pad 5 to 4 cells: the extra empty cell before the separator goes away (12 px at 1x).</figcaption></figure><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/f5-live-dp2.png" target="_blank"><img src="img/f5-live-dp2.png" width="1000" height="52" alt="DP-2 clipboard and clock today"></a></div><div class="shot"><span class="tag after">AFTER rendered</span><a href="img/f5-p4-dp2.png" target="_blank"><img src="img/f5-p4-dp2.png" width="980" height="52" alt="DP-2 clipboard width 4"></a></div><figcaption>DP-2, same change (2x zoom).</figcaption></figure><figure><div class="shot"><span class="tag before">BEFORE rendered, today's clip.sh</span><a href="img/f5-fx-before.png" target="_blank"><img src="img/f5-fx-before.png" width="970" height="52" alt="clip.sh today with test inputs"></a></div><div class="shot"><span class="tag after">AFTER rendered, new clip.sh</span><a href="img/f5-fx-after.png" target="_blank"><img src="img/f5-fx-after.png" width="874" height="52" alt="new clip.sh with test inputs"></a></div><figcaption>Same four test inputs through both scripts (2x zoom): 29 B, 999 B, 1023 B, empty clipboard. 1023B (the only 5-cell value) becomes 1.0K; "empty" (5 cells) becomes dim "none". <b>Cost:</b> S, clip.sh + 3 test.sh rows. <b>Recommended:</b> even spacing like every other block, no loss of information.</figcaption></figure><pre># scripts/clip.sh: printf '%-5s' -> '%-4s'; [ "$n" -lt 1024 ] -> -lt 1000; emit Info empty -> emit Info none</pre><label class="pick"><input type="checkbox" name="P4" value="P4" checked><span><b>P4</b> <span class="rec">recommended</span>: clipboard width 4 (K from 1000 B, "none")</span></label></section><section id="f6"><h2>F6: block order (part of options B and C) <span class="st decision">decision via A/B/C</span></h2><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/live-dp0-1.png" target="_blank"><img src="img/live-dp0-1.png" width="1237" height="26" alt="DP-0 today (left half)"></a></div><div class="shot"><a href="img/live-dp0-2.png" target="_blank"><img src="img/live-dp0-2.png" width="1581" height="26" alt="DP-0 today (right half)"></a></div><div class="shot"><span class="tag after">AFTER rendered, order only</span><a href="img/f6-dp0-1.png" target="_blank"><img src="img/f6-dp0-1.png" width="1591" height="26" alt="DP-0 new order only (left half)"></a></div><div class="shot"><a href="img/f6-dp0-2.png" target="_blank"><img src="img/f6-dp0-2.png" width="1227" height="26" alt="DP-0 new order only (right half)"></a></div><figcaption>DP-0, full bar in two halves (1x). <b>Changes:</b> only the order: monitors left (load, temp, freq, mem, disk, IO, GPU, net), then usage and clipboard, then the things you click (keyboard layout, battery, volume) next to the clock. Keyboard layout moves from the far left to near the clock. No values change.</figcaption></figure><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/live-dp2.png" target="_blank"><img src="img/live-dp2.png" width="1726" height="26" alt="DP-2 today"></a></div><div class="shot"><span class="tag after">AFTER rendered, order only</span><a href="img/f6-dp2.png" target="_blank"><img src="img/f6-dp2.png" width="1728" height="26" alt="DP-2 new order"></a></div><figcaption>DP-2 (1x), same order. <b>Cost:</b> config block order only; <b>risk:</b> muscle memory for the layout and volume positions. Comes with B and C, not with A.</figcaption></figure></section><section id="f7"><h2>F7: 12 equal separators, groups do not read (part of options B and C) <span class="st decision">decision via A/B/C</span></h2><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/f7-live-dp0.png" target="_blank"><img src="img/f7-live-dp0.png" width="1247" height="26" alt="DP-0 kbd to GPU today"></a></div><div class="shot"><span class="tag after">AFTER rendered, merge only</span><a href="img/f7-f7-dp0.png" target="_blank"><img src="img/f7-f7-dp0.png" width="1211" height="26" alt="DP-0 merged groups"></a></div><figcaption>DP-0, keyboard to GPU (1x), today's order. <b>Changes:</b> <code>merge_with_next = true</code> on load, temperature, memory, disk_space: the separators inside "CPU" (load, temp, freq) and "storage" (mem, disk, IO) disappear; 12 separators become 8 here, 6 with the full option B.</figcaption></figure><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/f7-live-dp2.png" target="_blank"><img src="img/f7-live-dp2.png" width="881" height="26" alt="DP-2 kbd to GPU today"></a></div><div class="shot"><span class="tag after">AFTER rendered</span><a href="img/f7-f7-dp2.png" target="_blank"><img src="img/f7-f7-dp2.png" width="863" height="26" alt="DP-2 merged CPU group"></a></div><figcaption>DP-2 (1x). The CPU group merges; memory stays alone because disk and IO are not on DP-2 (gen-compact must drop memory's merge flag there, otherwise memory glues onto GPU). <b>Cost:</b> M with the gen-compact rule. Comes with B and C.</figcaption></figure></section><section id="f8"><h2>F8 · P5: year in the DP-2 date <span class="st decision">decision</span></h2><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/f8-live.png" target="_blank"><img src="img/f8-live.png" width="754" height="52" alt="DP-2 clock with year"></a></div><div class="shot"><span class="tag after">AFTER rendered</span><a href="img/f8-p5.png" target="_blank"><img src="img/f8-p5.png" width="638" height="52" alt="DP-2 clock without year"></a></div><figcaption>DP-2 clock (2x zoom). <b>Changes:</b> <code>Wed 2026-11-18</code> to <code>Wed 11-18</code>: 5 cells shorter on the compact bar. DP-0 keeps the year. <b>Cost:</b> S, one rewrite in gen-compact.sh. <b>Recommended:</b> the year is never news.</figcaption></figure><pre># scripts/gen-compact.sh awk: on the time block format, %a %Y-%m-%d -> %a %m-%d</pre><label class="pick"><input type="checkbox" name="P5" value="P5" checked><span><b>P5</b> <span class="rec">recommended</span>: DP-2 date without the year</span></label></section>
+<h2 style="margin:28px 0 12px">Overall direction: pick one</h2>
+<section id="optb" class="option"><h2>Option B: polish + regroup <span class="rec">recommended</span> <span class="st decision">M</span></h2><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/live-dp0-1.png" target="_blank"><img src="img/live-dp0-1.png" width="1237" height="26" alt="DP-0 today (left half)"></a></div><div class="shot"><a href="img/live-dp0-2.png" target="_blank"><img src="img/live-dp0-2.png" width="1581" height="26" alt="DP-0 today (right half)"></a></div><div class="shot"><span class="tag after">AFTER rendered, option B</span><a href="img/b-dp0-1.png" target="_blank"><img src="img/b-dp0-1.png" width="1291" height="26" alt="DP-0 option B (left half)"></a></div><div class="shot"><a href="img/b-dp0-2.png" target="_blank"><img src="img/b-dp0-2.png" width="1197" height="26" alt="DP-0 option B (right half)"></a></div><figcaption>DP-0 (1x, two halves). P2-P5 + new order (F6) + groups (F7): CPU | storage | GPU | net | usage+clipboard | layout+volume | clock: 6 separators instead of 12, 330 px shorter.</figcaption></figure><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/live-dp2-1.png" target="_blank"><img src="img/live-dp2-1.png" width="871" height="26" alt="DP-2 today (left half)"></a></div><div class="shot"><a href="img/live-dp2-2.png" target="_blank"><img src="img/live-dp2-2.png" width="856" height="26" alt="DP-2 today (right half)"></a></div><div class="shot"><span class="tag after">AFTER rendered, option B</span><a href="img/b-dp2-1.png" target="_blank"><img src="img/b-dp2-1.png" width="742" height="26" alt="DP-2 option B (left half)"></a></div><div class="shot"><a href="img/b-dp2-2.png" target="_blank"><img src="img/b-dp2-2.png" width="840" height="26" alt="DP-2 option B (right half)"></a></div><figcaption>DP-2 (1x): same order, CPU group, date without year, 145 px shorter.</figcaption></figure><pre># order: load temp freq | memory disk_space disk_iostats | gpu | net(^wl) net(^en) | claude-usage clip | keyboard_layout battery sound | time
+[[block]]
+block = "load"
+merge_with_next = true   # also: temperature, memory, disk_space, net ^wl, claude-usage, keyboard_layout, battery
+# gen-compact.sh: drop merge_with_next from memory (disk/io are dropped on DP-2)</pre><p class="meta"><b>Cost:</b> M. <b>Risk:</b> layout and volume move. <b>Why B:</b> it fixes the noise like A and also makes the groups readable for little extra work.</p><label class="pick"><input type="radio" name="dir" value="B" checked><span><b>Option B</b>: P picks + new order + groups</span></label></section><section id="opta" class="option"><h2>Option A: polish only <span class="st decision">S</span></h2><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/live-dp0-1.png" target="_blank"><img src="img/live-dp0-1.png" width="1237" height="26" alt="DP-0 today (left half)"></a></div><div class="shot"><a href="img/live-dp0-2.png" target="_blank"><img src="img/live-dp0-2.png" width="1581" height="26" alt="DP-0 today (right half)"></a></div><div class="shot"><span class="tag after">AFTER rendered, option A</span><a href="img/a-dp0-1.png" target="_blank"><img src="img/a-dp0-1.png" width="1177" height="26" alt="DP-0 option A (left half)"></a></div><div class="shot"><a href="img/a-dp0-2.png" target="_blank"><img src="img/a-dp0-2.png" width="1365" height="26" alt="DP-0 option A (right half)"></a></div><figcaption>DP-0 (1x): P2-P4 only, same order and 12 separators, 276 px shorter.</figcaption></figure><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/live-dp2-1.png" target="_blank"><img src="img/live-dp2-1.png" width="871" height="26" alt="DP-2 today (left half)"></a></div><div class="shot"><a href="img/live-dp2-2.png" target="_blank"><img src="img/live-dp2-2.png" width="856" height="26" alt="DP-2 today (right half)"></a></div><div class="shot"><span class="tag after">AFTER rendered, option A</span><a href="img/a-dp2-1.png" target="_blank"><img src="img/a-dp2-1.png" width="847" height="26" alt="DP-2 option A (left half)"></a></div><div class="shot"><a href="img/a-dp2-2.png" target="_blank"><img src="img/a-dp2-2.png" width="762" height="26" alt="DP-2 option A (right half)"></a></div><figcaption>DP-2 (1x): P2, P4, P5.</figcaption></figure><p class="meta"><b>Cost:</b> S, text-only. <b>Against A as the end state:</b> it removes the noise but leaves the flat row of 12 equal separators (F6, F7); B costs little more.</p><label class="pick"><input type="radio" name="dir" value="A"><span><b>Option A</b>: P picks only, order and separators unchanged</span></label></section><section id="optc" class="option"><h2>Option C: quiet bar <span class="st decision">M-L</span></h2><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/live-dp0-1.png" target="_blank"><img src="img/live-dp0-1.png" width="1237" height="26" alt="DP-0 today (left half)"></a></div><div class="shot"><a href="img/live-dp0-2.png" target="_blank"><img src="img/live-dp0-2.png" width="1581" height="26" alt="DP-0 today (right half)"></a></div><div class="shot"><span class="tag after">AFTER rendered, option C</span><a href="img/c-dp0-1.png" target="_blank"><img src="img/c-dp0-1.png" width="1088" height="26" alt="DP-0 option C (left half)"></a></div><div class="shot"><a href="img/c-dp0-2.png" target="_blank"><img src="img/c-dp0-2.png" width="1490" height="26" alt="DP-0 option C (right half)"></a></div><figcaption>DP-0 (1x): option B + idle values grey #aaaaaa (theme <code>idle_fg</code>) + no separator lines (groups split by two spaces, theme <code>separator = "  "</code>). Only states stay bright: green usage, yellow/red alerts.</figcaption></figure><figure><div class="shot"><span class="tag before">BEFORE live 21:10</span><a href="img/live-dp2-1.png" target="_blank"><img src="img/live-dp2-1.png" width="871" height="26" alt="DP-2 today (left half)"></a></div><div class="shot"><a href="img/live-dp2-2.png" target="_blank"><img src="img/live-dp2-2.png" width="856" height="26" alt="DP-2 today (right half)"></a></div><div class="shot"><span class="tag after">AFTER rendered, option C</span><a href="img/c-dp2-1.png" target="_blank"><img src="img/c-dp2-1.png" width="1029" height="26" alt="DP-2 option C (left half)"></a></div><div class="shot"><a href="img/c-dp2-2.png" target="_blank"><img src="img/c-dp2-2.png" width="643" height="26" alt="DP-2 option C (right half)"></a></div><figcaption>DP-2 (1x).</figcaption></figure><pre>[theme.overrides]
+idle_fg = "#aaaaaa"
+separator = "  "
+separator_bg = "auto"
+separator_fg = "auto"</pre><p class="meta"><b>Cost:</b> M-L. <b>Against C:</b> grey values are harder to read at a glance on the 4K bar, and without lines the group edges rely on 2 spaces only; the gain over B is mostly taste.</p><label class="pick"><input type="radio" name="dir" value="C"><span><b>Option C</b>: option B + dim idle values, no separator lines</span></label></section>
+<section id="gap"><h2>DP-2 freq to mem gap (fix b5c2eb5) <span class="st">no decision</span></h2>
+<figure><div class="shot"><span class="tag before">BEFORE live 20:03, 3x</span><a href="img/gap-dp2.png" target="_blank"><img src="img/gap-dp2.png" width="1080" height="78" alt="freq to mem gap on DP-2, 3x zoom"></a></div><figcaption>Last freq digit to separator 29 px vs 17 px elsewhere: 1 space of pad, kept so freq has a fixed width (without it everything left of freq jitters). Keep as is.</figcaption></figure></section>
+<section><h2>What doesn't change</h2><ul>
+<li>Block set and thresholds, the freq histogram and palette, the freq pad.</li>
+<li>Colours: <code>[theme.overrides]</code> good/degraded/bad/dim-icon (C only changes idle_fg and the separator).</li>
+<li>Click actions, middle-click explanation popups, fonts and icons; the Claude usage block content (U1, U1b).</li>
+<li>DP-2 keeps dropping disk, IO, IP and the usage block.</li></ul></section>
+<section id="answer"><h2>Your answer</h2>
 <p class="meta">Copy this line into the chat (read-only; nothing is saved from this page).</p>
-<textarea id="out" readonly></textarea>
-</section>
+<textarea id="out" readonly></textarea></section>
 </main>
 <script>
-function upd(){const p=[...document.querySelectorAll('input[type=checkbox]')];document.getElementById('out').value='D5 picks: '+(p.filter(c=>c.checked).map(c=>c.name).join(', ')||'none')+'; no: '+(p.filter(c=>!c.checked).map(c=>c.name).join(', ')||'none');}
-document.querySelectorAll('input[type=checkbox]').forEach(c=>c.addEventListener('change',upd));upd();
-</script>
-</body>
-</html>
+function upd(){const d=document.querySelector('input[name=dir]:checked');const p=[...document.querySelectorAll('input[type=checkbox]')];
+document.getElementById('out').value='D5 picks: option '+(d?d.value:'none')+'; '+(p.filter(c=>c.checked).map(c=>c.name).join(', ')||'no P')+'; no: '+(p.filter(c=>!c.checked).map(c=>c.name).join(', ')||'none');}
+document.querySelectorAll('input').forEach(c=>c.addEventListener('change',upd));upd();
+</script></body></html>

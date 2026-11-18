@@ -1,5 +1,12 @@
 # Design workstream
 
+## 2026-11-18 D5 page v2 (picture per proposal)
+- User: old page hard to work with, needs more pictures. Rebuilt `docs/design/D5-bar-review/questions.html`: one section per decision (F1-F8 with their P fix, options B/A/C), BEFORE/AFTER pairs for DP-0 and DP-2, full bars as two 1x halves, small regions 2x, click to enlarge; radio for A/B/C + checkboxes P2-P5 feed the answer line.
+- BEFORE: live crops 21:10 (bar up 5 min after the U1b redeploy, no restart caught). AFTER: real i3bar + i3status-rs in Xvfb with temp config copies (`render/render.sh CFG WIDTH OUT`, status_command `env DISPLAY=:0` so kbd/clip/sound read the real session; i3 needs its own `ipc-socket` and `env -u I3SOCK`). No hand mocks.
+- F1/F2 marked resolved by U1 (P1 dropped). Measured: P2 -84 px DP-0 / -48 px DP-2, P4 -12 px, A -276 px, B -330 px (6 separators instead of 12), B DP-2 -145 px.
+- Observed: the U1b fixed 7-cell slot leaves a wide gap after `0h09m` while the mark is off; under option B (usage+clip merged) it reads as a hole. Candidate follow-up, not on the page as a pick.
+- Remaining: user picks → widget-builder spec.
+
 ## 2026-11-18 D5 bar design review (spec/investigation)
 - Screenshots of both real bars (import -window root, crops in `docs/design/D5-bar-review/img/today-*.png`); mocks A/B/C rendered with pango (PragmataPro Mono + Symbols Nerd Font Mono 18). Note: magick `-gravity` before `pango:` rotates glyphs; set it only after.
 - Findings F1-F8: ccusage green when limit unknown (state Good on `$pct == null`); cryptic "CH"; "B" unit on 7 values; static IP 15 cells; clip pad 5 → 41 px vs 17 px before separator; scattered controls; 13 equal separators; DP-2 year.
