@@ -51,3 +51,7 @@ Middle click on every block runs `scripts/explain.sh <name>` (names: kbd load te
 - Built per docs/design/D5-bar-review/spec-regroup.md: config.toml reordered (14 blocks, 7 merge_with_next), gen-compact.sh awk drops the merge flag before a dropped group end (compact.toml: 5 flags), claude-usage.sh 7d mark always shown (dim up to 70), explain.sh ccusage text, test.sh u1/u12/u18 edits + u22/u23 + groups/compact rows.
 - test.sh pass=94 fail=0; both configs smoke clean; deployed with install.sh --yes; middle-click on a merged block raises no error (all 14 blocks keep their explain click).
 - After crops: docs/design/D5-bar-review/img/live-after-dp0.png, live-after-dp2.png. Awaiting bar-designer review.
+
+## U1d per-part colours (2026-11-18)
+- claude-usage.sh: block state always Idle; 5h %, cache %, 7d coloured by own value via pango spans (5h >70 yellow >90 red; cache >=90 green, 70-89 yellow, <70 red; 7d dim/yellow/red). Hex read from config.toml `[theme.overrides]` (CU_CONFIG override, fallback same scheme). Stale 5h stays dim; widths unchanged.
+- test.sh: u1-u23 states now Idle, new u24-u27 (boundaries 70/71/90/91, cache 69/70/89/90, 7d 92 Idle, config hex match); explain.sh text updated. pass=107 fail=0, deployed.

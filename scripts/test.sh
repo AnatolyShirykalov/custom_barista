@@ -20,34 +20,34 @@ wc_() { printf '{"ts":%s,"five_hour":{"pct":%s,"resets_at":%s},"seven_day":%s}\n
 un() { CU_NOW=$NOW CU_PROJECTS=$U/proj CU_CREDS=${CRED:-$U/creds.json} CU_CACHE=$ucache CU_STATE_DIR=$usd CU_API_FIXTURE=${FX:-$U/api_000} "$d/claude-usage.sh"; }
 body=" 3.4M \$1.85 cache 90% 1h46m"
 sp7=" 7d  ?% "
-fresh; wc_ $((NOW-60)) 53 $RES; o=$(un); check u1 "$o" "53%  $body$sp7" Good
+fresh; wc_ $((NOW-60)) 53 $RES; o=$(un); check u1 "$o" "53%  $body$sp7" Idle
 jq -r .text <<<"$o" | grep -q '#777777">7d  ?%' && pass=$((pass+1)) || { echo "FAIL u1: 7d unknown dim"; fail=$((fail+1)); }
 jq -r .text <<<"$o" | grep -q '#777777">cache</span>' && pass=$((pass+1)) || { echo "FAIL u1: cache label not dim"; fail=$((fail+1)); }
-wc_ $((NOW-60)) 70 $RES; check u2 "$(un)" "70%  $body$sp7" Good
-wc_ $((NOW-60)) 70.4 $RES; check u3 "$(un)" "70%  $body$sp7" Warning
+wc_ $((NOW-60)) 70 $RES; check u2 "$(un)" "70%  $body$sp7" Idle
+wc_ $((NOW-60)) 70.4 $RES; check u3 "$(un)" "70%  $body$sp7" Idle
 w7() { wc_ $((NOW-60)) 53 $RES "{\"pct\":$1,\"resets_at\":$((NOW+86400))}"; }
-w7 70; o=$(un); check u18 "$o" "53%  $body 7d 70% " Good
+w7 70; o=$(un); check u18 "$o" "53%  $body 7d 70% " Idle
 jq -r .text <<<"$o" | grep -q '#777777">7d 70%' && pass=$((pass+1)) || { echo "FAIL u18: 7d dim"; fail=$((fail+1)); }
-w7 71; o=$(un); check u19 "$o" "53%  $body 7d 71% " Good
+w7 71; o=$(un); check u19 "$o" "53%  $body 7d 71% " Idle
 jq -r .text <<<"$o" | grep -q '#dddd66">7d 71%' && pass=$((pass+1)) || { echo "FAIL u19: 7d colour"; fail=$((fail+1)); }
-w7 91; o=$(un); check u20 "$o" "53%  $body 7d 91% " Critical
+w7 91; o=$(un); check u20 "$o" "53%  $body 7d 91% " Idle
 jq -r .text <<<"$o" | grep -q '#dd6666">7d 91%' && pass=$((pass+1)) || { echo "FAIL u20: 7d colour"; fail=$((fail+1)); }
-wc_ $((NOW-60)) 53 $RES '{"pct":91,"resets_at":1}'; check u21 "$(un)" "53%  $body$sp7" Good
-w7 0.3; check u22 "$(un)" "53%  $body 7d  0% " Good
-w7 100; check u23 "$(un)" "53%  $body 7d 99% " Critical
-wc_ $((NOW-60)) 90 $RES; check u4a "$(un)" "90%  $body$sp7" Warning
-wc_ $((NOW-60)) 95 $RES; check u4b "$(un)" "95%  $body$sp7" Critical
-fresh; wc_ $((NOW-600)) 53 $RES; check u5 "$(FX=$U/api_200 un)" "37%  $body$sp7" Good
+wc_ $((NOW-60)) 53 $RES '{"pct":91,"resets_at":1}'; check u21 "$(un)" "53%  $body$sp7" Idle
+w7 0.3; check u22 "$(un)" "53%  $body 7d  0% " Idle
+w7 100; check u23 "$(un)" "53%  $body 7d 99% " Idle
+wc_ $((NOW-60)) 90 $RES; check u4a "$(un)" "90%  $body$sp7" Idle
+wc_ $((NOW-60)) 95 $RES; check u4b "$(un)" "95%  $body$sp7" Idle
+fresh; wc_ $((NOW-600)) 53 $RES; check u5 "$(FX=$U/api_200 un)" "37%  $body$sp7" Idle
 [ "$(jq .next_at "$usd/api.json")" == $((NOW+180)) ] && pass=$((pass+1)) || { echo "FAIL u5: next_at"; fail=$((fail+1)); }
 fresh; printf '{"ts_ok":%s,"next_at":%s,"status":"ok","five_hour":null}\n' $((NOW-900)) $((NOW+100)) >"$usd/api.json"
-check u6 "$(FX=$U/api_200 un)" "53%  $body$sp7" Good
-fresh; check u7 "$(FX=$U/api_429 un)" "53%  $body$sp7" Good
+check u6 "$(FX=$U/api_200 un)" "53%  $body$sp7" Idle
+fresh; check u7 "$(FX=$U/api_429 un)" "53%  $body$sp7" Idle
 [ "$(jq .next_at "$usd/api.json")" == $((NOW+600)) ] && pass=$((pass+1)) || { echo "FAIL u7: next_at"; fail=$((fail+1)); }
 fresh; cp "$U/creds.json" "$gd/creds"; touch -d @1000000000 "$gd/creds"; wc_ $((NOW-1200)) 53 $RES
 o=$(FX=$U/api_401 CRED=$gd/creds un); check u8 "$o" "53%  $body$sp7" Idle
 jq -r .text <<<"$o" | grep -q '#777777">53%</span>' && [ "$(jq -r .status "$usd/api.json")" == stale ] && pass=$((pass+1)) || { echo "FAIL u8: dim pct / stale status"; fail=$((fail+1)); }
 check u9 "$(FX=$U/api_200 CRED=$gd/creds un)" "53%  $body$sp7" Idle
-touch -d "@$NOW" "$gd/creds"; check u10 "$(FX=$U/api_200 CRED=$gd/creds un)" "37%  $body$sp7" Good
+touch -d "@$NOW" "$gd/creds"; check u10 "$(FX=$U/api_200 CRED=$gd/creds un)" "37%  $body$sp7" Idle
 fresh; wc_ $((NOW-60)) 53 $((NOW-60)); check u11 "$(un)" "" ""
 fresh; rm -f "$ucache"; check u12 "$(un)" "?%   4.4M \$5.85 cache 69% -h--m 7d  ?%  " Idle
 fresh; wc_ $((NOW-1200)) 53 $RES; check u13 "$(FX=$gd/nonexistent CRED=$U/creds_expired.json un)" "53%  $body$sp7" Idle
@@ -67,6 +67,16 @@ for kv in pct:0 pct:5 pct:100 pct:null tok:0 tok:5 tok:999 tok:999950 tok:200000
   o=$("$d/claude-usage.sh" --render "$(jq -c --arg k "${kv%%:*}" --argjson v "${kv#*:}" '.[$k]=$v' <<<"$ub")")
   [ "$(len "$o")" == "$base" ] && [ "$base" == 40 ] && pass=$((pass+1)) || { echo "FAIL u16 $kv: '$(jq -r .text <<<"$o" | strip)' len $(len "$o")"; fail=$((fail+1)); }
 done
+# per-part colours (u24-u27): 5h 70/71/90/91, cache 69/70/89/90, 7d 92 -> state stays Idle; hex match config.toml
+pc() { jq -r .text <<<"$1" | grep -q "foreground=\"$2\">$3<" && pass=$((pass+1)) || { echo "FAIL $4: '$3' not $2"; fail=$((fail+1)); }; }
+for kv in 70:#66dd66 71:#dddd66 90:#dddd66 91:#dd6666; do
+  o=$("$d/claude-usage.sh" --render "$(jq -c --argjson v "${kv%%:*}" '.pct=$v' <<<"$ub")"); pc "$o" "${kv#*:}" "${kv%%:*}%" u24
+done
+for kv in 69:#dd6666 70:#dddd66 89:#dddd66 90:#66dd66; do
+  o=$("$d/claude-usage.sh" --render "$(jq -c --argjson v "${kv%%:*}" '.ch=$v' <<<"$ub")"); pc "$o" "${kv#*:}" "${kv%%:*}%" u25
+done
+o=$("$d/claude-usage.sh" --render "$(jq -c '.w=92' <<<"$ub")"); check u26 "$o" "53%   3.4M \$1.85 cache 90% 1h46m 7d 92% " Idle
+for c in good_fg:66dd66 warning_fg:dddd66 critical_fg:dd6666 info_fg:777777; do grep -q "^${c%%:*} = \"#${c#*:}\"" "$d/../config.toml" && pass=$((pass+1)) || { echo "FAIL u27: ${c%%:*} differs from claude-usage fallback"; fail=$((fail+1)); }; done
 o=$(EXPLAIN_DRY=1 "$d/explain.sh" ccusage); grep -q cache <<<"$o" && ! grep -q 'CH' <<<"$o" && pass=$((pass+1)) || { echo "FAIL u17: explain text"; fail=$((fail+1)); }
 printf '99, 16303\n' > "$cj"; o=$("$d/gpu.sh" "$cj"); printf '9, 5\n' > "$cj"; o2=$("$d/gpu.sh" "$cj")
 [ "$(len "$o")" == "$(len "$o2")" ] && pass=$((pass+1)) || { echo "FAIL gpuwidth"; fail=$((fail+1)); }

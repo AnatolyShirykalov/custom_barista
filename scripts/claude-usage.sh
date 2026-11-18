@@ -12,17 +12,22 @@ sdir=${CU_STATE_DIR:-$HOME/.cache/claude-usage}
 creds=${CU_CREDS:-$HOME/.claude/.credentials.json}
 prices=${CU_PRICES:-$d/claude-prices.json}
 
+# part colours from config.toml [theme.overrides] (good/degraded/bad/dim-icon); fallback = the same scheme
+cfg=${CU_CONFIG:-$d/../config.toml}
+col() { local v; v=$(sed -n "s/^$1 *= *\"\(#[0-9a-fA-F]*\)\".*/\1/p" "$cfg" 2>/dev/null | head -1); echo "${v:-$2}"; }
+cg=$(col good_fg '#66dd66'); cw=$(col warning_fg '#dddd66'); cb=$(col critical_fg '#dd6666'); cd_=$(col info_fg '#777777')
+
 render() { # stdin {pct,tok,cost,ch,left,stale,w} -> block JSON
-  jq -c '
+  jq -c --arg cg "$cg" --arg cw "$cw" --arg cb "$cb" --arg cd "$cd_" '
     def r0: (. + 0.5 | floor | tostring);
     def f1: (. * 10 + 0.5 | floor / 10 | tostring) as $s | if ($s | test("\\.")) then $s else $s + ".0" end;
     def pad($n): tostring | (($n - length) as $k | if $k > 0 then (" " * $k) + . else . end);
-    def dim: "<span foreground=\"#777777\">" + . + "</span>";
+    def col($c): "<span foreground=\"" + $c + "\">" + . + "</span>";
+    def dim: col($cd);
     .pct as $p | .tok as $t | .cost as $c | .left as $l | .w as $w
-    | (if $p == null or .stale then "Idle" elif $p > 90 or ($w != null and $w > 90) then "Critical" elif $p > 70 then "Warning" else "Good" end) as $st
-    | (if $w == null then ("7d  ?%" | dim) else (([$w + 0.5 | floor, 99] | min | tostring) | pad(2)) as $v | if $w > 90 then "<span foreground=\"#dd6666\">7d " + $v + "%</span>" elif $w > 70 then "<span foreground=\"#dddd66\">7d " + $v + "%</span>" else ("7d " + $v + "%" | dim) end end) as $wm
-    | ((if $p == null then "?%" else ($p | r0) + "%" end) as $s | (" " * (4 - ($s | length))) + (if .stale or $p == null then ($s | dim) else $s end)) as $pt
-    | { icon: "ccusage", state: $st,
+    | (if $w == null then ("7d  ?%" | dim) else (([$w + 0.5 | floor, 99] | min | tostring) | pad(2)) as $v | if $w > 90 then ("7d " + $v + "%" | col($cb)) elif $w > 70 then ("7d " + $v + "%" | col($cw)) else ("7d " + $v + "%" | dim) end end) as $wm
+    | ((if $p == null then "?%" else ($p | r0) + "%" end) as $s | (" " * (4 - ($s | length))) + (if .stale or $p == null then ($s | dim) else ($s | col(if $p > 90 then $cb elif $p > 70 then $cw else $cg end)) end)) as $pt
+    | { icon: "ccusage", state: "Idle",
         text: ([ $pt,
           ((($t / 1e3 * 10 + 0.5 | floor) / 10) as $k | if $t >= 1e6 or $k >= 1000 then (($t / 1e6 | f1) | pad(5)) + "M" elif $t >= 1e3 then (($t / 1e3 | f1) | pad(5)) + "K" else (($t | floor | tostring) | pad(5)) + " " end),
           (if $c < 9.995 then "$" + (($c * 100 + 0.5 | floor) / 100 | tostring | if test("\\.") then (split(".") | .[0] + "." + (.[1] + "0" | .[0:2])) else . + ".00" end)
@@ -31,7 +36,7 @@ render() { # stdin {pct,tok,cost,ch,left,stale,w} -> block JSON
            elif $c < 9950 then "$" + ($c / 1000 | f1) + "k"
            else ("$" + ([$c / 1000 | floor + 0.5 | floor, 999] | min | tostring) + "k" | pad(5)) end),
           ("cache" | dim),
-          (([.ch | r0 | tonumber, 99] | min | tostring) + "%" | pad(3)),
+          (([.ch | r0 | tonumber, 99] | min) as $cv | ($cv | tostring) + "%" | pad(3) | col(if $cv >= 90 then $cg elif $cv >= 70 then $cw else $cb end)),
           (if $l == null then "-h--m" else ((($l / 60) | floor) as $m | (($m / 60 | floor | tostring) + "h" + (($m % 60) | tostring | pad(2) | gsub(" "; "0")) + "m")) end)
         ] + [$wm] | join(" ") | length as $n | sub("^ +"; "") | . + (" " * ($n - length))) }'
 }
