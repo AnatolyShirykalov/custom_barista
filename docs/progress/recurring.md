@@ -93,3 +93,12 @@ No findings: U1d per-part colours (read from `[theme.overrides]`, padding before
 - 193 tracked files; no logs, caches, .pyc, secrets, .env, or large binaries tracked (largest 44 KB PNG). `__pycache__`, `log/`, `settings.local.json` correctly ignored.
 - `.gitignore`: added `*.pyc`, `node_modules/`, `coverage/`, `*.core`. Nothing needed `git rm --cached`.
 - Doubtful (listed in BACKLOG): duplicate `f5-p4-dp0/dp2.png` in D5-bar-review. Design images kept.
+
+## Look/usability pass 2026-11-20
+Screenshots of both bars + 8 hover popups (DP-0 load, net, usage, clock; DP-2 freq, gpu, sound, clock); crops in `docs/design/look-2026-11-20/`. Pointer parked at 3000,800 afterwards.
+- Widths: 32 samples over 32 s per bar, every block's plain-text length constant (DP-0 13 pieces, DP-2 10). No jitter.
+- Colours: status line uses only `#777777` (dim-icon), the theme good/degraded/bad and the freq palette (agreed exception). Usage parts green/dim as specified.
+- Glyphs: all Material icons render on both bars, no tofu; tray icons fine.
+- Popups: readable, dark box with grey border, placed above the block; at the right edges (DP-0 clock next to tray, DP-2 clock at the monitor edge) they are clamped inside the screen.
+- Fixed: usage popup line 5 was ~105 chars (popup ~1180 px wide); reflowed to 6 lines of at most 75 chars (`scripts/explain.sh`), freq text "colors" → "colours" for one spelling. test.sh pass=171 fail=0; deployed with `./install.sh --yes`, re-shot.
+- Backlog: one unreproduced miss of the first DP-0 load popup ("Hover: first popup missed once", widget-builder).

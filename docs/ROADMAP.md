@@ -34,7 +34,7 @@ No agent running. Done recently (2026-11-18, session 2): sound block on pulseaud
 10. [x] **T1f docs**: README.md block/script list (claude-usage.sh, explain.sh, hover files, install.sh, i3/), deps (python-xlib, python-gobject; drop node/npx), hover tooltips + HOVER=0 in README and CLAUDE.md:5 (after T1d). → `chore`
 11. [x] **U1c first-run placeholder** (from backlog): fresh user (no statusline tap, empty ~/.cache/claude-usage) → usage block hidden for minutes; show dim `cc …` placeholder until first data. Done: fixture row for empty cache → placeholder, width fixed. → `widget-builder` Done 2026-11-20: see docs/progress/widgets.md.
 12. [x] **Recurring: Git hygiene** (last 2026-11-20; due after T1d-f). → `repo-janitor`
-13. [ ] **Recurring: Look/usability pass** (last 2026-11-17; first since hover tooltips, D5-R, U1c): screenshot both bars + hover popups; clarity, colours, stable widths, glyphs; findings → backlog. → `bar-designer`
+13. [x] **Recurring: Look/usability pass** (last 2026-11-20; usage popup reflowed, 1 backlog item): screenshot both bars + hover popups; clarity, colours, stable widths, glyphs; findings → backlog. → `bar-designer`
 8. [x] **Recurring: Dependency updates** (last run 2026-11-20; due after U1b, P4, D5-R). → `dep-updater`
 
 ### Background checks
@@ -54,7 +54,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 | Git hygiene | `repo-janitor` | anything tracked that shouldn't be (build output, logs, dumps, caches, large binaries, local config, secrets); `.gitignore` gaps; safe `git rm --cached` | 2026-11-20 |
 | Backlog tidy | `chore` | monthly: drop or merge stale, superseded or duplicate backlog items, check each still has an agent and a done condition; never touch the roadmap's queue | 2026-11-17 |
 | Dependency updates | `dep-updater` | i3status-rs installed vs latest release, changelog breaking config changes grep'd in config.toml/scripts, script deps (jq, xclip, yad, nvidia-smi, xdotool, node) present and formats unchanged; fix keys, backlog the rest | 2026-11-20 |
-| Look/usability pass | `bar-designer` | screenshot the bar; clarity, colors, stable widths, glyphs render; findings → backlog | 2026-11-17 |
+| Look/usability pass | `bar-designer` | screenshot the bar; clarity, colors, stable widths, glyphs render; findings → backlog | 2026-11-20 |
 | Widget health | `chore` | every block shows real data on this machine: `bash scripts/test.sh`, smoke `(sleep 6) \| timeout 6 i3status-rs $PWD/config.toml` (and compact.toml), grep `ERR`/`not found`/`error`; after system upgrades check nvidia-smi, hwmon, pulse, sysfs formats; failures → backlog for `widget-builder` | 2026-11-18 |
 | Code review + docs | `code-reviewer` | review diffs since last run; README block list and CLAUDE.md match the code | 2026-11-20 |
 
