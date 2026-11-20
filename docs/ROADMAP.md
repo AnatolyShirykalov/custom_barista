@@ -32,6 +32,8 @@ No agent running. Done recently (2026-11-18, session 2): sound block on pulseaud
 8. [x] **T1d remove middle-click popups** (user Q1 B, 2026-11-20): per spec §3.3 move the explain-key mapping to `scripts/hover/keys.toml` (block type + distinguishing field, not block index), daemon reads it, drop button-2 explain.sh clicks from config.toml (compact.toml regenerated), h10 checks keys.toml; drop the backlog item about the tiled yad popup if explain.sh popups are gone; deploy. → `widget-builder` Done: see progress/design.md "T1d".
 9. [x] **T1e hover hardening**: HOVER persisted + HOVER=0 stops daemon/clears taps, bare `[` not tapped, --replace pid check, private /tmp fallback, font default, shellcheck clean, rows h2b r1-r5; detail docs/progress/design.md. → `widget-builder`
 10. [x] **T1f docs**: README.md block/script list (claude-usage.sh, explain.sh, hover files, install.sh, i3/), deps (python-xlib, python-gobject; drop node/npx), hover tooltips + HOVER=0 in README and CLAUDE.md:5 (after T1d). → `chore`
+11. [ ] **U1c first-run placeholder** (from backlog): fresh user (no statusline tap, empty ~/.cache/claude-usage) → usage block hidden for minutes; show dim `cc …` placeholder until first data. Done: fixture row for empty cache → placeholder, width fixed. → `widget-builder`
+12. [ ] **Recurring: Git hygiene** (last 2026-11-17; due after T1d-f). → `repo-janitor`
 8. [x] **Recurring: Dependency updates** (last run 2026-11-20; due after U1b, P4, D5-R). → `dep-updater`
 
 ### Background checks
