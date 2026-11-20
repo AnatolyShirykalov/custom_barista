@@ -33,7 +33,7 @@ No agent running. Done recently (2026-11-18, session 2): sound block on pulseaud
 9. [x] **T1e hover hardening**: HOVER persisted + HOVER=0 stops daemon/clears taps, bare `[` not tapped, --replace pid check, private /tmp fallback, font default, shellcheck clean, rows h2b r1-r5; detail docs/progress/design.md. → `widget-builder`
 10. [x] **T1f docs**: README.md block/script list (claude-usage.sh, explain.sh, hover files, install.sh, i3/), deps (python-xlib, python-gobject; drop node/npx), hover tooltips + HOVER=0 in README and CLAUDE.md:5 (after T1d). → `chore`
 11. [x] **U1c first-run placeholder** (from backlog): fresh user (no statusline tap, empty ~/.cache/claude-usage) → usage block hidden for minutes; show dim `cc …` placeholder until first data. Done: fixture row for empty cache → placeholder, width fixed. → `widget-builder` Done 2026-11-20: see docs/progress/widgets.md.
-12. [ ] **Recurring: Git hygiene** (last 2026-11-17; due after T1d-f). → `repo-janitor`
+12. [x] **Recurring: Git hygiene** (last 2026-11-20; due after T1d-f). → `repo-janitor`
 8. [x] **Recurring: Dependency updates** (last run 2026-11-20; due after U1b, P4, D5-R). → `dep-updater`
 
 ### Background checks
@@ -50,7 +50,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 |---|---|---|---|
 | Agent roster | `agent-curator` | revise `.claude/agents/*`: tighten, split, merge, add specialists for upcoming work no agent fits, retire unused; evidence from recent reports and items that lacked a specialist | 2026-11-18 |
 | Context diet | `context-auditor` | tools, MCP servers, connectors, plugins, skills, user agents loaded here but unused/unrelated; context cost; main session asks the user which to disable per project, applies, checks `/context` | 2026-11-17 (set up) |
-| Git hygiene | `repo-janitor` | anything tracked that shouldn't be (build output, logs, dumps, caches, large binaries, local config, secrets); `.gitignore` gaps; safe `git rm --cached` | 2026-11-17 |
+| Git hygiene | `repo-janitor` | anything tracked that shouldn't be (build output, logs, dumps, caches, large binaries, local config, secrets); `.gitignore` gaps; safe `git rm --cached` | 2026-11-20 |
 | Backlog tidy | `chore` | monthly: drop or merge stale, superseded or duplicate backlog items, check each still has an agent and a done condition; never touch the roadmap's queue | 2026-11-17 |
 | Dependency updates | `dep-updater` | i3status-rs installed vs latest release, changelog breaking config changes grep'd in config.toml/scripts, script deps (jq, xclip, yad, nvidia-smi, xdotool, node) present and formats unchanged; fix keys, backlog the rest | 2026-11-20 |
 | Look/usability pass | `bar-designer` | screenshot the bar; clarity, colors, stable widths, glyphs render; findings → backlog | 2026-11-17 |

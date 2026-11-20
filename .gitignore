@@ -14,3 +14,7 @@
 !.env.example
 .claude/settings.local.json
 __pycache__/
+*.pyc
+node_modules/
+coverage/
+*.core

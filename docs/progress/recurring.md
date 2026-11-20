@@ -88,3 +88,8 @@ Checks: `scripts/test.sh` pass=163 fail=0; `compact.toml` in sync with `gen-comp
 | docs | README.md:9,23; CLAUDE.md:5 | ccusage.sh/npx stale; hover, HOVER=0, python deps, explain.sh missing |
 
 No findings: U1d per-part colours (read from `[theme.overrides]`, padding before markup, width constant), D5-R gen-compact merge rule (drop chains handled), hover state machine and layout (rows h5-h14 against live captures), hover-tee short-write loop and pdeathsig. Last reviewed commit: a623aab.
+
+## Git hygiene 2026-11-20
+- 193 tracked files; no logs, caches, .pyc, secrets, .env, or large binaries tracked (largest 44 KB PNG). `__pycache__`, `log/`, `settings.local.json` correctly ignored.
+- `.gitignore`: added `*.pyc`, `node_modules/`, `coverage/`, `*.core`. Nothing needed `git rm --cached`.
+- Doubtful (listed in BACKLOG): duplicate `f5-p4-dp0/dp2.png` in D5-bar-review. Design images kept.
