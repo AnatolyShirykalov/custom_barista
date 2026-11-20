@@ -67,3 +67,8 @@ Rows: Agent roster, Git hygiene, Context diet, Backlog tidy (monthly), Dependenc
 *Once the session is wrapped up, new requests are only added to the roadmap/backlog; no new agents are started.*
 **Why:** user wanted a post-wrapup request scheduled, and an agent was launched instead.
 **How to apply:** after `/wrapup`, write the item into "Queued next" (or backlog), commit, push, and say it is queued for the next session.
+
+## Full file paths in replies (`full-paths`, communication; 2026-11-20)
+*Every file mentioned to the user is given as a full absolute path.*
+**Why:** user asked: "I always need full paths when you mention files".
+**How to apply:** write `/home/anatoly/projects/custom_barista/docs/...`, never `docs/...` or a bare filename; ask agents for full paths in their reports.
