@@ -35,3 +35,10 @@
 - Statusline output identical to `.bak-u1` for the same input; second `./install.sh --yes` keeps exactly one marker line.
 - Acceptance 6 replaced by an independent jq recompute (group_by dedupe, own price lookup): 118.95M / $67.34 vs bar 119.0M / $67.4 (gap = haiku >100K tier, which the one-off ignored).
 - Deviation, accepted: dim on API `stale` only when the newest data is also older than 300 s (fresh tap data is not dimmed by an old 401); better than the spec's literal rule.
+
+## D5-R regrouping review (2026-11-20): accepted
+- Diff 5959269 matches spec-regroup.md: block order §2 exact, 7 flags each right after `block =`, gen-compact awk verbatim, compact.toml 5 flags (none in memory), `gen-compact.sh - | cmp` clean; 7d mark M1 logic kept by later U1d (ea08b4f, colours now read from theme overrides).
+- `bash scripts/test.sh`: pass=107 fail=0 (94 + U1d rows). Both bars run i3status-rs 0.40.1, no error blocks; deployed configs equal the repo (install only expands paths).
+- Middle-click check: dry-run harness (scratch config copies, explain.sh path swapped for an `EXPLAIN_DRY=1` wrapper, click JSON on stdin). DP-0: load, temp, freq, mem, disk, io, gpu, net, ccusage, kbd, sound, time each gave its own text; DP-2: load, temp, freq, mem, gpu, net, kbd, sound, time (+ hidden battery) likewise. Texts match the thresholds in config.toml.
+- Live crops: `docs/design/D5-bar-review/img/review-dp0.png` (left/right halves), `review-dp2.png`: DP-0 6 separators, DP-2 5, dim `7d 49%`, no tofu.
+- Deviations: none. No backlog items.

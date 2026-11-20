@@ -22,7 +22,7 @@ No agent running. Done recently (2026-11-18, session 2): sound block on pulseaud
 
 ### Queued next (one agent each, in order)
 
-1. [ ] **D5-R regrouping review**: built 5959269 per `docs/design/D5-bar-review/spec-regroup.md` (7 merge flags, gen-compact merge rule, 7d mark always shown dim ≤70); tests 94 pass, deployed; crops `docs/design/D5-bar-review/img/live-after-dp0.png`, `live-after-dp2.png`. Review vs spec, click each block's middle-click explain (stdin click JSON), mark [x]. → `bar-designer` (review)
+1. [x] **D5-R regrouping review**: accepted, no deviations; tests 107 pass, all middle-click explains checked on both bars. Detail `docs/progress/design.md`.
 2. [ ] **T1 hover tooltips spike** (user 2026-11-18: wants real hover, middle-click popups are not it): research done `docs/design/T1-hover/research.md`, recommended (a) hover daemon beside i3bar (python-xlib Enter/Leave/Motion on i3bar windows, block extents from tee'd i3status-rs JSON + gi Pango widths, GTK popup with explain.sh text after ~600 ms). Spike: needs `python-xlib` (user installs: `sudo pacman -S python-xlib`); compute block edges for both bars, compare with click-reported edges (x − relative_x, width); done = error table per block + go/no-go. Then spec → build → review. → `widget-builder` (spike)
 3. [ ] **Recurring: Dependency updates** (last run never; due after U1b, P4, D5-R). → `dep-updater`
 
