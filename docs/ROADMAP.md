@@ -24,7 +24,7 @@ No agent running. Done recently (2026-11-18, session 2): sound block on pulseaud
 
 1. [x] **D5-R regrouping review**: accepted, no deviations; tests 107 pass, all middle-click explains checked on both bars. Detail `docs/progress/design.md`.
 2. [x] **T1 hover tooltips spike**: go. Computed edges = click-reported edges (0 px, both bars); python-xlib gets Enter/Leave/Motion on i3bar windows, no polling. `docs/design/T1-hover/spike.md`, scripts `scripts/spike/`.
-3. [ ] **T1 spec**: hover daemon (tee status_command wrapper, Pango edges, GTK popup with explain.sh text after ~600 ms; tray/Win+i/short_text risks in spike.md). → `bar-designer`
+3. [ ] **T1 spec** (top): hover daemon (tee status_command wrapper, Pango edges, GTK popup with explain.sh text after ~600 ms; tray/Win+i/short_text risks in spike.md). → `bar-designer`
 4. [ ] **Recurring: Dependency updates** (last run never; due after U1b, P4, D5-R). → `dep-updater`
 
 ### Background checks
