@@ -76,3 +76,9 @@
 - Live spot-check (fresh crops in scratch, not committed): DP-0 gpu centred above the block, slide gpu→net shown in 150 ms (browse), time near tray; DP-2 load, time clamped right 4 px from the edge; popups 4 px above the bar, #1d1d1d / #777777 border / white PragmataPro, no tofu. Pointer parked off the bars after.
 - Fixed: `hover-tee.py` stdout write now loops on short writes (a signal such as i3bar's SIGSTOP can cut a blocking pipe write and would have dropped the rest of a status line). Deleted `scripts/spike/`. test.sh 163/0. Nothing backlogged.
 - Open: Q1/Q2 (`questions.html`) still with the user.
+
+## T1d remove middle-click popups (2026-11-20, widget-builder)
+- Q1 B: `scripts/hover/keys.toml` maps blocks to explain.sh keys (`block` type + `command` substring / `device`, first match wins); `layout.explain_keys` reads it (daemon and h10 unchanged otherwise). All button-2 explain.sh clicks removed from `config.toml`, `compact.toml` regenerated.
+- `scripts/explain.sh` now only prints the text (yad path removed, nothing else used it; EXPLAIN_DRY accepted). test.sh explain rows now iterate keys.toml and assert no explain.sh left in config.toml; backlog item about the tiled yad popup deleted. test.sh 163/0.
+- Live after `install.sh --yes`: both bars no ERR; xdotool middle click on DP-2 and DP-0 blocks opens no yad; hover shows temp+mem on DP-2 and temp+freq on DP-0 with the right text (screenshots).
+- T1e hardening untouched.

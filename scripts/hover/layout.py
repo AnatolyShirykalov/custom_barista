@@ -2,7 +2,7 @@
 # T1 hover core, pure layout: where i3bar draws each status piece (libi3 font.c
 # predict_text_width_pango + i3bar xcb.c predict_statusline_length), hit test, block -> explain
 # key map, bar support check, popup placement. No X, no GTK window (Pango text measuring only).
-import re, tomllib
+import os, re, tomllib
 import gi
 gi.require_version("Pango", "1.0"); gi.require_version("PangoCairo", "1.0")
 from gi.repository import Pango, PangoCairo
@@ -71,16 +71,21 @@ def hit(regs, x, right):
             return r["index"]
     return None
 
+KEYS_TOML = os.path.join(os.path.dirname(os.path.abspath(__file__)), "keys.toml")
+
 def explain_keys(config_path):
-    """{block index: explain.sh key} from the first [[block.click]] cmd naming explain.sh."""
+    """{block index: explain.sh key}: each config block matched against the rules of keys.toml."""
     with open(config_path, "rb") as f:
         blocks = tomllib.load(f).get("block", [])
+    with open(KEYS_TOML, "rb") as f:
+        rules = tomllib.load(f).get("key", [])
+    def match(r, b):
+        return all(k == "key" or (r[k] in b.get(k, "") if k == "command" else r[k] == b.get(k)) for k in r)
     keys = {}
     for i, b in enumerate(blocks):
-        for c in b.get("click", []):
-            m = re.search(r"explain\.sh\s+(\w+)", c.get("cmd", ""))
-            if m:
-                keys[i] = m.group(1)
+        for r in rules:
+            if match(r, b):
+                keys[i] = r["key"]
                 break
     return keys
 

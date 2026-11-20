@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Middle-click help popup for a bar block (i3bar has no tooltips). Usage: explain.sh <block>; EXPLAIN_DRY=1 prints the text only.
-# Block names = the ones used in config.toml click actions. Keep each text to 6 lines.
+# Help text for a bar block, shown by the hover popup (i3bar has no tooltips). Usage: explain.sh <block>; EXPLAIN_DRY=1 is accepted and ignored.
+# Block names = the keys of scripts/hover/keys.toml. Keep each text to 6 lines.
 case ${1:-} in
   kbd)     t='Keyboard layout (US / RU).\nLeft click: switch layout.' ;;
   load)    t='CPU load average, 1 min and 15 min.\nYellow from 0.25, red from 0.5.' ;;
@@ -18,8 +18,4 @@ case ${1:-} in
   time)    t='Date and time.\nLeft click: open the calendar.' ;;
   *) echo "explain.sh: unknown block '${1:-}'" >&2; exit 1 ;;
 esac
-[ -n "${EXPLAIN_DRY:-}" ] && { printf '%b\n' "$t"; exit 0; }
-# detached so the bar never waits for the popup; any click on the button closes it
-setsid yad --mouse --undecorated --timeout 8 --on-top --skip-taskbar --borders 8 \
-  --text "$(printf '%b' "$t" | sed 's/&/\&amp;/g; s/</\&lt;/g')" --button=OK:0 >/dev/null 2>&1 &
-exit 0
+printf '%b\n' "$t"

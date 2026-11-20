@@ -124,11 +124,11 @@ printf 'CONFDIR=/x/conf\nHOVER=0\n' >"$gd/bars0.env"; BARS_ENV=$gd/bars0.env "$d
 grep -q "hover-tee.py --output DP-0 -- i3status-rs /x/conf/config.toml" "$gd/h15.rs" && grep -q "hover-tee.py --output DP-2 -- i3status-rs /x/conf/compact.toml" "$gd/h15.rs" \
   && cmp -s "$gd/h15.rs" "$gd/h15.off" && ! grep -q hover-tee "$gd/h15.0" && grep -q 'status_command i3status-rs /x/conf/config.toml' "$gd/h15.0" \
   && pass=$((pass+1)) || { echo "FAIL h15: barsconf wrapping"; fail=$((fail+1)); }
-# explain.sh: every middle-click name used in config.toml has a text of at most 6 lines
-for n in $(grep -o 'explain\.sh [a-z]*' "$d/../config.toml" | cut -d' ' -f2); do
+# explain.sh: every key in hover/keys.toml has a text of at most 6 lines; every config block has a key
+for n in $(grep '^key = ' "$d/hover/keys.toml" | cut -d'"' -f2); do
   o=$(EXPLAIN_DRY=1 "$d/explain.sh" $n 2>&1); [ -n "$o" ] && [ "$(wc -l <<<"$o")" -le 6 ] && pass=$((pass+1)) || { echo "FAIL explain $n"; fail=$((fail+1)); }
 done
-[ "$(grep -c 'explain\.sh' "$d/../config.toml")" == "$(grep -c '^\[\[block\]\]' "$d/../config.toml")" ] && pass=$((pass+1)) || { echo "FAIL explain: block without middle-click explanation"; fail=$((fail+1)); }
+! grep -q 'explain\.sh' "$d/../config.toml" && pass=$((pass+1)) || { echo "FAIL explain: middle-click popup back in config.toml"; fail=$((fail+1)); }
 # hover core (T1b): rows h5-h14 in test_hover.py add their counts to ours
 ho=$(python3 "$d/hover/test_hover.py" 2>&1); grep '^FAIL' <<<"$ho"
 hp=$(grep -o '^pass=[0-9]*' <<<"$ho" | cut -d= -f2); hf=$(grep -o 'fail=[0-9]*$' <<<"$ho" | cut -d= -f2)

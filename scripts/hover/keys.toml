@@ -1,0 +1,49 @@
+# Block -> explain.sh key for the hover popup. A [[key]] matches a config block of the same `block` type whose
+# other fields all agree (`command`: the block's command contains it; `device`: equal). First match wins.
+[[key]]
+block = "load"
+key = "load"
+[[key]]
+block = "temperature"
+key = "temp"
+[[key]]
+block = "custom"
+command = "freq.sh"
+key = "freq"
+[[key]]
+block = "memory"
+key = "mem"
+[[key]]
+block = "disk_space"
+key = "disk"
+[[key]]
+block = "disk_iostats"
+key = "io"
+[[key]]
+block = "custom"
+command = "gpu.sh"
+key = "gpu"
+[[key]]
+block = "net"
+device = "^wl"
+key = "wifi"
+[[key]]
+block = "net"
+device = "^en"
+key = "net"
+[[key]]
+block = "custom"
+command = "claude-usage.sh"
+key = "ccusage"
+[[key]]
+block = "keyboard_layout"
+key = "kbd"
+[[key]]
+block = "battery"
+key = "battery"
+[[key]]
+block = "sound"
+key = "sound"
+[[key]]
+block = "time"
+key = "time"
