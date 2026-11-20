@@ -135,5 +135,9 @@ if [ ${#dirs[@]} -gt 0 ]; then
 fi
 [ -n "$sums" ] || { echo "$err"; exit 0; }
 
+if [ "$none" = true ] && [ "$(jq -r '.tok' <<<"$sums")" = 0 ]; then   # nothing fetched yet, no local usage: dim placeholder, same width
+  w=$(render <<<'{"pct":0,"tok":0,"cost":0,"ch":0,"left":0,"stale":false,"w":null}' | jq -r '.text | gsub("<[^>]*>"; "") | length')
+  jq -nc --arg c "$cd_" --argjson w "$w" '{icon: "ccusage", state: "Idle", text: ("<span foreground=\"" + $c + "\">" + ("cc …" + (" " * $w))[0:$w] + "</span>")}'; exit 0
+fi
 jq -c --argjson p "$pct" --argjson l "$left" --argjson st "$stale" --argjson w "$w" '. + {pct: $p, left: $l, stale: $st, w: $w}' <<<"$sums" | render || echo "$err"
 exit 0

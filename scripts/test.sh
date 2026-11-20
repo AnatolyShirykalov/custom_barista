@@ -77,6 +77,9 @@ for kv in 69:#dd6666 70:#dddd66 89:#dddd66 90:#66dd66; do
 done
 o=$("$d/claude-usage.sh" --render "$(jq -c '.w=92' <<<"$ub")"); check u26 "$o" "53%   3.4M \$1.85 cache 90% 1h46m 7d 92% " Idle
 for c in good_fg:66dd66 warning_fg:dddd66 critical_fg:dd6666 info_fg:777777; do grep -q "^${c%%:*} = \"#${c#*:}\"" "$d/../config.toml" && pass=$((pass+1)) || { echo "FAIL u27: ${c%%:*} differs from claude-usage fallback"; fail=$((fail+1)); }; done
+e=$(mktemp -d -p "$gd"); o=$(CU_NOW=$NOW CU_PROJECTS=$e CU_CREDS=$e/none CU_CACHE=$e/rl.json CU_STATE_DIR=$e "$d/claude-usage.sh")
+check u28 "$o" "cc …                                    " Idle
+jq -r .text <<<"$o" | grep -q '^<span foreground="#777777">cc …' && [ "$(len "$o")" = "$base" ] && pass=$((pass+1)) || { echo "FAIL u28: placeholder dim/width"; fail=$((fail+1)); }
 o=$(EXPLAIN_DRY=1 "$d/explain.sh" ccusage); grep -q cache <<<"$o" && ! grep -q 'CH' <<<"$o" && pass=$((pass+1)) || { echo "FAIL u17: explain text"; fail=$((fail+1)); }
 printf '99, 16303\n' > "$cj"; o=$("$d/gpu.sh" "$cj"); printf '9, 5\n' > "$cj"; o2=$("$d/gpu.sh" "$cj")
 [ "$(len "$o")" == "$(len "$o2")" ] && pass=$((pass+1)) || { echo "FAIL gpuwidth"; fail=$((fail+1)); }

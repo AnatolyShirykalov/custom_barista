@@ -55,3 +55,7 @@ Middle click on every block runs `scripts/explain.sh <name>` (names: kbd load te
 ## U1d per-part colours (2026-11-18)
 - claude-usage.sh: block state always Idle; 5h %, cache %, 7d coloured by own value via pango spans (5h >70 yellow >90 red; cache >=90 green, 70-89 yellow, <70 red; 7d dim/yellow/red). Hex read from config.toml `[theme.overrides]` (CU_CONFIG override, fallback same scheme). Stale 5h stays dim; widths unchanged.
 - test.sh: u1-u23 states now Idle, new u24-u27 (boundaries 70/71/90/91, cache 69/70/89/90, 7d 92 Idle, config hex match); explain.sh text updated. pass=107 fail=0, deployed.
+
+## U1c first-run placeholder (2026-11-20)
+- claude-usage.sh: when no tap/API window exists and local logs have 0 tokens, prints a dim `cc …` padded to the normal text width (measured from a render at runtime, 40 chars). With local usage but no window it still shows tokens with `?%`.
+- explain.sh ccusage text: "cc … = waiting for first data" (kept to 6 lines). test.sh u28 (empty temp cache dir: text, Idle, dim, width = normal). pass=171 fail=0, deployed; both bars no errors, real block shows real data.
