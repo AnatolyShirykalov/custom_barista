@@ -18,25 +18,15 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-No agent running. Done recently (2026-11-18, session 2): sound block on pulseaudio (frees ALSA card 3 for smart_speaker), DP-2 freq→mem gap, middle-click explain popups, Claude usage block U1 (statusline tap + OAuth fallback, real 5h %, 7d mark), D5 design review v2, clipboard block removed, D5-R regrouping built (review pending), hover tooltips researched; widget health check ok; usage block per-part colours (U1d). Earlier 2026-11-18: switched to i3status-rust. Archive: `docs/roadmap-archive/2026-11.md`.
+No agent running. Done recently (2026-11-20, session 3): D5-R review accepted; hover tooltips T1 (spike, spec, wrapper, core, daemon, review), middle-click popups removed (T1d), hover hardening from code review (T1e), README/CLAUDE.md docs (T1f); usage `cc …` first-run placeholder (U1c); recurring dep updates, code review, git hygiene, look pass. Earlier: 2026-11-18 i3status-rust switch, usage block U1/U1d, D5 regroup. Archive: `docs/roadmap-archive/2026-11.md`.
 
 ### Queued next (one agent each, in order)
 
-1. [x] **D5-R regrouping review**: accepted, no deviations; tests 107 pass, all middle-click explains checked on both bars. Detail `docs/progress/design.md`.
-2. [x] **T1 hover tooltips spike**: go. Computed edges = click-reported edges (0 px, both bars); python-xlib gets Enter/Leave/Motion on i3bar windows, no polling. `docs/design/T1-hover/spike.md`, scripts `scripts/spike/`.
-3. [x] **T1 spec**: `docs/design/T1-hover/spec.md` (tee wrapper + separate hover daemon, 500 ms, GTK popup above the block, explain.sh text); questions page `questions.html` (Q1 middle-click, Q2 delay; defaults let the build start).
-4. [x] **T1a hover wrapper**: `hover-tee.py` pass-through + tap files, barsconf wiring, `HOVER=0` fallback, rows h1-h4, h15; deployed, both bars run through it. Needs bar-designer review (in T1 review).
-5. [x] **T1b hover core**: `scripts/hover/{layout,state,test_hover}.py`, live fixtures `testdata/hover/dp{0,2}.json`; rows h5-h14 green (23 pieces, 0 px vs clicks). Progress: design.md.
-6. [x] **T1c hover daemon**: `hover-daemon.py`, `hover-run.sh`, install.sh `exec_always`, h16; deployed, acceptance 1-9 pass, crops `img/review-hover-*`. Progress: design.md. Needs bar-designer review (T1 review).
-7. [x] **T1 review**: accepted; short-write fix in hover-tee.py, `scripts/spike/` deleted. Q1/Q2 still open. Progress: design.md.
-8. [x] **T1d remove middle-click popups** (user Q1 B, 2026-11-20): per spec §3.3 move the explain-key mapping to `scripts/hover/keys.toml` (block type + distinguishing field, not block index), daemon reads it, drop button-2 explain.sh clicks from config.toml (compact.toml regenerated), h10 checks keys.toml; drop the backlog item about the tiled yad popup if explain.sh popups are gone; deploy. → `widget-builder` Done: see progress/design.md "T1d".
-9. [x] **T1e hover hardening**: HOVER persisted + HOVER=0 stops daemon/clears taps, bare `[` not tapped, --replace pid check, private /tmp fallback, font default, shellcheck clean, rows h2b r1-r5; detail docs/progress/design.md. → `widget-builder`
-10. [x] **T1f docs**: README.md block/script list (claude-usage.sh, explain.sh, hover files, install.sh, i3/), deps (python-xlib, python-gobject; drop node/npx), hover tooltips + HOVER=0 in README and CLAUDE.md:5 (after T1d). → `chore`
-11. [x] **U1c first-run placeholder** (from backlog): fresh user (no statusline tap, empty ~/.cache/claude-usage) → usage block hidden for minutes; show dim `cc …` placeholder until first data. Done: fixture row for empty cache → placeholder, width fixed. → `widget-builder` Done 2026-11-20: see docs/progress/widgets.md.
-12. [x] **Recurring: Git hygiene** (last 2026-11-20; due after T1d-f). → `repo-janitor`
-13. [x] **Recurring: Look/usability pass** (last 2026-11-20; usage popup reflowed, 1 backlog item): screenshot both bars + hover popups; clarity, colours, stable widths, glyphs; findings → backlog. → `bar-designer`
-14. [ ] **Hover: first popup missed once** (look pass 2026-11-20, from backlog): first hover on DP-0 load showed no popup, no log line; retries fine. Done: 20 scripted hovers on both bars all show a popup, or cause found + `test_hover.py` row. → `widget-builder`
-8. [x] **Recurring: Dependency updates** (last run 2026-11-20; due after U1b, P4, D5-R). → `dep-updater`
+1. [ ] **Hover: first popup missed once** (look pass 2026-11-20, from backlog): first hover on DP-0 load showed no popup, no log line; retries fine. Done: 20 scripted hovers on both bars all show a popup, or cause found + `test_hover.py` row. → `widget-builder`
+2. [ ] **Recurring: Context diet** (last 2026-11-17): list unused tools/MCP/plugins/skills with cost; main session asks the user (AskUserQuestion multiSelect), applies to `.claude/settings.local.json`. → `context-auditor`
+3. [ ] **Recurring: Backlog tidy** (last 2026-11-17): backlog nearly empty; resolve the byte-identical `docs/design/D5-bar-review/img/f5-p4-dp{0,2}.png` note (keep one, fix references). → `chore`
+4. [ ] **Recurring: Agent roster** (last 2026-11-18): evidence this session: widget-builder ran spike + builds + docs fine; code-reviewer could not write (main session did); no gaps seen. → `agent-curator`
+5. [ ] **Recurring: Widget health** (last 2026-11-18): after hover wrapper + U1c; smoke both configs through hover-tee, grep ERR/error. → `chore`
 
 ### Background checks
 

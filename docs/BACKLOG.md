@@ -9,4 +9,3 @@ _(empty: add new items here)_
 ## Bar blocks
 
 
-- Doubtful, git hygiene 2026-11-20 (no action taken): `docs/design/D5-bar-review/img/f5-p4-dp0.png` and `f5-p4-dp2.png` are byte-identical (design evidence, keep or drop one?); 94 design PNGs total about 1.4 MB, largest 44 KB, so no size problem.
