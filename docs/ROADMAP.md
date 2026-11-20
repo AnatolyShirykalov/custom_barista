@@ -29,6 +29,7 @@ No agent running. Done recently (2026-11-18, session 2): sound block on pulseaud
 5. [x] **T1b hover core**: `scripts/hover/{layout,state,test_hover}.py`, live fixtures `testdata/hover/dp{0,2}.json`; rows h5-h14 green (23 pieces, 0 px vs clicks). Progress: design.md.
 6. [x] **T1c hover daemon**: `hover-daemon.py`, `hover-run.sh`, install.sh `exec_always`, h16; deployed, acceptance 1-9 pass, crops `img/review-hover-*`. Progress: design.md. Needs bar-designer review (T1 review).
 7. [x] **T1 review**: accepted; short-write fix in hover-tee.py, `scripts/spike/` deleted. Q1/Q2 still open. Progress: design.md.
+8. [ ] **T1d remove middle-click popups** (user Q1 B, 2026-11-20): per spec §3.3 move the explain-key mapping to `scripts/hover/keys.toml` (block type + distinguishing field, not block index), daemon reads it, drop button-2 explain.sh clicks from config.toml (compact.toml regenerated), h10 checks keys.toml; drop the backlog item about the tiled yad popup if explain.sh popups are gone; deploy. → `widget-builder`
 8. [x] **Recurring: Dependency updates** (last run 2026-11-20; due after U1b, P4, D5-R). → `dep-updater`
 
 ### Background checks
@@ -55,6 +56,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 ## Decisions made
 
+- 2026-11-20: T1 picks: Q1 B remove middle-click popups (hover only), Q2 A 500 ms delay then instant while sliding.
 - 2026-11-18: D5 picks: regrouping only (from option B), no P2/P3/P5 ("enough space"), clipboard block removed entirely; 7d usage mark always visible.
 - 2026-11-18: Claude usage block: statusline rate_limits cache + OAuth usage endpoint fallback; show window tokens, colour from real 5h %, reset time, window cost, cache ratio; ccusage dropped.
 - 2026-11-18: tooltips must appear on hover (middle-click popup is only a stopgap); sound block uses pulseaudio driver.
@@ -71,5 +73,4 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
-- T1 hover choices `docs/design/T1-hover/questions.html`: Q1 keep middle-click popups (rec A keep), Q2 hover delay (rec 500 ms). asked 2026-11-20
 - Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user action, from own GitHub account). asked 2026-11-17
