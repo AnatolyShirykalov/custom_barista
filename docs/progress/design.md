@@ -42,3 +42,7 @@
 - Middle-click check: dry-run harness (scratch config copies, explain.sh path swapped for an `EXPLAIN_DRY=1` wrapper, click JSON on stdin). DP-0: load, temp, freq, mem, disk, io, gpu, net, ccusage, kbd, sound, time each gave its own text; DP-2: load, temp, freq, mem, gpu, net, kbd, sound, time (+ hidden battery) likewise. Texts match the thresholds in config.toml.
 - Live crops: `docs/design/D5-bar-review/img/review-dp0.png` (left/right halves), `review-dp2.png`: DP-0 6 separators, DP-2 5, dim `7d 49%`, no tofu.
 - Deviations: none. No backlog items.
+
+## T1 hover spike (2026-11-20)
+- Spike scripts `scripts/spike/` (tee-wrap.py, edges.py, xbars.py; throwaway, not installed). bars.conf temporarily wrapped, restored, i3 restarted; all spike processes gone.
+- Edge error 0 px on all 13 (DP-0) + 10 (DP-2) pieces, clicks with button 9. Enter/Leave/Motion delivered by python-xlib (dock windows not override-redirect). Verdict go; table and risks in `docs/design/T1-hover/spike.md`. Next: T1 spec (bar-designer).

@@ -23,8 +23,9 @@ No agent running. Done recently (2026-11-18, session 2): sound block on pulseaud
 ### Queued next (one agent each, in order)
 
 1. [x] **D5-R regrouping review**: accepted, no deviations; tests 107 pass, all middle-click explains checked on both bars. Detail `docs/progress/design.md`.
-2. [ ] **T1 hover tooltips spike** (user 2026-11-18: wants real hover, middle-click popups are not it): research done `docs/design/T1-hover/research.md`, recommended (a) hover daemon beside i3bar (python-xlib Enter/Leave/Motion on i3bar windows, block extents from tee'd i3status-rs JSON + gi Pango widths, GTK popup with explain.sh text after ~600 ms). Spike (python-xlib 0.33 installed 2026-11-20): compute block edges for both bars, compare with click-reported edges (x − relative_x, width); done = error table per block + go/no-go. Then spec → build → review. → `widget-builder` (spike)
-3. [ ] **Recurring: Dependency updates** (last run never; due after U1b, P4, D5-R). → `dep-updater`
+2. [x] **T1 hover tooltips spike**: go. Computed edges = click-reported edges (0 px, both bars); python-xlib gets Enter/Leave/Motion on i3bar windows, no polling. `docs/design/T1-hover/spike.md`, scripts `scripts/spike/`.
+3. [ ] **T1 spec**: hover daemon (tee status_command wrapper, Pango edges, GTK popup with explain.sh text after ~600 ms; tray/Win+i/short_text risks in spike.md). → `bar-designer`
+4. [ ] **Recurring: Dependency updates** (last run never; due after U1b, P4, D5-R). → `dep-updater`
 
 ### Background checks
 
