@@ -102,7 +102,7 @@ done
 mkdir "$gd/bin"; printf '#!/bin/sh\necho "$@" >>"%s/i3msg.log"\n' "$gd" >"$gd/bin/i3-msg"; chmod +x "$gd/bin/i3-msg"
 printf 'BARSCONF=%s/cyc.conf\nI3CFG=%s/cyccfg\n' "$gd" "$gd" >>"$gd/bars.env"; echo "include $gd/cyc.conf" >"$gd/cyccfg"
 BARS_ENV=$gd/bars.env "$d/barsconf.sh" off >"$gd/cyc.conf"
-for i in 1 2 3; do PATH=$gd/bin:$PATH BARS_ENV=$gd/bars.env BARCYCLE_SETTLE=0 "$d/barcycle.sh" 2>>"$gd/cyc.err" & done; wait
+for _ in 1 2 3; do PATH=$gd/bin:$PATH BARS_ENV=$gd/bars.env BARCYCLE_SETTLE=0 "$d/barcycle.sh" 2>>"$gd/cyc.err" & done; wait
 if [ "$(head -1 "$gd/cyc.conf" | cut -d" " -f3)" = rs ] && [ "$(grep -c reload "$gd/i3msg.log")" = 3 ] && [ ! -s "$gd/cyc.err" ]
 then pass=$((pass+1)); else echo "FAIL barcycle: 3 concurrent presses -> $(head -1 "$gd/cyc.conf" | cut -c1-20), reloads $(grep -c reload "$gd/i3msg.log"), stderr: $(head -2 "$gd/cyc.err")"; fail=$((fail+1)); fi
 # hover-tee.py (T1a): h1 stdout byte-identical, h2 stdin forwarded + last click tapped, h3 unwritable tap dir, h4 child dies with the wrapper
@@ -112,6 +112,10 @@ printf '[\n{"button":1}\n,{"button":9,"x":5}\n' | HOVER_DIR=$hd FAKE_IN=$hin "$d
 cmp -s "$gd/h.direct" "$gd/h.out" && [ $hrc = 3 ] && pass=$((pass+1)) || { echo "FAIL h1: wrapper stdout differs or exit $hrc"; fail=$((fail+1)); }
 printf '[\n{"button":1}\n,{"button":9,"x":5}\n' | cmp -s - "$hin" && [ "$(jq -c .click "$hd/DP-0.click.json")" = '{"button":9,"x":5}' ] && jq -e '.status[0].full_text == "c" and .output == "DP-0"' "$hd/DP-0.status.json" >/dev/null \
   && pass=$((pass+1)) || { echo "FAIL h2: stdin forwarding or tap files"; fail=$((fail+1)); }
+# h2b: an earlier session's tap files are removed at start, the opening "[" is not tapped as a status
+echo '{"v":1,"status":[]}' >"$hd/DP-2.status.json"; echo '{}' >"$hd/DP-2.click.json"
+HOVER_DIR=$hd FAKE_STOP=1 "$d/hover-tee.py" --output DP-2 -- bash "$fk" </dev/null >/dev/null
+[ ! -e "$hd/DP-2.status.json" ] && [ ! -e "$hd/DP-2.click.json" ] && pass=$((pass+1)) || { echo "FAIL h2b: stale or bare-[ tap file: $(head -c 80 "$hd/DP-2.status.json" 2>/dev/null)"; fail=$((fail+1)); }
 HOVER_DIR=/proc/nope "$d/hover-tee.py" --output DP-0 -- bash "$fk" </dev/null >"$gd/h3.out" 2>/dev/null; hrc=$?
 cmp -s "$gd/h.direct" "$gd/h3.out" && [ $hrc = 3 ] && pass=$((pass+1)) || { echo "FAIL h3: unwritable tap dir, exit $hrc"; fail=$((fail+1)); }
 printf '#!/bin/sh\nsleep 4\n' >"$gd/hsleep"; chmod +x "$gd/hsleep"
@@ -134,7 +138,26 @@ ho=$(python3 "$d/hover/test_hover.py" 2>&1); grep '^FAIL' <<<"$ho"
 hp=$(grep -o '^pass=[0-9]*' <<<"$ho" | cut -d= -f2); hf=$(grep -o 'fail=[0-9]*$' <<<"$ho" | cut -d= -f2)
 [ -n "$hp" ] && { pass=$((pass+hp)); fail=$((fail+hf)); } || { echo "FAIL h5-h14: test_hover.py did not run"; fail=$((fail+1)); }
 # h16: hover daemon selftest (imports, key maps of both configs) without a display
-hs=$(DISPLAY= python3 "$d/hover-daemon.py" --selftest 2>&1); hrc=$?
+hs=$(DISPLAY="" python3 "$d/hover-daemon.py" --selftest 2>&1); hrc=$?
 [ $hrc = 0 ] && grep -q '^config.toml .*[0-9]:time' <<<"$hs" && grep -q '^compact.toml .*[0-9]:time' <<<"$hs" \
   && pass=$((pass+1)) || { echo "FAIL h16: hover-daemon.py --selftest rc=$hrc: $(head -c 200 <<<"$hs")"; fail=$((fail+1)); }
+# hover-run.sh (T1e) with a fake daemon: r1 backoff 1..16 s then give-up after 6 crashes, r2 exit 0 stops,
+# r3 second instance exits, --replace stops the first, r4 --replace leaves a non-hover-run pid alone, r5 HOVER=0
+rd=$gd/run; fd="bash $t/hover/fake-daemon.sh"; printf 'HOVER=1\n' >"$gd/run1.env"; printf 'HOVER=0\n' >"$gd/run0.env"
+hr() { HOVER_DIR=$rd BARS_ENV=$gd/run${2:-1}.env HOVER_DAEMON="$fd" HOVER_RUN_SLEEP=0.01 FAKE_RC=$1 FAKE_LOG=$gd/starts timeout 20 "$d/hover-run.sh" "${@:3}"; }
+hr 1; hrc=$?; dl=$(grep -o 'restart in [0-9]*s' "$rd/hover.log" | grep -o '[0-9]*' | tr '\n' ' ')
+[ $hrc = 1 ] && [ "$dl" = "1 2 4 8 16 " ] && [ "$(wc -l <"$gd/starts")" = 6 ] && grep -q '6 crashes in 10 min, giving up' "$rd/hover.log" \
+  && pass=$((pass+1)) || { echo "FAIL r1: hover-run rc=$hrc delays '$dl' starts $(wc -l <"$gd/starts")"; fail=$((fail+1)); }
+: >"$gd/starts"; hr 0; hrc=$?
+[ $hrc = 0 ] && [ "$(wc -l <"$gd/starts")" = 1 ] && tail -1 "$rd/hover.log" | grep -q 'daemon stopped' && pass=$((pass+1)) || { echo "FAIL r2: daemon exit 0, rc=$hrc"; fail=$((fail+1)); }
+{ hr sleep & } 2>/dev/null; sleep 0.5; r1=$(cat "$rd/daemon.pid"); hr 0; hrc=$?
+kill -0 "$r1" 2>/dev/null && [ $hrc = 0 ] && ok3=1 || ok3=
+{ hr sleep "" --replace & } 2>/dev/null; sleep 1.5; r2=$(cat "$rd/daemon.pid")
+[ -n "$ok3" ] && ! kill -0 "$r1" 2>/dev/null && [ "$r2" != "$r1" ] && kill -0 "$r2" 2>/dev/null && pass=$((pass+1)) || { echo "FAIL r3: single instance / --replace ($r1 -> $r2)"; fail=$((fail+1)); }
+kill -TERM -- -"$r2" 2>/dev/null; sleep 0.3
+sleep 30 & sp=$!; echo $sp >"$rd/daemon.pid"; hr 0 "" --replace
+kill -0 $sp 2>/dev/null && pass=$((pass+1)) || { echo "FAIL r4: --replace killed a pid that is not hover-run.sh"; fail=$((fail+1)); }
+kill $sp 2>/dev/null
+echo '{}' >"$rd/DP-0.status.json"; echo '{}' >"$rd/DP-2.click.json"; : >"$gd/starts"; hr 1 0; hrc=$?
+[ $hrc = 0 ] && [ ! -s "$gd/starts" ] && ! ls "$rd"/*.json >/dev/null 2>&1 && pass=$((pass+1)) || { echo "FAIL r5: HOVER=0 rc=$hrc, daemon started or tap files kept"; fail=$((fail+1)); }
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]

@@ -6,14 +6,14 @@
 import json, os, signal, subprocess, sys, time, tomllib
 here = os.path.dirname(os.path.abspath(__file__)); repo = os.path.dirname(here)
 sys.path.insert(0, os.path.join(here, "hover"))
-import layout, state
+import layout, rundir, state
 from Xlib import X, display, error
 import gi
 gi.require_version("Gtk", "3.0"); gi.require_version("Gdk", "3.0")
 from gi.repository import Gtk, Gdk, GLib
 import cairo
 
-DIR = os.environ.get("HOVER_DIR") or os.path.join(os.environ.get("XDG_RUNTIME_DIR") or "/tmp", "custom_barista/hover")
+DIR = rundir.hover_dir()
 EXPLAIN = os.path.join(here, "explain.sh")
 REDISCOVER_DEBOUNCE, REDISCOVER_EVERY, TICK, MOTION_STAT = 500, 10000, 250, 50  # ms
 DEBUG = os.environ.get("HOVER_DEBUG")  # 1: log every popup action
@@ -43,7 +43,7 @@ def selftest():
 class Bar:
     def __init__(self, win, out, conf):
         self.win, self.out = win, out
-        self.font = conf["font"].removeprefix("pango:")
+        self.font = conf.get("font", "monospace 8").removeprefix("pango:")  # no font in the bar config: a plain default
         self.sep, self.padding, self.position = conf.get("separator_symbol"), conf.get("padding", {}), conf.get("position", "bottom")
         self.hv = state.Hover()
         self.mtime = self.stat_at = 0

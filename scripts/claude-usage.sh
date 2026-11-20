@@ -50,7 +50,7 @@ mkdir -p "$sdir" 2>/dev/null
 
 # --- OAuth fallback (only when the tap cache is missing/old and the gate allows) ---
 api_refresh() {
-  local st ok=0 next=0 status= cm cmt exp code ra= body backoff=0 nb
+  local st next=0 status="" cm cmt exp code ra="" backoff=0 nb
   st=$(cat "$sdir/api.json" 2>/dev/null); [ -n "$st" ] || st='{}'
   jq -e . >/dev/null 2>&1 <<<"$st" || st='{}'
   next=$(jq -r '.next_at // 0' <<<"$st"); status=$(jq -r '.status // ""' <<<"$st"); cm=$(jq -r '.cred_mtime // 0' <<<"$st")

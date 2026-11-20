@@ -82,3 +82,12 @@
 - `scripts/explain.sh` now only prints the text (yad path removed, nothing else used it; EXPLAIN_DRY accepted). test.sh explain rows now iterate keys.toml and assert no explain.sh left in config.toml; backlog item about the tiled yad popup deleted. test.sh 163/0.
 - Live after `install.sh --yes`: both bars no ERR; xdotool middle click on DP-2 and DP-0 blocks opens no yad; hover shows temp+mem on DP-2 and temp+freq on DP-0 with the right text (screenshots).
 - T1e hardening untouched.
+
+## T1e hover hardening (2026-11-20, widget-builder)
+- HOVER persisted in bars.env (`install.sh`: env, else the last install's value, else 1), so Win+i (`barsconf.sh`) keeps it. `exec_always hover-run.sh --replace` stays; with HOVER=0 hover-run stops a running supervisor, removes `*.status.json`/`*.click.json` and exits without a daemon. `hover-tee.py` removes its output's tap files at start (an earlier session's files are never read).
+- `hover-tee.py` taps only `[...]` status lines (the protocol's opening `[` was written as `"status":[`).
+- `hover-run.sh --replace` kills the old group only if `/proc/<pid>/cmdline` names hover-run.sh (daemon.pid holds the supervisor's pid, not the daemon's) and it is not ourselves.
+- Without XDG_RUNTIME_DIR: private `/tmp/custom_barista-$UID` (0700, refused if not our own dir/mode or a symlink), new `scripts/hover/rundir.py` for tee + daemon, same rule in shell in hover-run.sh.
+- Daemon: bar config without `font` falls back to `monospace 8`. Shellcheck -S warning clean on `scripts/*.sh install.sh` (also install.sh:43 one-item loop, test.sh:137 `DISPLAY=`).
+- test.sh: h2b (stale tap files removed, bare `[` not tapped; fake-status `FAKE_STOP=1`), r1-r5 for hover-run.sh with `scripts/testdata/hover/fake-daemon.sh` via `HOVER_DAEMON`/`HOVER_RUN_SLEEP` (backoff 1-16 s + give-up after 6 crashes, exit 0 stops, single instance + --replace, foreign pid left alive, HOVER=0). 169 pass.
+- Live: `install.sh --yes` → 1 daemon, 2 tees, 2 bars, hover on both; popups for keyboard (DP-0, DP-2) and date (DP-2). `HOVER=0 install.sh --yes` + Win+i twice: no tee in bars.conf, no daemon, tap files gone; restored HOVER=1.
