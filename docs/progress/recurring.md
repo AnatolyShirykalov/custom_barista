@@ -71,3 +71,20 @@ test.sh pass=87 fail=0. Smoke config.toml and compact.toml (6 s): no ERR/not fou
 
 ## Dependency updates 2026-11-20
 i3status-rs installed 0.40.1-2 = latest upstream release 0.40.1 (08 Nov; checked via GitHub releases page, gh unauthenticated). No upgrade, no breaking changes to grep. Script deps present: jq, xclip, yad, nvidia-smi (34.56C, 907MiB, format as parsed), xdotool, node, python3 with Xlib and gi (Gtk 3.0, Pango). test.sh pass=107 fail=0. No backlog items.
+
+## 2026-11-20 — Code review + docs (6b97023..a623aab)
+
+Checks: `scripts/test.sh` pass=163 fail=0; `compact.toml` in sync with `gen-compact.sh -`; shellcheck -S warning: claude-usage.sh:53, test.sh:105, hover-run.sh:8 (SC2174). Focus: T1 hover (tee, core, daemon, supervisor, install/barsconf, rows h1-h16), U1d, D5-R. Findings are backlog items (Bar blocks).
+
+| Sev | Where | Problem |
+|---|---|---|
+| medium | install.sh:78, barsconf.sh:13, install.sh:84 | HOVER=0 lost at the next Win+i; daemon still started and reads stale status files |
+| low | hover-tee.py:73 | bare `[` line tapped as invalid status.json (verified) |
+| low | hover-run.sh:12-15 | --replace kills a stale pid's group without checking it |
+| low | hover-run.sh:8, hover-tee.py:30, hover-daemon.py:16 | shared /tmp fallback dir |
+| low | hover-run.sh | no test rows (backoff, give-up, --replace) |
+| low | hover-daemon.py:46 | `conf["font"]` KeyError aborts rediscover |
+| low | claude-usage.sh:53, test.sh:105 | shellcheck SC2034/SC1007 |
+| docs | README.md:9,23; CLAUDE.md:5 | ccusage.sh/npx stale; hover, HOVER=0, python deps, explain.sh missing |
+
+No findings: U1d per-part colours (read from `[theme.overrides]`, padding before markup, width constant), D5-R gen-compact merge rule (drop chains handled), hover state machine and layout (rows h5-h14 against live captures), hover-tee short-write loop and pdeathsig. Last reviewed commit: a623aab.
