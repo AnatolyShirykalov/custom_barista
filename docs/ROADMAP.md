@@ -30,6 +30,8 @@ No agent running. Done recently (2026-11-18, session 2): sound block on pulseaud
 6. [x] **T1c hover daemon**: `hover-daemon.py`, `hover-run.sh`, install.sh `exec_always`, h16; deployed, acceptance 1-9 pass, crops `img/review-hover-*`. Progress: design.md. Needs bar-designer review (T1 review).
 7. [x] **T1 review**: accepted; short-write fix in hover-tee.py, `scripts/spike/` deleted. Q1/Q2 still open. Progress: design.md.
 8. [ ] **T1d remove middle-click popups** (user Q1 B, 2026-11-20): per spec §3.3 move the explain-key mapping to `scripts/hover/keys.toml` (block type + distinguishing field, not block index), daemon reads it, drop button-2 explain.sh clicks from config.toml (compact.toml regenerated), h10 checks keys.toml; drop the backlog item about the tiled yad popup if explain.sh popups are gone; deploy. → `widget-builder`
+9. [ ] **T1e hover hardening** (code review 2026-11-20, backlog "Bar blocks"): medium HOVER=0 lost on Win+i (bars.env, install.sh:78/84, barsconf.sh:13) + stale status files; lows: bare `[` tapped as status.json (hover-tee.py:73), `--replace` pid check (hover-run.sh:12-15), /tmp fallback without XDG_RUNTIME_DIR, hover-run.sh test rows, KeyError on font-less bar (hover-daemon.py:46), shellcheck warnings; move the items from backlog. → `widget-builder`
+10. [ ] **T1f docs**: README.md block/script list (claude-usage.sh, explain.sh, hover files, install.sh, i3/), deps (python-xlib, python-gobject; drop node/npx), hover tooltips + HOVER=0 in README and CLAUDE.md:5 (after T1d). → `chore`
 8. [x] **Recurring: Dependency updates** (last run 2026-11-20; due after U1b, P4, D5-R). → `dep-updater`
 
 ### Background checks
