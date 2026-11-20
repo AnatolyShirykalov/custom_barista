@@ -91,3 +91,6 @@
 - Daemon: bar config without `font` falls back to `monospace 8`. Shellcheck -S warning clean on `scripts/*.sh install.sh` (also install.sh:43 one-item loop, test.sh:137 `DISPLAY=`).
 - test.sh: h2b (stale tap files removed, bare `[` not tapped; fake-status `FAKE_STOP=1`), r1-r5 for hover-run.sh with `scripts/testdata/hover/fake-daemon.sh` via `HOVER_DAEMON`/`HOVER_RUN_SLEEP` (backoff 1-16 s + give-up after 6 crashes, exit 0 stops, single instance + --replace, foreign pid left alive, HOVER=0). 169 pass.
 - Live: `install.sh --yes` → 1 daemon, 2 tees, 2 bars, hover on both; popups for keyboard (DP-0, DP-2) and date (DP-2). `HOVER=0 install.sh --yes` + Win+i twice: no tee in bars.conf, no daemon, tap files gone; restored HOVER=1.
+
+## T1f docs (2026-11-20, chore)
+- README.md: script/file list (claude-usage, claude-rl-tap, explain, hover-*, hover/, install.sh, i3/), deps (python-xlib, python-gobject, curl, flock; node/npx dropped: nothing uses them, also removed from install.sh dep check), new Hover tooltips section. CLAUDE.md:5 got the hover clause + HOVER=0. Backlog line removed.
