@@ -69,4 +69,4 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
-- Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user action, from own GitHub account). asked 2026-11-17
+- Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user action, from own GitHub account). asked 2026-11-17, still pending 2026-11-20
