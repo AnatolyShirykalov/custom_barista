@@ -35,6 +35,7 @@ No agent running. Done recently (2026-11-18, session 2): sound block on pulseaud
 11. [x] **U1c first-run placeholder** (from backlog): fresh user (no statusline tap, empty ~/.cache/claude-usage) → usage block hidden for minutes; show dim `cc …` placeholder until first data. Done: fixture row for empty cache → placeholder, width fixed. → `widget-builder` Done 2026-11-20: see docs/progress/widgets.md.
 12. [x] **Recurring: Git hygiene** (last 2026-11-20; due after T1d-f). → `repo-janitor`
 13. [x] **Recurring: Look/usability pass** (last 2026-11-20; usage popup reflowed, 1 backlog item): screenshot both bars + hover popups; clarity, colours, stable widths, glyphs; findings → backlog. → `bar-designer`
+14. [ ] **Hover: first popup missed once** (look pass 2026-11-20, from backlog): first hover on DP-0 load showed no popup, no log line; retries fine. Done: 20 scripted hovers on both bars all show a popup, or cause found + `test_hover.py` row. → `widget-builder`
 8. [x] **Recurring: Dependency updates** (last run 2026-11-20; due after U1b, P4, D5-R). → `dep-updater`
 
 ### Background checks
