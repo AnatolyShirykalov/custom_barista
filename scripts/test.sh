@@ -107,7 +107,7 @@ if [ "$(head -1 "$gd/cyc.conf" | cut -d" " -f3)" = rs ] && [ "$(grep -c reload "
 then pass=$((pass+1)); else echo "FAIL barcycle: 3 concurrent presses -> $(head -1 "$gd/cyc.conf" | cut -c1-20), reloads $(grep -c reload "$gd/i3msg.log"), stderr: $(head -2 "$gd/cyc.err")"; fail=$((fail+1)); fi
 # hover-tee.py (T1a): h1 stdout byte-identical, h2 stdin forwarded + last click tapped, h3 unwritable tap dir, h4 child dies with the wrapper
 fk=$t/hover/fake-status.sh; hd=$gd/hover; hin=$gd/fake.in
-bash "$fk" >"$gd/h.direct"
+bash "$fk" </dev/null >"$gd/h.direct"
 printf '[\n{"button":1}\n,{"button":9,"x":5}\n' | HOVER_DIR=$hd FAKE_IN=$hin "$d/hover-tee.py" --output DP-0 -- bash "$fk" >"$gd/h.out"; hrc=$?
 cmp -s "$gd/h.direct" "$gd/h.out" && [ $hrc = 3 ] && pass=$((pass+1)) || { echo "FAIL h1: wrapper stdout differs or exit $hrc"; fail=$((fail+1)); }
 printf '[\n{"button":1}\n,{"button":9,"x":5}\n' | cmp -s - "$hin" && [ "$(jq -c .click "$hd/DP-0.click.json")" = '{"button":9,"x":5}' ] && jq -e '.status[0].full_text == "c" and .output == "DP-0"' "$hd/DP-0.status.json" >/dev/null \
@@ -133,4 +133,8 @@ done
 ho=$(python3 "$d/hover/test_hover.py" 2>&1); grep '^FAIL' <<<"$ho"
 hp=$(grep -o '^pass=[0-9]*' <<<"$ho" | cut -d= -f2); hf=$(grep -o 'fail=[0-9]*$' <<<"$ho" | cut -d= -f2)
 [ -n "$hp" ] && { pass=$((pass+hp)); fail=$((fail+hf)); } || { echo "FAIL h5-h14: test_hover.py did not run"; fail=$((fail+1)); }
+# h16: hover daemon selftest (imports, key maps of both configs) without a display
+hs=$(DISPLAY= python3 "$d/hover-daemon.py" --selftest 2>&1); hrc=$?
+[ $hrc = 0 ] && grep -q '^config.toml .*[0-9]:time' <<<"$hs" && grep -q '^compact.toml .*[0-9]:time' <<<"$hs" \
+  && pass=$((pass+1)) || { echo "FAIL h16: hover-daemon.py --selftest rc=$hrc: $(head -c 200 <<<"$hs")"; fail=$((fail+1)); }
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]
