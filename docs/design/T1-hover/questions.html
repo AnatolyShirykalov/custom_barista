@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T1 Hover tooltips: decisions</title>
+<style>
+:root { --bg:#f6f7f9; --fg:#1b1f24; --muted:#5b6470; --card:#fff; --line:#d9dee5; --accent:#2f6fde; --rec:#1f8a4c; --risk:#b25e09; }
+@media (prefers-color-scheme: dark) { :root { --bg:#14171c; --fg:#e6e9ee; --muted:#9aa3ae; --card:#1d2129; --line:#2e3440; --accent:#6ea0ff; --rec:#4cc47e; --risk:#e0a050; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
+main { max-width:1000px; margin:0 auto; padding:24px 16px 64px; }
+h1 { font-size:1.6rem; margin:0 0 4px; }
+h2 { font-size:1.25rem; margin:0 0 8px; }
+.sub { color:var(--muted); margin:0 0 24px; }
+section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin:0 0 20px; }
+img { max-width:100%; height:auto; border-radius:8px; border:1px solid var(--line); display:block; }
+figure { margin:12px 0; }
+figcaption { color:var(--muted); font-size:.9rem; margin-top:4px; }
+.opts { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; }
+.opt { border:1px solid var(--line); border-radius:10px; padding:12px; }
+.opt h3 { margin:0 0 6px; font-size:1rem; }
+.rec { color:var(--rec); font-weight:600; font-size:.85rem; }
+.meta { color:var(--muted); font-size:.85rem; }
+.risk { color:var(--risk); font-size:.85rem; }
+.against { color:var(--muted); font-size:.9rem; margin:6px 0 0; }
+ul { margin:6px 0; padding-left:20px; }
+code { font-size:.9em; }
+label.pick { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); }
+label.pick input { margin-top:5px; transform:scale(1.3); }
+#out { width:100%; min-height:60px; font:14px monospace; }
+</style>
+</head>
+<body>
+<main>
+<h1>T1: Hover tooltips</h1>
+<p class="sub">Your note (2026-11-18): "tooltips must appear on hover (middle-click popup is only a stopgap)". The spec is written with the recommended answers, so the build can start now; these two choices only change a constant or a small cleanup. Answer in the chat with the line at the bottom.</p>
+
+<section>
+<h2>Today</h2>
+<figure><img src="img/today-middleclick-dp2.png" alt="Middle-click popup today: a yad window tiled by i3 over half of DP-2"><figcaption>Middle-click on the clock today: the yad window opens tiled by i3 (half the monitor), with an OK button.</figcaption></figure>
+<figure><img src="img/mock-popup-dp2.png" alt="Mock of the hover popup above the temperature block on DP-2"><figcaption>Planned hover popup (mock, DP-2 right half): above the hovered block, bar font, dim border, no buttons, gone when the pointer leaves.</figcaption></figure>
+</section>
+
+<section>
+<h2>Question 1: keep the middle-click popups once hover works?</h2>
+<div class="opts">
+  <div class="opt">
+    <h3>A. Keep middle-click as a fallback <span class="rec">recommended</span></h3>
+    <figure><img src="img/today-middleclick-dp2.png" alt="yad popup"><figcaption>Unchanged; still there if the hover daemon is down.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">no change; the click entries also tell the daemon which text belongs to which block</span></span>
+  </div>
+  <div class="opt">
+    <h3>B. Remove middle-click popups</h3>
+    <figure><img src="img/mock-popup-dp2.png" alt="hover popup only"><figcaption>Hover is the only way to see the texts.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">one extra mapping file (block → text) to keep in sync, checked by a test</span></span>
+    <p class="against">Why the designer is against B: no help at all while the daemon is down, and the block-to-text mapping moves out of config.toml into a second file.</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Question 2: hover delay before the popup appears</h2>
+<div class="opts">
+  <div class="opt">
+    <h3>A. 500 ms, then instant while sliding along the bar <span class="rec">recommended</span></h3>
+    <figure><img src="img/mock-popup-dp2.png" alt="popup"><figcaption>The usual tooltip delay (GTK's default too). Once one popup shows, neighbours switch with no delay.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">a constant</span></span>
+  </div>
+  <div class="opt">
+    <h3>B. 300 ms</h3>
+    <figure><img src="img/mock-popup-dp2.png" alt="popup"><figcaption>Faster first popup.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">a constant</span></span>
+    <p class="against">Why the designer is against B: popups flash when the pointer only crosses the bar on its way to a window edge or the tray.</p>
+  </div>
+  <div class="opt">
+    <h3>C. 800 ms</h3>
+    <figure><img src="img/mock-popup-dp2.png" alt="popup"><figcaption>Fewer accidental popups.</figcaption></figure>
+    <span class="meta">S &middot; <span class="risk">a constant</span></span>
+    <p class="against">Why the designer is against C: feels sluggish when you do want the text; the instant sliding already cuts repeat waits.</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Picks</h2>
+<label class="pick"><input type="radio" name="q1" value="Q1A" checked><span><b>Q1A keep middle-click</b> <span class="rec">recommended</span><br>Fallback when the daemon is down.<br><span class="meta">S &middot; no change</span></span></label>
+<label class="pick"><input type="radio" name="q1" value="Q1B"><span><b>Q1B remove middle-click</b><br>Hover only.<br><span class="meta">S &middot; extra mapping file</span></span></label>
+<label class="pick"><input type="radio" name="q2" value="Q2A" checked><span><b>Q2A 500 ms</b> <span class="rec">recommended</span><br>Then instant while sliding.<br><span class="meta">S &middot; constant</span></span></label>
+<label class="pick"><input type="radio" name="q2" value="Q2B"><span><b>Q2B 300 ms</b><br><span class="meta">S &middot; constant</span></span></label>
+<label class="pick"><input type="radio" name="q2" value="Q2C"><span><b>Q2C 800 ms</b><br><span class="meta">S &middot; constant</span></span></label>
+</section>
+
+<section>
+<h2>What doesn't change</h2>
+<ul><li>The bars themselves: same blocks, colours, widths and clicks; the daemon only reads them.</li><li>The popup texts: the same ones as the middle-click popups (scripts/explain.sh).</li><li>Win+i still toggles the bars; no popups while they are off.</li></ul>
+</section>
+
+<section>
+<h2>Your answer</h2>
+<p class="meta">Copy this line into the chat (read-only; nothing is saved from this page).</p>
+<textarea id="out" readonly></textarea>
+</section>
+</main>
+<script>
+function upd(){const p=[...document.querySelectorAll('input[type=radio]')];document.getElementById('out').value='T1 picks: '+p.filter(c=>c.checked).map(c=>c.value).join(', ');}
+document.querySelectorAll('input[type=radio]').forEach(c=>c.addEventListener('change',upd));upd();
+</script>
+</body>
+</html>

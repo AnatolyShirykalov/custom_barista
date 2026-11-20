@@ -46,3 +46,9 @@
 ## T1 hover spike (2026-11-20)
 - Spike scripts `scripts/spike/` (tee-wrap.py, edges.py, xbars.py; throwaway, not installed). bars.conf temporarily wrapped, restored, i3 restarted; all spike processes gone.
 - Edge error 0 px on all 13 (DP-0) + 10 (DP-2) pieces, clicks with button 9. Enter/Leave/Motion delivered by python-xlib (dock windows not override-redirect). Verdict go; table and risks in `docs/design/T1-hover/spike.md`. Next: T1 spec (bar-designer).
+
+## T1 hover spec (2026-11-20)
+- `docs/design/T1-hover/spec.md`: option A (tee wrapper writes the latest status line + last click to tmpfs files; separate python-xlib + GTK3 daemon; the wrapper never talks to the daemon, so a daemon crash cannot touch the bar). Against B (own i3status-rs copy: different samples, double API/nvidia-smi calls) and C (hover inside the wrapper: GTK/X failure kills the status line).
+- Findings while specifying: i3status-rs `name` = merge group, `instance` = `<block index>:<widget>`, so the explain key comes from block index → `explain.sh <key>` click cmd in the config named by the wrapper; i3bar WM_NAME `i3bar for output <OUT>` maps windows to bars; `get_bar_config` gives font/padding/separator_symbol (all default now). Middle-click yad popup opens tiled by i3 (backlog item).
+- Defaults: 500 ms delay, instant browse, 150 ms gap grace, popup PragmataPro Mono 16, #1d1d1d bg, theme idle_fg text, info_fg border, 4 px above the block, clamped to the monitor. Self-check against real click edges; short_text / separator_symbol / padding → that bar's hover off.
+- Split into T1a (wrapper), T1b (pure core + fixtures), T1c (daemon, supervisor, install), T1 review. Questions page `docs/design/T1-hover/questions.html` (Q1 middle-click, Q2 delay); mock `img/mock-popup-dp2.png`.

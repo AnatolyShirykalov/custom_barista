@@ -24,8 +24,12 @@ No agent running. Done recently (2026-11-18, session 2): sound block on pulseaud
 
 1. [x] **D5-R regrouping review**: accepted, no deviations; tests 107 pass, all middle-click explains checked on both bars. Detail `docs/progress/design.md`.
 2. [x] **T1 hover tooltips spike**: go. Computed edges = click-reported edges (0 px, both bars); python-xlib gets Enter/Leave/Motion on i3bar windows, no polling. `docs/design/T1-hover/spike.md`, scripts `scripts/spike/`.
-3. [ ] **T1 spec** (top): hover daemon (tee status_command wrapper, Pango edges, GTK popup with explain.sh text after ~600 ms; tray/Win+i/short_text risks in spike.md). → `bar-designer`
-4. [ ] **Recurring: Dependency updates** (last run never; due after U1b, P4, D5-R). → `dep-updater`
+3. [x] **T1 spec**: `docs/design/T1-hover/spec.md` (tee wrapper + separate hover daemon, 500 ms, GTK popup above the block, explain.sh text); questions page `questions.html` (Q1 middle-click, Q2 delay; defaults let the build start).
+4. [ ] **T1a hover wrapper**: `hover-tee.py` status_command pass-through + tap files, barsconf wiring, `HOVER=0` fallback, rows h1-h4, h15 (spec §7). → `widget-builder`
+5. [ ] **T1b hover core**: `hover/layout.py` + `hover/state.py`, live fixtures, rows h5-h14 (spec §7). → `widget-builder`
+6. [ ] **T1c hover daemon**: `hover-daemon.py`, `hover-run.sh`, install.sh `exec_always`, h16, acceptance 1-9 (spec §6-7). → `widget-builder`
+7. [ ] **T1 review**: review mode against `docs/design/T1-hover/spec.md`, delete `scripts/spike/`. → `bar-designer`
+8. [ ] **Recurring: Dependency updates** (last run never; due after U1b, P4, D5-R). → `dep-updater`
 
 ### Background checks
 
@@ -67,4 +71,5 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
+- T1 hover choices `docs/design/T1-hover/questions.html`: Q1 keep middle-click popups (rec A keep), Q2 hover delay (rec 500 ms). asked 2026-11-20
 - Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user action, from own GitHub account). asked 2026-11-17

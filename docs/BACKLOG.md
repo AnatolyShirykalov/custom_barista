@@ -10,3 +10,4 @@ _(empty: add new items here)_
 
 - [ ] **U1c first-run placeholder**: on a fresh user (no statusline tap, empty ~/.cache/claude-usage) the usage block stays hidden for minutes until the first API poll lands (seen for anatolii 2026-11-18); show a dim `cc …` placeholder instead of hiding while no data has been fetched yet. Done: fixture row for empty cache → placeholder, width fixed. → `widget-builder`
 - [ ] **install.sh stale deps**: drop `node`/`npx` from the dependency warnings (ccusage removed in U1). Done: no node/npx check, test.sh green. → `widget-builder`
+- [ ] **Middle-click popup tiled**: `explain.sh`'s yad window opens tiled by i3 (half of DP-2 with an OK button, seen 2026-11-20 in T1 spec, `docs/design/T1-hover/img/today-middleclick-dp2.png`), not a small floating box; add an i3 `for_window` floating rule (or yad `--class` + rule) so it pops at the pointer. Moot if T1 Q1 = B. Done: popup floats near the pointer on both bars. → `widget-builder`
