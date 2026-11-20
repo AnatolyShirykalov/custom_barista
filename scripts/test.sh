@@ -93,7 +93,7 @@ for st in barista rs off; do  # barista = migrated to rs
   BARS_ENV=$gd/bars.env "$d/barsconf.sh" $st >"$gd/bars.conf" || { echo "FAIL bars $st: generator"; fail=$((fail+1)); continue; }
   n=$(grep -c 'tray_output DP-0' "$gd/bars.conf"); tb=$(grep -B8 'tray_output DP-0' "$gd/bars.conf" | grep -c 'id bar-main')
   docks=$(grep -c 'mode dock' "$gd/bars.conf"); wd=2; [ $st = off ] && wd=0
-  rs=$(grep -c 'status_command i3status-rs /x/conf/' "$gd/bars.conf"); wr=2
+  rs=$(grep -cE 'status_command (.*hover-tee.py --output DP-[02] -- )?i3status-rs /x/conf/' "$gd/bars.conf"); wr=2
   if [ "$(grep -c '^bar {' "$gd/bars.conf")" = 2 ] && [ "$n$tb" = 11 ] && [ "$docks" = $wd ] && [ "$rs" = $wr ] && ! grep -q @ "$gd/bars.conf" \
      && { ! command -v i3 >/dev/null || { echo "include $gd/bars.conf" >"$gd/i3cfg"; i3 -C -c "$gd/i3cfg" >/dev/null 2>&1; }; }
   then pass=$((pass+1)); else echo "FAIL bars $st: tray on bar-main $n/$tb, dock $docks/$wd, rs commands $rs/$wr or i3 -C"; fail=$((fail+1)); fi
@@ -105,6 +105,25 @@ BARS_ENV=$gd/bars.env "$d/barsconf.sh" off >"$gd/cyc.conf"
 for i in 1 2 3; do PATH=$gd/bin:$PATH BARS_ENV=$gd/bars.env BARCYCLE_SETTLE=0 "$d/barcycle.sh" 2>>"$gd/cyc.err" & done; wait
 if [ "$(head -1 "$gd/cyc.conf" | cut -d" " -f3)" = rs ] && [ "$(grep -c reload "$gd/i3msg.log")" = 3 ] && [ ! -s "$gd/cyc.err" ]
 then pass=$((pass+1)); else echo "FAIL barcycle: 3 concurrent presses -> $(head -1 "$gd/cyc.conf" | cut -c1-20), reloads $(grep -c reload "$gd/i3msg.log"), stderr: $(head -2 "$gd/cyc.err")"; fail=$((fail+1)); fi
+# hover-tee.py (T1a): h1 stdout byte-identical, h2 stdin forwarded + last click tapped, h3 unwritable tap dir, h4 child dies with the wrapper
+fk=$t/hover/fake-status.sh; hd=$gd/hover; hin=$gd/fake.in
+bash "$fk" >"$gd/h.direct"
+printf '[\n{"button":1}\n,{"button":9,"x":5}\n' | HOVER_DIR=$hd FAKE_IN=$hin "$d/hover-tee.py" --output DP-0 -- bash "$fk" >"$gd/h.out"; hrc=$?
+cmp -s "$gd/h.direct" "$gd/h.out" && [ $hrc = 3 ] && pass=$((pass+1)) || { echo "FAIL h1: wrapper stdout differs or exit $hrc"; fail=$((fail+1)); }
+printf '[\n{"button":1}\n,{"button":9,"x":5}\n' | cmp -s - "$hin" && [ "$(jq -c .click "$hd/DP-0.click.json")" = '{"button":9,"x":5}' ] && jq -e '.status[0].full_text == "c" and .output == "DP-0"' "$hd/DP-0.status.json" >/dev/null \
+  && pass=$((pass+1)) || { echo "FAIL h2: stdin forwarding or tap files"; fail=$((fail+1)); }
+HOVER_DIR=/proc/nope "$d/hover-tee.py" --output DP-0 -- bash "$fk" </dev/null >"$gd/h3.out" 2>/dev/null; hrc=$?
+cmp -s "$gd/h.direct" "$gd/h3.out" && [ $hrc = 3 ] && pass=$((pass+1)) || { echo "FAIL h3: unwritable tap dir, exit $hrc"; fail=$((fail+1)); }
+printf '#!/bin/sh\nsleep 4\n' >"$gd/hsleep"; chmod +x "$gd/hsleep"
+{ (sleep 4 | HOVER_DIR=$hd "$d/hover-tee.py" --output DP-0 -- "$gd/hsleep" >/dev/null 2>&1) & } 2>/dev/null; sleep 0.5
+hw=$(pgrep -f "[h]over-tee.py --output DP-0 -- $gd/hsleep"); kill -9 $hw; sleep 1
+pgrep -f "[ ]$gd/hsleep" >/dev/null && { echo "FAIL h4: child survived wrapper kill"; fail=$((fail+1)); pkill -f "[ ]$gd/hsleep"; } || pass=$((pass+1))
+# h15: both states wrap both commands with the outputs of the template; HOVER=0 gives plain commands
+for st in rs off; do BARS_ENV=$gd/bars.env "$d/barsconf.sh" $st | grep status_command >"$gd/h15.$st"; done
+printf 'CONFDIR=/x/conf\nHOVER=0\n' >"$gd/bars0.env"; BARS_ENV=$gd/bars0.env "$d/barsconf.sh" rs | grep status_command >"$gd/h15.0"
+grep -q "hover-tee.py --output DP-0 -- i3status-rs /x/conf/config.toml" "$gd/h15.rs" && grep -q "hover-tee.py --output DP-2 -- i3status-rs /x/conf/compact.toml" "$gd/h15.rs" \
+  && cmp -s "$gd/h15.rs" "$gd/h15.off" && ! grep -q hover-tee "$gd/h15.0" && grep -q 'status_command i3status-rs /x/conf/config.toml' "$gd/h15.0" \
+  && pass=$((pass+1)) || { echo "FAIL h15: barsconf wrapping"; fail=$((fail+1)); }
 # explain.sh: every middle-click name used in config.toml has a text of at most 6 lines
 for n in $(grep -o 'explain\.sh [a-z]*' "$d/../config.toml" | cut -d' ' -f2); do
   o=$(EXPLAIN_DRY=1 "$d/explain.sh" $n 2>&1); [ -n "$o" ] && [ "$(wc -l <<<"$o")" -le 6 ] && pass=$((pass+1)) || { echo "FAIL explain $n"; fail=$((fail+1)); }

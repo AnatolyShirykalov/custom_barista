@@ -9,6 +9,11 @@ d=$(cd "$(dirname "$0")" && pwd)
 rsfont='font pango:PragmataPro Mono, Symbols Nerd Font Mono 18'
 st=${1:-}; [ "$st" = barista ] && st=rs  # migration: the removed Go bar's saved state
 mc="i3status-rs $CONFDIR/config.toml"; sc="i3status-rs $CONFDIR/compact.toml"; f=$rsfont
+# T1 hover: wrap the status commands in the tap wrapper (outputs read from the template); HOVER=0 or no python3 = plain
+if [ "${HOVER:-1}" != 0 ] && command -v python3 >/dev/null; then
+  read -r mo so < <(awk '$1 == "output" { printf "%s ", $2 } END { print "" }' "$d/../i3/bars.conf.tmpl")
+  mc="$d/hover-tee.py --output $mo -- $mc"; sc="$d/hover-tee.py --output $so -- $sc"
+fi
 case $st in
   rs)  m=dock ;;
   off) m=invisible ;;

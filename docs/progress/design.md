@@ -52,3 +52,9 @@
 - Findings while specifying: i3status-rs `name` = merge group, `instance` = `<block index>:<widget>`, so the explain key comes from block index → `explain.sh <key>` click cmd in the config named by the wrapper; i3bar WM_NAME `i3bar for output <OUT>` maps windows to bars; `get_bar_config` gives font/padding/separator_symbol (all default now). Middle-click yad popup opens tiled by i3 (backlog item).
 - Defaults: 500 ms delay, instant browse, 150 ms gap grace, popup PragmataPro Mono 16, #1d1d1d bg, theme idle_fg text, info_fg border, 4 px above the block, clamped to the monitor. Self-check against real click edges; short_text / separator_symbol / padding → that bar's hover off.
 - Split into T1a (wrapper), T1b (pure core + fixtures), T1c (daemon, supervisor, install), T1 review. Questions page `docs/design/T1-hover/questions.html` (Q1 middle-click, Q2 delay); mock `img/mock-popup-dp2.png`.
+
+## T1a hover wrapper (2026-11-20, widget-builder)
+- `scripts/hover-tee.py` pass-through (writes line to stdout first, then taps `<dir>/<OUT>.status.json` / `.click.json`, atomic, tap errors pause 60 s); `barsconf.sh` wraps both commands, outputs read from the `output` lines of `i3/bars.conf.tmpl` (no template change); `HOVER=0` in bars.env or no python3 = plain commands. `testdata/hover/fake-status.sh` fixture.
+- test.sh rows h1-h4, h15 added (existing bars-state row regex extended for the wrapper); 112 pass, 0 fail.
+- Live: both bars run through the wrapper, no ERR/Critical blocks, status files update each second, button-9 xdotool clicks on both bars reach i3status-rs and land in `.click.json`.
+- Not done (T1b/T1c): layout, state machine, daemon, hover-run.sh, install.sh exec_always.
