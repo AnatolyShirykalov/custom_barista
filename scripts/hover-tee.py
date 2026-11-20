@@ -67,7 +67,9 @@ def main():
     threading.Thread(target=pump_in, daemon=True).start()
     fd = sys.stdout.fileno()
     for line in iter(p.stdout.readline, b""):
-        os.write(fd, line)
+        mv = memoryview(line)
+        while mv:  # a signal (i3bar's SIGSTOP) can cut a blocking pipe write short: write the rest
+            mv = mv[os.write(fd, mv):]
         if line.startswith((b"[", b",[")):
             s = line.decode(errors="replace").strip().rstrip(",")
             if s.startswith(","):
