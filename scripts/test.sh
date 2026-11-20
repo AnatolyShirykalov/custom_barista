@@ -129,4 +129,8 @@ for n in $(grep -o 'explain\.sh [a-z]*' "$d/../config.toml" | cut -d' ' -f2); do
   o=$(EXPLAIN_DRY=1 "$d/explain.sh" $n 2>&1); [ -n "$o" ] && [ "$(wc -l <<<"$o")" -le 6 ] && pass=$((pass+1)) || { echo "FAIL explain $n"; fail=$((fail+1)); }
 done
 [ "$(grep -c 'explain\.sh' "$d/../config.toml")" == "$(grep -c '^\[\[block\]\]' "$d/../config.toml")" ] && pass=$((pass+1)) || { echo "FAIL explain: block without middle-click explanation"; fail=$((fail+1)); }
+# hover core (T1b): rows h5-h14 in test_hover.py add their counts to ours
+ho=$(python3 "$d/hover/test_hover.py" 2>&1); grep '^FAIL' <<<"$ho"
+hp=$(grep -o '^pass=[0-9]*' <<<"$ho" | cut -d= -f2); hf=$(grep -o 'fail=[0-9]*$' <<<"$ho" | cut -d= -f2)
+[ -n "$hp" ] && { pass=$((pass+hp)); fail=$((fail+hf)); } || { echo "FAIL h5-h14: test_hover.py did not run"; fail=$((fail+1)); }
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]

@@ -58,3 +58,9 @@
 - test.sh rows h1-h4, h15 added (existing bars-state row regex extended for the wrapper); 112 pass, 0 fail.
 - Live: both bars run through the wrapper, no ERR/Critical blocks, status files update each second, button-9 xdotool clicks on both bars reach i3status-rs and land in `.click.json`.
 - Not done (T1b/T1c): layout, state machine, daemon, hover-run.sh, install.sh exec_always.
+
+## T1b hover core (2026-11-20)
+- Files: `scripts/hover/layout.py` (edge maths promoted from `spike/edges.py`: Pango text width, min_width int/string, border, tray, regions, hit, `explain_keys` via tomllib, `bar_supported`, `place`), `scripts/hover/state.py` (injected-clock machine: `over/leave/click/unmapped/tick`, actions show/move/hide, `deadline`), `scripts/hover/test_hover.py` (rows h5-h14, called from `test.sh`, counts added).
+- Fixtures `scripts/testdata/hover/dp0.json`, `dp2.json`: one sample per piece (status line + click-reported edges from button-9 clicks via the T1a tap files; tray 3 on DP-0, 0 on DP-2). Edge error: 0 px for all 23 pieces (13 + 10), computed with Pango without a display.
+- Findings: `name` is the merge group, `instance` `<n>:` is the config block index (spec holds; sound = two pieces sharing 12). `bar_supported` takes the status too (short_text check merged into it). The state machine applies the 300 ms browse window after Leave/tray/unmapped, not after a grace-timer hide; a click keeps suppression across gaps and clears it on tray/Leave.
+- Open for T1c: the daemon must call `over(k, now)` after `enter()`; font/DPI/padding/separator come from i3 bar config (`layout` takes the font string without `pango:`). `test.sh` total now 162.

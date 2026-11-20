@@ -26,7 +26,7 @@ No agent running. Done recently (2026-11-18, session 2): sound block on pulseaud
 2. [x] **T1 hover tooltips spike**: go. Computed edges = click-reported edges (0 px, both bars); python-xlib gets Enter/Leave/Motion on i3bar windows, no polling. `docs/design/T1-hover/spike.md`, scripts `scripts/spike/`.
 3. [x] **T1 spec**: `docs/design/T1-hover/spec.md` (tee wrapper + separate hover daemon, 500 ms, GTK popup above the block, explain.sh text); questions page `questions.html` (Q1 middle-click, Q2 delay; defaults let the build start).
 4. [x] **T1a hover wrapper**: `hover-tee.py` pass-through + tap files, barsconf wiring, `HOVER=0` fallback, rows h1-h4, h15; deployed, both bars run through it. Needs bar-designer review (in T1 review).
-5. [ ] **T1b hover core**: `hover/layout.py` + `hover/state.py`, live fixtures, rows h5-h14 (spec §7). → `widget-builder`
+5. [x] **T1b hover core**: `scripts/hover/{layout,state,test_hover}.py`, live fixtures `testdata/hover/dp{0,2}.json`; rows h5-h14 green (23 pieces, 0 px vs clicks). Progress: design.md.
 6. [ ] **T1c hover daemon**: `hover-daemon.py`, `hover-run.sh`, install.sh `exec_always`, h16, acceptance 1-9 (spec §6-7). → `widget-builder`
 7. [ ] **T1 review**: review mode against `docs/design/T1-hover/spec.md`, delete `scripts/spike/`. → `bar-designer`
 8. [x] **Recurring: Dependency updates** (last run 2026-11-20; due after U1b, P4, D5-R). → `dep-updater`
