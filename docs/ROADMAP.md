@@ -29,7 +29,7 @@ No agent running. Done recently (2026-11-18, session 2): sound block on pulseaud
 5. [ ] **T1b hover core**: `hover/layout.py` + `hover/state.py`, live fixtures, rows h5-h14 (spec §7). → `widget-builder`
 6. [ ] **T1c hover daemon**: `hover-daemon.py`, `hover-run.sh`, install.sh `exec_always`, h16, acceptance 1-9 (spec §6-7). → `widget-builder`
 7. [ ] **T1 review**: review mode against `docs/design/T1-hover/spec.md`, delete `scripts/spike/`. → `bar-designer`
-8. [ ] **Recurring: Dependency updates** (last run never; due after U1b, P4, D5-R). → `dep-updater`
+8. [x] **Recurring: Dependency updates** (last run 2026-11-20; due after U1b, P4, D5-R). → `dep-updater`
 
 ### Background checks
 
@@ -47,7 +47,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 | Context diet | `context-auditor` | tools, MCP servers, connectors, plugins, skills, user agents loaded here but unused/unrelated; context cost; main session asks the user which to disable per project, applies, checks `/context` | 2026-11-17 (set up) |
 | Git hygiene | `repo-janitor` | anything tracked that shouldn't be (build output, logs, dumps, caches, large binaries, local config, secrets); `.gitignore` gaps; safe `git rm --cached` | 2026-11-17 |
 | Backlog tidy | `chore` | monthly: drop or merge stale, superseded or duplicate backlog items, check each still has an agent and a done condition; never touch the roadmap's queue | 2026-11-17 |
-| Dependency updates | `dep-updater` | i3status-rs installed vs latest release, changelog breaking config changes grep'd in config.toml/scripts, script deps (jq, xclip, yad, nvidia-smi, xdotool, node) present and formats unchanged; fix keys, backlog the rest | never |
+| Dependency updates | `dep-updater` | i3status-rs installed vs latest release, changelog breaking config changes grep'd in config.toml/scripts, script deps (jq, xclip, yad, nvidia-smi, xdotool, node) present and formats unchanged; fix keys, backlog the rest | 2026-11-20 |
 | Look/usability pass | `bar-designer` | screenshot the bar; clarity, colors, stable widths, glyphs render; findings → backlog | 2026-11-17 |
 | Widget health | `chore` | every block shows real data on this machine: `bash scripts/test.sh`, smoke `(sleep 6) \| timeout 6 i3status-rs $PWD/config.toml` (and compact.toml), grep `ERR`/`not found`/`error`; after system upgrades check nvidia-smi, hwmon, pulse, sysfs formats; failures → backlog for `widget-builder` | 2026-11-18 |
 | Code review + docs | `code-reviewer` | review diffs since last run; README block list and CLAUDE.md match the code | 2026-11-17 |

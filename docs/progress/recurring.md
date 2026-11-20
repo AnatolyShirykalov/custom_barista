@@ -68,3 +68,6 @@ Recurring table: Dependency updates and Widget health rewritten for rs; Widget h
 
 ## Widget health 2026-11-18
 test.sh pass=87 fail=0. Smoke config.toml and compact.toml (6 s): no ERR/not found/error. All blocks show plausible data: kbd US, load, temp 60-71C, cpu, mem 85GB, disk 595GB, io, gpu 33C/1.1GB (nvidia-smi 0%, 33.22C, 1013MiB matches), net, sound 100% (pactl 100%, pulseaudio driver ok), claude-usage 57% $69.1 cache 96%, clip, clock. hwmon0-9 present; no battery supply, block hidden. No failures, no backlog items.
+
+## Dependency updates 2026-11-20
+i3status-rs installed 0.40.1-2 = latest upstream release 0.40.1 (08 Nov; checked via GitHub releases page, gh unauthenticated). No upgrade, no breaking changes to grep. Script deps present: jq, xclip, yad, nvidia-smi (34.56C, 907MiB, format as parsed), xdotool, node, python3 with Xlib and gi (Gtk 3.0, Pango). test.sh pass=107 fail=0. No backlog items.
