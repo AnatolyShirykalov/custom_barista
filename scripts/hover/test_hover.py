@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# T1 hover core unit rows h5-h14 (headless); prints FAIL lines and `pass=N fail=M`, called by test.sh.
+# T1 hover core unit rows h5-h14, h17 (headless); prints FAIL lines and `pass=N fail=M`, called by test.sh.
 import json, os, subprocess, sys
 here = os.path.dirname(os.path.abspath(__file__)); repo = os.path.dirname(os.path.dirname(here))
 sys.path.insert(0, here)
@@ -105,6 +105,20 @@ check("h13", h.over(1, 600, relayout=True) == [("move", 1)] and h.over(2, 700, r
 pl = lambda cx, **kw: layout.place(cx, 400, 100, 0, 2560, 1566, 34, kw.get("pos", "bottom"))
 check("h14", pl(1000) == (800, 1462) and pl(50) == (4, 1462) and pl(2550) == (2560 - 4 - 400, 1462)
       and pl(1000, pos="top") == (800, 1566 + 34 + 4), f"{pl(1000)} {pl(50)} {pl(2550)}")
+
+# h17: an X event that a timer handler's request reply moved into Xlib's queue is handled by that handler
+# (the fd watch never fires for it: the first hover's Enter was lost until the next motion)
+import importlib.util
+sp = importlib.util.spec_from_file_location("hover_daemon", f"{repo}/scripts/hover-daemon.py")
+hd = importlib.util.module_from_spec(sp); sp.loader.exec_module(hd)
+class FakeX:
+    def __init__(self, q): self.q = q
+    def pending_events(self): return len(self.q)
+    def next_event(self): return self.q.pop(0)
+dm = hd.Daemon.__new__(hd.Daemon); dm.d, dm.bars, dm.tick_src, seen = FakeX(["enter"]), {}, None, []
+dm.event, hd.log = seen.append, lambda *a: None
+dm.tick()
+check("h17", seen == ["enter"] and not dm.d.q, f"queued after tick: {dm.d.q}")
 
 print(f"pass={pas} fail={fail}")
 sys.exit(1 if fail else 0)

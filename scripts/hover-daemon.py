@@ -240,6 +240,7 @@ class Daemon:
                 if g != (b.x, b.y, b.w, b.h, b.tray_n):
                     self.relayout(b, force=True)
         self.d.flush()
+        self.drain("rediscover")
         self.schedule()
         return True
 
@@ -251,14 +252,25 @@ class Daemon:
     def on_x(self, fd, cond):
         if cond & (GLib.IO_HUP | GLib.IO_ERR):
             log("X connection lost"); Gtk.main_quit(); return False
-        try:
-            while self.d.pending_events():
-                e = self.d.next_event()
-                self.guard(self.event, e, None)
-        except (error.ConnectionClosedError, BrokenPipeError):
-            log("X connection closed"); Gtk.main_quit(); return False
+        if self.drain() is None:
+            return False
         self.guard(self.schedule, None)
         return True
+
+    def drain(self, where=None):
+        """Handle every queued X event. Any reply read (query_pointer, get_geometry, ...) also moves events that
+        arrived meanwhile into Xlib's queue, where the fd watch never sees them: timer handlers drain too.
+        Number of events handled, None if the connection is gone; `where` (a timer) logs a non-empty drain."""
+        n = 0
+        try:
+            while self.d.pending_events():
+                e = self.d.next_event(); n += 1
+                self.guard(self.event, e, None)
+        except (error.ConnectionClosedError, BrokenPipeError):
+            log("X connection closed"); Gtk.main_quit(); return None
+        if n and where:
+            log(f"{where}: {n} queued X events handled")
+        return n
 
     def event(self, e):
         now = ms()
@@ -313,6 +325,7 @@ class Daemon:
             if b.hv.shown is not None or b.hv.armed is not None:
                 self.relayout(b); self.click(b, now)
             self.apply(b, b.hv.tick(now))
+        self.drain("tick" if DEBUG else None)   # common (a Leave read by relayout's query_pointer)
         self.schedule()
         return False
 

@@ -23,7 +23,7 @@ Running: no agent. Done recently: 2026-11-22 install.sh config.local move. (2026
 ### Queued next (one agent each, in order)
 
 1. [x] **install.sh → ~/.config/i3/config.local** (2026-11-22, commit below): `scripts/i3block.sh` writes the block (symlink-safe, `~` paths), ~/.i3/config only warned about, test.sh i1-i4. Remains: anatolii reruns install.sh (adds the missing hover-run line). Note: `docs/progress/install.md`.
-2. [ ] **Hover: first popup missed once** (look pass 2026-11-20, from backlog): first hover on DP-0 load showed no popup, no log line; retries fine. Done: 20 scripted hovers on both bars all show a popup, or cause found + `test_hover.py` row. → `widget-builder`
+2. [x] **Hover: first popup missed once** (2026-11-22, commit below): not reproduced in 298 scripted hovers; cause found (X events stranded in python-xlib's queue by timer requests), timers now drain, test_hover h17, rediscover log line. Detail: `docs/progress/design.md`.
 3. [ ] **Recurring: Context diet** (last 2026-11-17): list unused tools/MCP/plugins/skills with cost; main session asks the user (AskUserQuestion multiSelect), applies to `.claude/settings.local.json`. → `context-auditor`
 4. [ ] **Recurring: Backlog tidy** (last 2026-11-17): backlog nearly empty; resolve the byte-identical `docs/design/D5-bar-review/img/f5-p4-dp{0,2}.png` note (keep one, fix references). → `chore`
 5. [ ] **Recurring: Agent roster** (last 2026-11-18): evidence this session: widget-builder ran spike + builds + docs fine; code-reviewer could not write (main session did); no gaps seen. → `agent-curator`

@@ -94,3 +94,9 @@
 
 ## T1f docs (2026-11-20, chore)
 - README.md: script/file list (claude-usage, claude-rl-tap, explain, hover-*, hover/, install.sh, i3/), deps (python-xlib, python-gobject, curl, flock; node/npx dropped: nothing uses them, also removed from install.sh dep check), new Hover tooltips section. CLAUDE.md:5 got the hover clause + HOVER=0. Backlog line removed.
+
+## Hover: first popup missed once (2026-11-22, widget-builder)
+- Symptom (look pass 2026-11-20): the first hover, on the DP-0 load block, showed no popup and logged nothing; a retry worked.
+- Not reproduced: 48 hovers right after `i3-msg restart` (both bars, waits 0.5-5 s; each one a fresh daemon's first popup) and 250 hovers without restart, all popups up (latency 503-510 ms, first popup included). Scripts: xdotool warp + Xlib check for the daemon's mapped override-redirect window.
+- Cause found in the code: python-xlib moves events that arrive while a request waits for its reply (query_pointer, get_geometry, query_tree) into its own queue; the GLib fd watch never fires for them, so they sat there until the next X event. The timers did such requests: rediscover (every 10 s) could swallow the first Enter of a pointer that then rests (a xdotool warp: no further motion), tick (relayout's query_pointer) swallowed a Leave on 22 of the first ~70 hovers measured with a log line.
+- Fix (`scripts/hover-daemon.py`): `drain()` (the on_x loop) also runs at the end of `tick()` and `rediscover()`. A rediscover drain that finds events logs `rediscover: N queued X events handled` (tick drains only with HOVER_DEBUG: common). test_hover.py h17 (fails on the old daemon). test.sh pass=176 fail=0; deployed, both bars i3status-rs, smoke of both configs clean.
