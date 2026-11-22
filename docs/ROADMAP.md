@@ -18,16 +18,14 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-Running: no agent. Done recently: 2026-11-22 install.sh config.local move. (2026-11-20, session 3): D5-R review accepted; hover tooltips T1 (spike, spec, wrapper, core, daemon, review), middle-click popups removed (T1d), hover hardening from code review (T1e), README/CLAUDE.md docs (T1f); usage `cc …` first-run placeholder (U1c); recurring dep updates, code review, git hygiene, look pass. Earlier: 2026-11-18 i3status-rust switch, usage block U1/U1d, D5 regroup. Archive: `docs/roadmap-archive/2026-11.md`.
+No agent running. Done recently (2026-11-22, session 4): install.sh writes i3 lines to ~/.config/i3/config.local (setup repo owns ~/.i3/config; verified both users), hover first-popup fix (X queue drain), recurring widget health, backlog tidy, agent roster, context diet (chrome + gopls off). (2026-11-20, session 3): D5-R review accepted; hover tooltips T1 (spike, spec, wrapper, core, daemon, review), middle-click popups removed (T1d), hover hardening from code review (T1e), README/CLAUDE.md docs (T1f); usage `cc …` first-run placeholder (U1c); recurring dep updates, code review, git hygiene, look pass. Earlier: 2026-11-18 i3status-rust switch, usage block U1/U1d, D5 regroup. Archive: `docs/roadmap-archive/2026-11.md`.
 
 ### Queued next (one agent each, in order)
 
-1. [x] **install.sh → ~/.config/i3/config.local** (2026-11-22, commit below): `scripts/i3block.sh` writes the block (symlink-safe, `~` paths), ~/.i3/config only warned about, test.sh i1-i4. Remains: anatolii reruns install.sh (adds the missing hover-run line). Note: `docs/progress/install.md`.
-2. [x] **Hover: first popup missed once** (2026-11-22, commit below): not reproduced in 298 scripted hovers; cause found (X events stranded in python-xlib's queue by timer requests), timers now drain, test_hover h17, rediscover log line. Detail: `docs/progress/design.md`.
-3. [x] **Recurring: Context diet** (last 2026-11-17): list unused tools/MCP/plugins/skills with cost; main session asks the user (AskUserQuestion multiSelect), applies to `.claude/settings.local.json`. → `context-auditor`
-4. [x] **Recurring: Backlog tidy** (last 2026-11-22): backlog empty; duplicate f5-p4 image merged into `f5-p4.png`. → `chore`
-5. [x] **Recurring: Agent roster** (last 2026-11-22): code-reviewer hands findings back (no write tools), widget-builder told config.local not ~/.i3/config. → `agent-curator`
-6. [x] **Recurring: Widget health** (last 2026-11-22): after hover wrapper + U1c; smoke both configs through hover-tee, grep ERR/error. → `chore`
+1. [ ] **Recurring: Code review + docs** (last 2026-11-20): review 60bc4a6 (install.sh/i3block.sh config.local), 58750f0 (hover-daemon drain), 7211676 (agent files); README/CLAUDE.md match. Reviewer has no write tools: main session writes the note. → `code-reviewer`
+2. [ ] **Recurring: Git hygiene** (last 2026-11-20): check `config.local.bak-*`/install backups never land in the repo; .gitignore gaps. → `repo-janitor`
+3. [ ] **Recurring: Dependency updates** (last 2026-11-20): i3status-rs release, python-xlib (hover drain relies on pending_events/next_event behaviour). → `dep-updater`
+4. [ ] **Recurring: Look/usability pass** (last 2026-11-20): both bars + hover popups for both users (anatolii uses usage API fallback, no statusline tap). → `bar-designer`
 
 ### Background checks
 
@@ -70,4 +68,4 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
-- Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user action, from own GitHub account). asked 2026-11-17, still pending 2026-11-20
+- Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user action, from own GitHub account). asked 2026-11-17, still pending 2026-11-22
