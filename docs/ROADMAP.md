@@ -24,7 +24,7 @@ Running: no agent. Done recently: 2026-11-22 install.sh config.local move. (2026
 
 1. [x] **install.sh → ~/.config/i3/config.local** (2026-11-22, commit below): `scripts/i3block.sh` writes the block (symlink-safe, `~` paths), ~/.i3/config only warned about, test.sh i1-i4. Remains: anatolii reruns install.sh (adds the missing hover-run line). Note: `docs/progress/install.md`.
 2. [x] **Hover: first popup missed once** (2026-11-22, commit below): not reproduced in 298 scripted hovers; cause found (X events stranded in python-xlib's queue by timer requests), timers now drain, test_hover h17, rediscover log line. Detail: `docs/progress/design.md`.
-3. [ ] **Recurring: Context diet** (last 2026-11-17): list unused tools/MCP/plugins/skills with cost; main session asks the user (AskUserQuestion multiSelect), applies to `.claude/settings.local.json`. → `context-auditor`
+3. [x] **Recurring: Context diet** (last 2026-11-17): list unused tools/MCP/plugins/skills with cost; main session asks the user (AskUserQuestion multiSelect), applies to `.claude/settings.local.json`. → `context-auditor`
 4. [x] **Recurring: Backlog tidy** (last 2026-11-22): backlog empty; duplicate f5-p4 image merged into `f5-p4.png`. → `chore`
 5. [x] **Recurring: Agent roster** (last 2026-11-22): code-reviewer hands findings back (no write tools), widget-builder told config.local not ~/.i3/config. → `agent-curator`
 6. [x] **Recurring: Widget health** (last 2026-11-22): after hover wrapper + U1c; smoke both configs through hover-tee, grep ERR/error. → `chore`
@@ -42,7 +42,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 | Check | Agent | What | Last run |
 |---|---|---|---|
 | Agent roster | `agent-curator` | revise `.claude/agents/*`: tighten, split, merge, add specialists for upcoming work no agent fits, retire unused; evidence from recent reports and items that lacked a specialist | 2026-11-22 |
-| Context diet | `context-auditor` | tools, MCP servers, connectors, plugins, skills, user agents loaded here but unused/unrelated; context cost; main session asks the user which to disable per project, applies, checks `/context` | 2026-11-17 (set up) |
+| Context diet | `context-auditor` | tools, MCP servers, connectors, plugins, skills, user agents loaded here but unused/unrelated; context cost; main session asks the user which to disable per project, applies, checks `/context` | 2026-11-22 |
 | Git hygiene | `repo-janitor` | anything tracked that shouldn't be (build output, logs, dumps, caches, large binaries, local config, secrets); `.gitignore` gaps; safe `git rm --cached` | 2026-11-20 |
 | Backlog tidy | `chore` | monthly: drop or merge stale, superseded or duplicate backlog items, check each still has an agent and a done condition; never touch the roadmap's queue | 2026-11-22 |
 | Dependency updates | `dep-updater` | i3status-rs installed vs latest release, changelog breaking config changes grep'd in config.toml/scripts, script deps (jq, xclip, yad, nvidia-smi, xdotool, node) present and formats unchanged; fix keys, backlog the rest | 2026-11-20 |

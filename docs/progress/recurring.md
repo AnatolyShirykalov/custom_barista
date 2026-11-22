@@ -119,3 +119,7 @@ Screenshots of both bars + 8 hover popups (DP-0 load, net, usage, clock; DP-2 fr
 - Evidence since 2026-11-18: widget-builder (spike, builds, docs, config.local move, hover diagnosis) fine; chore (widget health, backlog tidy) fine; code-reviewer could not write its note; no item lacked a specialist. No add/split/retire.
 - code-reviewer: has no Write/Edit tools, so its prompt now says to return findings in the report and let the main session write the note, table date and commit (was told to write recurring.md, which it cannot).
 - widget-builder: added the rule that install.sh's i3 lines go to `~/.config/i3/config.local` via `scripts/i3block.sh` and `~/.i3/config` (setup repo) is never edited. No other agent file mentions `~/.i3/config`.
+
+## Context diet 2026-11-22
+
+context-auditor (read-only): baseline first-turn context 48.6k-50.0k tokens. Offered: easel, Claude Docs, claude-in-chrome, stale Go allow rules, 14 web-design skills, roadmap-init, caveman, gopls-lsp. User picked: disable claude-in-chrome (`deniedMcpServers` + `permissions.deny mcp__claude-in-chrome`), remove `Bash(go get/doc:*)` allow rules, disable `gopls-lsp@claude-plugins-official` (`enabledPlugins`). Kept: easel, Claude Docs, design skills, roadmap-init, caveman. Applied in `.claude/settings.local.json` (untracked); takes effect next session.
