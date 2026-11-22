@@ -110,3 +110,7 @@ Screenshots of both bars + 8 hover popups (DP-0 load, net, usage, clock; DP-2 fr
 - Live: two hover-tee wrappers + two i3status-rs (DP-0, DP-2) and hover-daemon running.
 - Note: the last JSON line of each smoke is cut by timeout (jq parse error on it only); not a bar bug.
 - No failures, nothing added to BACKLOG.
+
+## Backlog tidy 2026-11-22
+- BACKLOG.md has 0 items (nothing stale, nothing to merge); hover fix 58750f0 and config.local move 60bc4a6 left no entries.
+- `f5-p4-dp0.png` and `f5-p4-dp2.png` were byte-identical (cmp): kept one as `docs/design/D5-bar-review/img/f5-p4.png`, `git rm` the other; questions.html references (2) updated.
