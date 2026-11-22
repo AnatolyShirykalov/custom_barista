@@ -114,3 +114,8 @@ Screenshots of both bars + 8 hover popups (DP-0 load, net, usage, clock; DP-2 fr
 ## Backlog tidy 2026-11-22
 - BACKLOG.md has 0 items (nothing stale, nothing to merge); hover fix 58750f0 and config.local move 60bc4a6 left no entries.
 - `f5-p4-dp0.png` and `f5-p4-dp2.png` were byte-identical (cmp): kept one as `docs/design/D5-bar-review/img/f5-p4.png`, `git rm` the other; questions.html references (2) updated.
+
+## Agent roster 2026-11-22
+- Evidence since 2026-11-18: widget-builder (spike, builds, docs, config.local move, hover diagnosis) fine; chore (widget health, backlog tidy) fine; code-reviewer could not write its note; no item lacked a specialist. No add/split/retire.
+- code-reviewer: has no Write/Edit tools, so its prompt now says to return findings in the report and let the main session write the note, table date and commit (was told to write recurring.md, which it cannot).
+- widget-builder: added the rule that install.sh's i3 lines go to `~/.config/i3/config.local` via `scripts/i3block.sh` and `~/.i3/config` (setup repo) is never edited. No other agent file mentions `~/.i3/config`.

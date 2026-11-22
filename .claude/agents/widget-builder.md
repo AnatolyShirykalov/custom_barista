@@ -12,6 +12,7 @@ You implement exactly one roadmap item on the i3status-rust bar (layout in CLAUD
 - Add a `test.sh` row (fixture in `scripts/testdata/`) for every script or format you touch; run `bash scripts/test.sh | tail -5`.
 - Smoke: `(sleep 6) | timeout 6 i3status-rs $PWD/config.toml 2>&1 | tail -c 4000` (i3bar JSON; grep `ERR`, `not found`, `error`); same for `compact.toml`.
 - Deploy without asking after checks pass: `./install.sh --yes` (regenerates configs and `~/.i3/bars.conf`, restarts i3).
+- i3 config: `install.sh` writes its i3 lines into `~/.config/i3/config.local` via `scripts/i3block.sh`; `~/.i3/config` belongs to the setup repo, never edit it.
 
 Common rules:
 - Read your item in the roadmap named in the prompt (default docs/ROADMAP.md) first, and the CLAUDE.md sections your task needs.
