@@ -163,4 +163,24 @@ kill -0 $sp 2>/dev/null && pass=$((pass+1)) || { echo "FAIL r4: --replace killed
 kill $sp 2>/dev/null
 echo '{}' >"$rd/DP-0.status.json"; echo '{}' >"$rd/DP-2.click.json"; : >"$gd/starts"; hr 1 0; hrc=$?
 [ $hrc = 0 ] && [ ! -s "$gd/starts" ] && ! ls "$rd"/*.json >/dev/null 2>&1 && pass=$((pass+1)) || { echo "FAIL r5: HOVER=0 rc=$hrc, daemon started or tap files kept"; fail=$((fail+1)); }
+# i1-i4: install.sh writes its block into ~/.config/i3/config.local of a temp HOME (repo copy without .git: no
+# pull), never ~/.i3/config; i1 creates the file, i2 rerun idempotent, i3 symlinked file keeps the link and other
+# lines, i4 an old block in ~/.i3/config is only warned about
+ir=$gd/irepo; mkdir -p "$ir/scripts"; cp "$d/../install.sh" "$d/../config.toml" "$d/../compact.toml" "$ir"; cp -r "$d/../i3" "$ir"; cp "$d"/*.sh "$ir/scripts"
+ih=$gd/ih; mkdir -p "$ih/.i3"; printf 'set $mod Mod4\nbindsym $mod+Return exec true\ninclude ~/.config/i3/config.local\n' >"$ih/.i3/config"; cp "$ih/.i3/config" "$gd/imain"
+inst() { env -u XDG_CONFIG_HOME HOME=$ih "$ir/install.sh" --no-restart >"$gd/inst.out" 2>&1; }
+ib() { grep -c '^# BEGIN custom_barista' "$1"; }
+il=$ih/.config/i3/config.local
+inst; irc=$?
+[ $irc = 0 ] && [ -f "$il" ] && [ "$(ib "$il")" = 1 ] && grep -qx 'include ~/.i3/bars.conf' "$il" && ! grep -q "$ih" "$il" && cmp -s "$ih/.i3/config" "$gd/imain" \
+  && [ ! -e "$ih/.config/i3/config" ] && [ -f "$ih/.i3/bars.conf" ] && pass=$((pass+1)) || { echo "FAIL i1: rc=$irc $(tail -3 "$gd/inst.out")"; fail=$((fail+1)); }
+cp "$il" "$gd/il1"; inst; irc=$?
+[ $irc = 0 ] && cmp -s "$il" "$gd/il1" && grep -q 'config.local already up to date' "$gd/inst.out" && pass=$((pass+1)) || { echo "FAIL i2: rerun rc=$irc not idempotent"; fail=$((fail+1)); }
+{ echo 'bindsym $mod+v exec true'; echo '# BEGIN custom_barista'; echo "include /home/x/.i3/bars.conf"; echo '# END custom_barista'; echo 'bindsym $mod+m exec true'; } >"$gd/itarget"
+rm "$il"; ln -s "$gd/itarget" "$il"; inst; irc=$?
+[ $irc = 0 ] && [ -L "$il" ] && [ "$(readlink "$il")" = "$gd/itarget" ] && [ "$(ib "$gd/itarget")" = 1 ] && grep -qx 'include ~/.i3/bars.conf' "$gd/itarget" \
+  && [ "$(head -1 "$gd/itarget")" = 'bindsym $mod+v exec true' ] && [ "$(tail -1 "$gd/itarget")" = 'bindsym $mod+m exec true' ] && cmp -s "$ih/.i3/config" "$gd/imain" \
+  && pass=$((pass+1)) || { echo "FAIL i3: symlinked config.local rc=$irc $(ls -l "$il")"; fail=$((fail+1)); }
+printf '# BEGIN custom_barista\ninclude /home/x/.i3/bars.conf\n# END custom_barista\n' >>"$ih/.i3/config"; cp "$ih/.i3/config" "$gd/imain"; inst; irc=$?
+[ $irc = 0 ] && cmp -s "$ih/.i3/config" "$gd/imain" && grep -q 'still has an old custom_barista block' "$gd/inst.out" && pass=$((pass+1)) || { echo "FAIL i4: old block in ~/.i3/config rc=$irc"; fail=$((fail+1)); }
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]
