@@ -26,8 +26,8 @@ Running: no agent. Done recently: 2026-11-22 install.sh config.local move. (2026
 2. [x] **Hover: first popup missed once** (2026-11-22, commit below): not reproduced in 298 scripted hovers; cause found (X events stranded in python-xlib's queue by timer requests), timers now drain, test_hover h17, rediscover log line. Detail: `docs/progress/design.md`.
 3. [ ] **Recurring: Context diet** (last 2026-11-17): list unused tools/MCP/plugins/skills with cost; main session asks the user (AskUserQuestion multiSelect), applies to `.claude/settings.local.json`. → `context-auditor`
 4. [ ] **Recurring: Backlog tidy** (last 2026-11-17): backlog nearly empty; resolve the byte-identical `docs/design/D5-bar-review/img/f5-p4-dp{0,2}.png` note (keep one, fix references). → `chore`
-5. [ ] **Recurring: Agent roster** (last 2026-11-18): evidence this session: widget-builder ran spike + builds + docs fine; code-reviewer could not write (main session did); no gaps seen. → `agent-curator`
-6. [ ] **Recurring: Widget health** (last 2026-11-18): after hover wrapper + U1c; smoke both configs through hover-tee, grep ERR/error. → `chore`
+5. [ ] **Recurring: Agent roster** (last 2026-11-22): evidence this session: widget-builder ran spike + builds + docs fine; code-reviewer could not write (main session did); no gaps seen. → `agent-curator`
+6. [x] **Recurring: Widget health** (last 2026-11-22): after hover wrapper + U1c; smoke both configs through hover-tee, grep ERR/error. → `chore`
 
 ### Background checks
 
@@ -47,7 +47,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 | Backlog tidy | `chore` | monthly: drop or merge stale, superseded or duplicate backlog items, check each still has an agent and a done condition; never touch the roadmap's queue | 2026-11-17 |
 | Dependency updates | `dep-updater` | i3status-rs installed vs latest release, changelog breaking config changes grep'd in config.toml/scripts, script deps (jq, xclip, yad, nvidia-smi, xdotool, node) present and formats unchanged; fix keys, backlog the rest | 2026-11-20 |
 | Look/usability pass | `bar-designer` | screenshot the bar; clarity, colors, stable widths, glyphs render; findings → backlog | 2026-11-20 |
-| Widget health | `chore` | every block shows real data on this machine: `bash scripts/test.sh`, smoke `(sleep 6) \| timeout 6 i3status-rs $PWD/config.toml` (and compact.toml), grep `ERR`/`not found`/`error`; after system upgrades check nvidia-smi, hwmon, pulse, sysfs formats; failures → backlog for `widget-builder` | 2026-11-18 |
+| Widget health | `chore` | every block shows real data on this machine: `bash scripts/test.sh`, smoke `(sleep 6) \| timeout 6 i3status-rs $PWD/config.toml` (and compact.toml), grep `ERR`/`not found`/`error`; after system upgrades check nvidia-smi, hwmon, pulse, sysfs formats; failures → backlog for `widget-builder` | 2026-11-22 |
 | Code review + docs | `code-reviewer` | review diffs since last run; README block list and CLAUDE.md match the code | 2026-11-20 |
 
 

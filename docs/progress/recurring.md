@@ -102,3 +102,11 @@ Screenshots of both bars + 8 hover popups (DP-0 load, net, usage, clock; DP-2 fr
 - Popups: readable, dark box with grey border, placed above the block; at the right edges (DP-0 clock next to tray, DP-2 clock at the monitor edge) they are clamped inside the screen.
 - Fixed: usage popup line 5 was ~105 chars (popup ~1180 px wide); reflowed to 6 lines of at most 75 chars (`scripts/explain.sh`), freq text "colors" → "colours" for one spelling. test.sh pass=171 fail=0; deployed with `./install.sh --yes`, re-shot.
 - Backlog: one unreproduced miss of the first DP-0 load popup ("Hover: first popup missed once", widget-builder).
+
+## Widget health 2026-11-22
+- `bash scripts/test.sh`: pass=176 fail=0.
+- Smoke 6 s each: config.toml (57 lines), compact.toml (48), hover-tee DP-0 (57) and DP-2 (48) as in bars.conf: 0 matches for ERR / not found / error.
+- Real data in every block: load, temp 47-50 C, usage parts, mem 95GB, disk 686GB, disk I/O, nvidia-smi 38 C 0.5GB, net with IP, claude usage, kbd US, pulse 70%, date/time. compact has the same minus disk, I/O, IP, claude usage (as designed).
+- Live: two hover-tee wrappers + two i3status-rs (DP-0, DP-2) and hover-daemon running.
+- Note: the last JSON line of each smoke is cut by timeout (jq parse error on it only); not a bar bug.
+- No failures, nothing added to BACKLOG.
