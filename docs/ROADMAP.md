@@ -18,15 +18,16 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-No agent running. Done recently (2026-11-20, session 3): D5-R review accepted; hover tooltips T1 (spike, spec, wrapper, core, daemon, review), middle-click popups removed (T1d), hover hardening from code review (T1e), README/CLAUDE.md docs (T1f); usage `cc …` first-run placeholder (U1c); recurring dep updates, code review, git hygiene, look pass. Earlier: 2026-11-18 i3status-rust switch, usage block U1/U1d, D5 regroup. Archive: `docs/roadmap-archive/2026-11.md`.
+Running: install.sh config.local item (widget-builder). Done recently (2026-11-20, session 3): D5-R review accepted; hover tooltips T1 (spike, spec, wrapper, core, daemon, review), middle-click popups removed (T1d), hover hardening from code review (T1e), README/CLAUDE.md docs (T1f); usage `cc …` first-run placeholder (U1c); recurring dep updates, code review, git hygiene, look pass. Earlier: 2026-11-18 i3status-rust switch, usage block U1/U1d, D5 regroup. Archive: `docs/roadmap-archive/2026-11.md`.
 
 ### Queued next (one agent each, in order)
 
-1. [ ] **Hover: first popup missed once** (look pass 2026-11-20, from backlog): first hover on DP-0 load showed no popup, no log line; retries fine. Done: 20 scripted hovers on both bars all show a popup, or cause found + `test_hover.py` row. → `widget-builder`
-2. [ ] **Recurring: Context diet** (last 2026-11-17): list unused tools/MCP/plugins/skills with cost; main session asks the user (AskUserQuestion multiSelect), applies to `.claude/settings.local.json`. → `context-auditor`
-3. [ ] **Recurring: Backlog tidy** (last 2026-11-17): backlog nearly empty; resolve the byte-identical `docs/design/D5-bar-review/img/f5-p4-dp{0,2}.png` note (keep one, fix references). → `chore`
-4. [ ] **Recurring: Agent roster** (last 2026-11-18): evidence this session: widget-builder ran spike + builds + docs fine; code-reviewer could not write (main session did); no gaps seen. → `agent-curator`
-5. [ ] **Recurring: Widget health** (last 2026-11-18): after hover wrapper + U1c; smoke both configs through hover-tee, grep ERR/error. → `chore`
+1. [ ] **install.sh → ~/.config/i3/config.local** (setup session 2026-11-22, note `~/projects/setup/docs/handoff/custom_barista-i3-config-local.md`): ~/.i3/config now managed by setup repo. install.sh writes/replaces BEGIN/END custom_barista block in `${XDG_CONFIG_HOME:-$HOME/.config}/i3/config.local` (create if missing, keep other lines, edit through symlink in place), never writes ~/.i3/config (remove old block or warn), never creates ~/.config/i3/config, uses ~/$HOME paths, binds no key the shared config uses (`i3 -C -c ~/.i3/config`). Check anatolii block lacks hover-run line: intended? Done: test.sh row(s) for block edit incl. symlink kept; install as anatoly leaves config.local symlink intact; anatolii safe to rerun. → `widget-builder`
+2. [ ] **Hover: first popup missed once** (look pass 2026-11-20, from backlog): first hover on DP-0 load showed no popup, no log line; retries fine. Done: 20 scripted hovers on both bars all show a popup, or cause found + `test_hover.py` row. → `widget-builder`
+3. [ ] **Recurring: Context diet** (last 2026-11-17): list unused tools/MCP/plugins/skills with cost; main session asks the user (AskUserQuestion multiSelect), applies to `.claude/settings.local.json`. → `context-auditor`
+4. [ ] **Recurring: Backlog tidy** (last 2026-11-17): backlog nearly empty; resolve the byte-identical `docs/design/D5-bar-review/img/f5-p4-dp{0,2}.png` note (keep one, fix references). → `chore`
+5. [ ] **Recurring: Agent roster** (last 2026-11-18): evidence this session: widget-builder ran spike + builds + docs fine; code-reviewer could not write (main session did); no gaps seen. → `agent-curator`
+6. [ ] **Recurring: Widget health** (last 2026-11-18): after hover wrapper + U1c; smoke both configs through hover-tee, grep ERR/error. → `chore`
 
 ### Background checks
 
