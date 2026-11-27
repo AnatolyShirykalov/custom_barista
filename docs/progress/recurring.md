@@ -132,3 +132,10 @@ code-reviewer (read-only) on 60bc4a6..47ffa41: test.sh 176/0, shellcheck info/st
 - 199 tracked files; no logs, caches, .pyc, .env, backups, real secrets or large binaries (largest 44 KB PNG). Pattern scan for API keys/private keys: none. `creds*.json` under testdata/u1 hold fake tokens (TESTTOKEN-u1); `scripts/hover/keys.toml` is a block-to-key map.
 - `git check-ignore` confirms `config.local.bak-*`, any `*.bak-*`, `.claude/settings.local.json`, `__pycache__`, `log/` are ignored. `scripts/testdata/reboot/` fixture (.keep) kept as intended.
 - No .gitignore change or `git rm --cached` needed.
+
+## Dependency updates 2026-11-27
+- i3status-rs 0.40.1-2 installed = latest release v0.40.1 (2026-11-08); no changelog delta, no config changes needed. Smoke run: no ERR/not found/error.
+- python-xlib 0.33-7: Display.pending_events/next_event present (hover drain OK).
+- Deps present: jq, xclip, yad, nvidia-smi, xdotool, node, notify-send. nvidia-smi works with nvidia-open 620.73.04-2 (RTX 5070 Ti, temp/util read). pipewire 1.6.12.
+- pacman.log format `[ts] [ALPM] upgraded linux (a -> b)` unchanged (reboot-needed.sh parses it); kernel 7.3.6 pending reboot as expected.
+- test.sh: pass=188 fail=0. No edits to config/compact.toml.
