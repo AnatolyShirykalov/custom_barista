@@ -19,14 +19,12 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-No agent running. Done recently (2026-11-27, session 6): R1b reboot "Invalid JSON" fix, G1 GitLab runner queue block (research, spec, build, review, review fixes G1f; live checks G1e wait for the user), USER_TODO page, parallel agents rule, agent roster, context diet, backlog tidy, code review. Session 5 and earlier: see archive `docs/roadmap-archive/2026-11.md`.
+No agent running. Done recently (2026-11-27, session 6): G2a runner metrics dropped for both users (journal only) + G2b fixture/hover fix, R1b reboot "Invalid JSON" fix, G1 GitLab runner queue block (research, spec, build, review, review fixes G1f; live checks G1e wait for the user), USER_TODO page, parallel agents rule, agent roster, context diet, backlog tidy, code review. Session 5 and earlier: see archive `docs/roadmap-archive/2026-11.md`.
 
 ### Queued next (one agent each, in order)
 
-1. [x] **G2a drop runner metrics (user decision 2026-11-27)**: remove the metrics path from scripts/runner-queue.sh (journal for running, config.toml for concurrent), update spec/tests/README/hover text; remove `listen_address` from ~/.gitlab-runner/config.toml and restart the user runner only when no job runs; deploy, smoke both bars. → `widget-builder` DONE: journal-only, listen_address removed, runner restarted idle; see docs/progress/gitlab-runner-block.md.
-   - [x] G2b journal ANSI fix (+ separate "no project list" hover message): done, see progress note.
-2. [ ] **G2 runner block for anatolii, private sources only** (constraint from user via setup session, 2026-11-27): anatolii's runner data must never be visible to other local users: no metrics at all (G2a), no `listen_address` TCP port (any localhost port is readable by anatoly), no world-readable files (cache dir 700/files 600 already). Allowed: anatolii's own `journalctl --user` (current fallback), API token in a 600 file in anatolii's home. Spec check first: does runner-queue.sh with no listen_address already comply; make install.sh/docs never enable metrics for other users; test as anatolii. → `bar-designer` (spec) then `widget-builder`
-3. [ ] **G1e live acceptance checks for runner block** (ask when user has done U-3 + U-4 in docs/USER_TODO.html): spec acceptance 2, 3, 5, 6 — green `1/4` during a real job, token absent from `ps` during refresh, ≤1 API refresh per 60 s, yellow `net` on network drop; apply U-2 idle choice if not A. → `chore`
+1. [ ] **G2 runner block for anatolii, private sources only** (constraint from user via setup session, 2026-11-27): anatolii's runner data must never be visible to other local users: no metrics at all (G2a), no `listen_address` TCP port (any localhost port is readable by anatoly), no world-readable files (cache dir 700/files 600 already). Allowed: anatolii's own `journalctl --user` (current fallback), API token in a 600 file in anatolii's home. Spec check first: does runner-queue.sh with no listen_address already comply; make install.sh/docs never enable metrics for other users; test as anatolii. → `bar-designer` (spec) then `widget-builder`
+2. [ ] **G1e live acceptance checks for runner block** (ask when user has done U-3 + U-4 in docs/USER_TODO.html): spec acceptance 2, 3, 5, 6 — green `1/4` during a real job, token absent from `ps` during refresh, ≤1 API refresh per 60 s, yellow `net` on network drop; apply U-2 idle choice if not A. → `chore`
 
 ### Background checks
 

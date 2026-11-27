@@ -13,7 +13,7 @@ pre{padding:8px;overflow-x:auto}img,svg{max-width:100%;height:auto;border:1px so
 .mut{color:var(--mut)}svg text{fill:var(--fg);font:13px system-ui,sans-serif}svg .b{fill:var(--bg);stroke:var(--bd)}
 </style></head><body>
 <h1>User TODO</h1>
-<p class="mut">Refreshed 2026-11-27 (wrapup). Answer decisions in chat; tell Claude when U-n is done.</p>
+<p class="mut">Refreshed 2026-11-27 (wrapup 2). Answer decisions in chat; tell Claude when U-n is done.</p>
 
 <section id="U-1"><h2>U-1: Post the upstream nvidia_gpu issue</h2>
 <p><b>Why:</b> i3status-rust shows 0&deg; GPU temperature when nvidia-smi prints a float; must be posted from your own GitHub account. Open since 2026-11-17.</p>
@@ -30,6 +30,7 @@ pre{padding:8px;overflow-x:auto}img,svg{max-width:100%;height:auto;border:1px so
 <p>Answer A, B or C in chat. The builder builds A unless told otherwise.</p></section>
 <section id="U-4"><h2>U-4: Project ids to watch</h2>
 <p><b>Note:</b> your bar token (U-3) is limited to your personal projects (<code>pipocavsobake/…</code>); other projects return 403 and show as <code>+?</code>. Pick personal projects that use your runner, e.g. <code>pipocavsobake/sprecher</code>.</p>
+<p>Quick start: <code>printf '%s\n' pipocavsobake/sprecher &gt; ~/.config/custom_barista/runner-projects</code> (the hover shows "Pending: no project list" until this file exists).</p>
 <p><b>Why:</b> the block counts pending jobs only for the projects you list (max 10; more are ignored). Spec: <a href="design/G1-runner-queue/spec.md">spec.md</a>.</p>
 <ol><li>Find each id: project page, <code>&#8942;</code> menu top right, "Copy project ID" (or Settings, General).</li>
 <li>Write them to <code>~/.config/custom_barista/runner-projects</code>, one per line. Numeric ids or <code>group/project</code> paths both work; <code>#</code> comments and blank lines are allowed:
