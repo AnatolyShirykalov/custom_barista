@@ -1,0 +1,8 @@
+# HELP gitlab_runner_concurrent The current value of concurrent setting
+# TYPE gitlab_runner_concurrent gauge
+gitlab_runner_concurrent 4
+# HELP gitlab_runner_jobs The current number of running builds.
+# TYPE gitlab_runner_jobs gauge
+gitlab_runner_jobs{executor_stage="prepare_script",runner="abc",stage="build"} 1
+gitlab_runner_jobs_total{runner="abc"} 17
+gitlab_runner_jobs{executor_stage="run",runner="abc",stage="test"} 1

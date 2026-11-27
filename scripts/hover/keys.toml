@@ -28,6 +28,10 @@ block = "custom"
 command = "reboot-needed.sh"
 key = "reboot"
 [[key]]
+block = "custom"
+command = "runner-queue.sh"
+key = "runner"
+[[key]]
 block = "net"
 device = "^wl"
 key = "wifi"

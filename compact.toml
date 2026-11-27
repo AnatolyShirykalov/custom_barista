@@ -17,6 +17,7 @@ cpu_freq = "\U000F095B"   # md-sine_wave (frequency); better than md-flash, dist
 gpu = "\U000F08AE"        # md-expansion_card
 reboot = "\U000F0709"       # md-restart
 ccusage = "\U000F0674"    # md-creation
+gitlab = "\U000F0BA0"      # md-gitlab
 disk_read = "R"
 disk_write = "W"
 
@@ -86,6 +87,20 @@ format = " $icon ^icon_net_up $speed_up.eng(prefix:k,w:3) ^icon_net_down $speed_
 inactive_format = " $icon down "
 missing_format = ""
 interval = 2
+
+[[block]]
+block = "custom"
+command = "~/projects/custom_barista/scripts/runner-queue.sh"
+json = true
+interval = 5
+hide_when_empty = true
+[[block.click]]
+button = "left"
+cmd = "~/projects/custom_barista/scripts/runner-queue.sh refresh-now"
+update = true
+[[block.click]]
+button = "right"
+cmd = "~/projects/custom_barista/scripts/runner-queue.sh open"
 
 [[block]]
 block = "keyboard_layout"

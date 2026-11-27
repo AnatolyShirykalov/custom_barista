@@ -24,3 +24,12 @@ Sources: https://docs.gitlab.com/runner/monitoring/ , https://docs.gitlab.com/ap
 ## G1b spec (2026-11-27)
 
 Spec `docs/design/G1-runner-queue/spec.md`, mocks `img/`, decision page `questions.html` (Q1 idle look; A recommended). New script `scripts/runner-queue.sh`, icon md-gitlab `\U000F0BA0` (renders in Symbols Nerd Font Mono), own group before the usage block. Text `r/c  +p` fixed width 7 for c=4; states off/ERR/net/stuck >15 min. Own port: `listen_address` from own config + `ss -p` pid match with the user unit MainPID. Pending: detached `refresh` under `flock`, TTL 60 s (600 s after 401), ≤10 projects, token via process substitution. Test rows rq1-rq20.
+
+## G1c build (2026-11-27)
+
+Built from the spec: `scripts/runner-queue.sh`, fixtures `scripts/testdata/runner/`, test.sh rows rq1-rq20 (+rq19b-e), block in config.toml before the usage block, icon `gitlab`, hover key `runner` + `explain.sh runner`, compact.toml regenerated. Deployed with idle option A (always shown, dim; the idle rule is the comment line before the final `emit` in `bar()`; B/C are one-line swaps).
+- Runner setup done (no job running, builds=0, no containers): backup `~/.gitlab-runner/config.toml.bak-g1c`, added top-level `listen_address = "127.0.0.1:9252"` (only change), `systemctl --user restart gitlab-runner`. Metric names confirmed: `gitlab_runner_jobs`, `gitlab_runner_concurrent`; socket on 127.0.0.1 owned by the user unit pid. Other user untouched.
+- Journal pitfall: every runner log line ends with `builds=N max_builds=M`, so the journal fallback matches `builds=` only at word start.
+- Deviations: rq19 expects `+7 more` (headers count towards LIST_MAX=8: 2 headers + 5 rows + the more line); `METRICS_FILE` set but empty/missing means "no metrics" (journal fallback) in tests.
+- Not done / user: token file `~/.config/custom_barista/gitlab-token` (0600) and `~/.config/custom_barista/runner-projects` do not exist; the block shows `r/c` without the pending slot until both exist. The pending path (refresh, `+?`, list) is tested with fixtures only, never against gitlab.com.
+- Smoke: config.toml and compact.toml show dim fox icon `0/4`, no error blocks. `net` warning seen once right after the runner restart (journal `Checking for jobs... failed`), gone after.

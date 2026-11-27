@@ -1,0 +1,11 @@
+concurrent = 4
+check_interval = 0
+listen_address = "127.0.0.1:9252"
+
+[[runners]]
+  name = "fixture"
+  url = "https://gitlab.example"
+  id = 42
+  executor = "docker"
+  [runners.docker]
+    image = "ruby:3.4"
