@@ -142,7 +142,8 @@ list() {
   local meta; meta=$(jq -r '[(.err // "-"), (.ts // 0), (.ts_ok // 0)] | @tsv' "$CACHE" 2>/dev/null)
   local err=- ts=0 ts_ok=0; [ -n "$meta" ] && read -r err ts ts_ok <<<"$meta"
   local pstat='' usecache=''
-  if [ ! -e "$TOKEN_FILE" ] || [ ! -e "$PROJECTS_FILE" ]; then pstat="Pending: no token (${TOKEN_FILE/#$HOME/\~})"
+  if [ ! -e "$TOKEN_FILE" ]; then pstat="Pending: no token (${TOKEN_FILE/#$HOME/\~})"
+  elif [ ! -e "$PROJECTS_FILE" ]; then pstat="Pending: no project list (${PROJECTS_FILE/#$HOME/\~})"
   elif ! mode_ok; then pstat="Pending: token file mode $(tokmode): chmod 600 ${TOKEN_FILE/#$HOME/\~}"
   elif [ "$err" = auth ]; then pstat="Pending: token rejected (401), next try in 10 min"
   elif [ -z "$meta" ]; then pstat="Pending: not fetched yet"

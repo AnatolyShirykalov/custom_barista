@@ -247,6 +247,8 @@ rqw=$(for v in "$o2" "$o3" "$o4" "$o5" "$o6" "$o7" "$o8" "$o9" "$o10" "$o11" "$o
 qcache 10 "" 12 600; o=$(rq list)
 [ "$(wc -l <<<"$o")" = 8 ] && tail -1 <<<"$o" | grep -qx '  +7 more' && grep -q '^Pending 12 (API, 10s ago):' <<<"$o" && grep -q '^  grp/proj  *main  *build  *[0-9]*[smh]$' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rq19: list $(wc -l <<<"$o") lines: $(tail -2 <<<"$o")"; fail=$((fail+1)); }
 o=$(TF=$rqd/none rq list); grep -q '^Pending: no token' <<<"$o" && grep -q '^Running 0/4:' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rq19b: no-token list"; fail=$((fail+1)); }
+o=$(PF=$rqd/none rq list); grep -q '^Pending: no project list' <<<"$o" && ! grep -q 'no token' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rq19d: no-projects list"; fail=$((fail+1)); }
+o=$(JF=$Q/journal_b2 rq | jq -r .text); grep -q '^2/4' <<<"$o" && grep -q $'\x1b' "$Q/journal_b2" && pass=$((pass+1)) || { echo "FAIL rq19e: ANSI inside builds= field"; fail=$((fail+1)); }
 o=$(LM=20 JF=$Q/journal_jobs TF=$rqd/none rq list); grep -q 'grp/proj12 *job 12' <<<"$o" && ! grep -q 'job 1$' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rq19c: journal running rows"; fail=$((fail+1)); }
 o=$(PATH=/nonexistent /bin/bash "$d/runner-queue.sh" 2>/dev/null); jq -e '.state == "Critical"' >/dev/null 2>&1 <<<"$o" && pass=$((pass+1)) || { echo "FAIL rq19d: error path json: $o"; fail=$((fail+1)); }
 qcache 10 "" 2 600; printf '#!/bin/sh\necho "$1" >"%s/opened"\n' "$rqd" >"$rqd/opencmd"; chmod +x "$rqd/opencmd"; OPEN_CMD=$rqd/opencmd rq open; sleep 0.3

@@ -1,13 +1,13 @@
-Added job to processing list  builds=1 job=1 max_builds=4 project_full_path=grp/proj1
-Added job to processing list  builds=1 job=2 max_builds=4 project_full_path=grp/proj2
-Added job to processing list  builds=1 job=3 max_builds=4 project_full_path=grp/proj3
-Added job to processing list  builds=1 job=4 max_builds=4 project_full_path=grp/proj4
-Added job to processing list  builds=1 job=5 max_builds=4 project_full_path=grp/proj5
-Added job to processing list  builds=1 job=6 max_builds=4 project_full_path=grp/proj6
-Added job to processing list  builds=1 job=7 max_builds=4 project_full_path=grp/proj7
-Added job to processing list  builds=1 job=8 max_builds=4 project_full_path=grp/proj8
-Added job to processing list  builds=1 job=9 max_builds=4 project_full_path=grp/proj9
-Added job to processing list  builds=1 job=10 max_builds=4 project_full_path=grp/proj10
-Added job to processing list  builds=1 job=11 max_builds=4 project_full_path=grp/proj11
-Added job to processing list  builds=1 job=12 max_builds=4 project_full_path=grp/proj12
+Added job to processing list  builds[0;m=1 job[0;m=1 max_builds[0;m=4 project_full_path[0;m=grp/proj1
+Added job to processing list  builds[0;m=1 job[0;m=2 max_builds[0;m=4 project_full_path[0;m=grp/proj2
+Added job to processing list  builds[0;m=1 job[0;m=3 max_builds[0;m=4 project_full_path[0;m=grp/proj3
+Added job to processing list  builds[0;m=1 job[0;m=4 max_builds[0;m=4 project_full_path[0;m=grp/proj4
+Added job to processing list  builds[0;m=1 job[0;m=5 max_builds[0;m=4 project_full_path[0;m=grp/proj5
+Added job to processing list  builds[0;m=1 job[0;m=6 max_builds[0;m=4 project_full_path[0;m=grp/proj6
+Added job to processing list  builds[0;m=1 job[0;m=7 max_builds[0;m=4 project_full_path[0;m=grp/proj7
+Added job to processing list  builds[0;m=1 job[0;m=8 max_builds[0;m=4 project_full_path[0;m=grp/proj8
+Added job to processing list  builds[0;m=1 job[0;m=9 max_builds[0;m=4 project_full_path[0;m=grp/proj9
+Added job to processing list  builds[0;m=1 job[0;m=10 max_builds[0;m=4 project_full_path[0;m=grp/proj10
+Added job to processing list  builds[0;m=1 job[0;m=11 max_builds[0;m=4 project_full_path[0;m=grp/proj11
+Added job to processing list  builds[0;m=1 job[0;m=12 max_builds[0;m=4 project_full_path[0;m=grp/proj12
 Removed job from processing list  builds=1 job=1 max_builds=4

@@ -57,3 +57,7 @@ runner-queue.sh: `spawn()` creates the cache dir (700) before `flock`; refresh h
 - runner-queue.sh: metrics source removed (port discovery, ss/MainPID, curl, METRICS_FILE); running = `journalctl --user` `builds=N`, concurrent = config.toml; hover header `Running r/c:`. Tests: metrics fixtures removed, `journal_b2` added, rq5/6/8/14/19b/19c adapted (220 pass).
 - Machine: `listen_address` removed from ~/.gitlab-runner/config.toml (backup config.toml.bak-g2a), runner restarted while idle (builds=0, no containers); `ss -ltn` shows nothing on :9252. Other user's runner untouched.
 - README/spec updated (spec carries a dated note; metrics sections historical).
+
+## G2b journal ANSI fix + project-list message (2026-11-27)
+- Real journal lines carry ANSI codes inside fields (`builds\e[0;m=0`); `journal()` strips them (strip helper). Fixtures journal_b2/b3/ok/net/jobs now use the real layout; rq19e asserts it (old code fails rq9, rq19c, rq19e).
+- Hover: missing token -> "Pending: no token (path)"; missing runner-projects -> "Pending: no project list (path)"; test rq19d.
