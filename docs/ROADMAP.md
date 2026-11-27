@@ -30,7 +30,7 @@ No agent running. Done recently (2026-11-27, session 5): code review, R1 reboot-
 5. [x] **G1a research gitlab-runner queue source**: done; running jobs from user journal or `listen_address` metrics, pending only via API token; user picks A/B/C (see docs/progress/gitlab-runner-block.md).
 6. [x] **G1b spec runner queue block**: done; docs/design/G1-runner-queue/spec.md (build option A unless the user picks B/C in questions.html).
 7. [x] **G1c build runner queue block**: done, deployed (no-token path, idle option A); scripts/runner-queue.sh, rows rq1-rq20; user still creates token + project files (see progress note). → `widget-builder`
-8. [ ] **G1d review runner queue block**: against spec, screenshot. → `bar-designer`
+8. [x] **G1d review runner queue block**: accepted, no fixes; live checks with a job and a token remain (see progress note).
 
 ### Background checks
 

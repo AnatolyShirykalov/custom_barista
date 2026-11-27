@@ -33,3 +33,19 @@ Built from the spec: `scripts/runner-queue.sh`, fixtures `scripts/testdata/runne
 - Deviations: rq19 expects `+7 more` (headers count towards LIST_MAX=8: 2 headers + 5 rows + the more line); `METRICS_FILE` set but empty/missing means "no metrics" (journal fallback) in tests.
 - Not done / user: token file `~/.config/custom_barista/gitlab-token` (0600) and `~/.config/custom_barista/runner-projects` do not exist; the block shows `r/c` without the pending slot until both exist. The pending path (refresh, `+?`, list) is tested with fixtures only, never against gitlab.com.
 - Smoke: config.toml and compact.toml show dim fox icon `0/4`, no error blocks. `net` warning seen once right after the runner restart (journal `Checking for jobs... failed`), gone after.
+
+## G1d review (2026-11-27, bar-designer): accepted, no fixes
+
+| Check | Result |
+|---|---|
+| Icon / position | md-gitlab fox renders (no tofu), dim, own group before the usage block (DP-0) and before keyboard (DP-2); crops `docs/design/G1-runner-queue/img/review-dp{0,2}.png` |
+| Idle colour | state `Info` = `info_fg #777777` (dim-icon), i.e. the spec's grey; live text `0/4` (no-token mode, slot dropped as specified) |
+| Width | rq18 green (7 chars for every slotted state, 3 in no-token mode) |
+| Pending path (fixture cache, no token created) | `0/4  +1` Warning; list shows running + pending rows, columns cut with `…`, ages `4m`/`12m` |
+| Hover | `explain.sh runner`: 3 legend lines + `Running 0/4 (metrics)` + `Pending: no token (…)` |
+| Clicks | left `refresh-now` without a token: exit 0, no cache, no error; right `open` covered by rq19e |
+| Security | token sent via `-H @-` on stdin (not argv); metrics socket `127.0.0.1:9252` owned by the user unit pid; no `/home/` reads |
+| Tests | `bash scripts/test.sh`: pass=217 fail=0, bar run 24 ms |
+
+Deviations accepted: rq19 `+7 more` is the correct hidden count (spec's `+5` was an arithmetic slip, spec row fixed); empty/missing `METRICS_FILE` = no metrics is a test-hook detail, production (unset) uses the real port path.
+Still open (need the user's token + project list): acceptance 2 (green `1/4` during a job), 3 (`ps` check during a live refresh), 5 (refresh ≤1/60 s log), 6 (net-down yellow). The script checks the token file mode only, not the dir mode; `~/.config/custom_barista` is 0755 today (file 0600 is enough).

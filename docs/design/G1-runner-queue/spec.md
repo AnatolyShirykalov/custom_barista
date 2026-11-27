@@ -139,7 +139,7 @@ Env: `RUNNER_CONFIG`, `UNIT_STATE` (skips systemctl), `METRICS_FILE` (skips port
 | rq16 | `refresh`, project status 401 | cache `err:"auth"` | |
 | rq17 | every rq1-rq14 output passes `jq -e .` | | |
 | rq18 | width: `len` equal for rq2-rq11, rq13, rq14 | | |
-| rq19 | `list` with 12 jobs, `LIST_MAX=8` | 8 lines, last `  +5 more` | |
+| rq19 | `list` with 12 jobs, `LIST_MAX=8` (headers count) | 8 lines: 2 headers + 5 rows + `  +7 more` | |
 | rq20 | explain runner ≤ 11 lines; keys.toml has `runner` | | |
 
 ## Acceptance checks (review, G1d)
