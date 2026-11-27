@@ -13,7 +13,7 @@ pre{padding:8px;overflow-x:auto}img,svg{max-width:100%;height:auto;border:1px so
 .mut{color:var(--mut)}svg text{fill:var(--fg);font:13px system-ui,sans-serif}svg .b{fill:var(--bg);stroke:var(--bd)}
 </style></head><body>
 <h1>User TODO</h1>
-<p class="mut">Refreshed 2026-11-27. Answer decisions in chat; tell Claude when U-n is done.</p>
+<p class="mut">Refreshed 2026-11-27 (wrapup). Answer decisions in chat; tell Claude when U-n is done.</p>
 
 <section id="U-1"><h2>U-1: Post the upstream nvidia_gpu issue</h2>
 <p><b>Why:</b> i3status-rust shows 0&deg; GPU temperature when nvidia-smi prints a float; must be posted from your own GitHub account. Open since 2026-11-17.</p>
@@ -28,24 +28,8 @@ pre{padding:8px;overflow-x:auto}img,svg{max-width:100%;height:auto;border:1px so
 <p>B:<br><img src="design/G1-runner-queue/img/b-idle-hidden.png" alt="B idle hidden"></p>
 <p>C:<br><img src="design/G1-runner-queue/img/c-idle-icon.png" alt="C idle icon"></p>
 <p>Answer A, B or C in chat. The builder builds A unless told otherwise.</p></section>
-
-<section id="U-3"><h2>U-3: GitLab token (read_api)</h2>
-<p><b>Why:</b> the runner block reads the pending-job queue through the GitLab API; it needs a read-only token.</p>
-<ol><li>Open <a href="https://gitlab.com/-/user_settings/personal_access_tokens">personal access tokens</a>, add a new token: any name, set an expiry, tick only <code>read_api</code>.</li>
-<li>Create the file with safe mode:
-<pre>mkdir -p ~/.config/custom_barista &amp;&amp; install -m 600 /dev/null ~/.config/custom_barista/gitlab-token</pre></li>
-<li>Open it in an editor and paste the token as the only line (never put it on the command line or in shell history).</li></ol>
-<svg viewBox="0 0 360 170" width="360" role="img" aria-label="token form sketch">
-<rect class="b" x="2" y="2" width="356" height="166" rx="6"/>
-<text x="14" y="24">Add personal access token</text>
-<text x="14" y="48">Token name</text><rect class="b" x="110" y="34" width="230" height="20"/><text x="116" y="49">custom_barista</text>
-<text x="14" y="78">Expiration</text><rect class="b" x="110" y="64" width="230" height="20"/><text x="116" y="79">2027-11-27</text>
-<text x="14" y="108">Scopes</text>
-<rect class="b" x="110" y="96" width="14" height="14"/><text x="112" y="108">&#10003;</text><text x="132" y="108">read_api</text>
-<rect class="b" x="110" y="116" width="14" height="14"/><text x="132" y="128">api, write_*, ... (leave empty)</text>
-<rect class="b" x="14" y="140" width="150" height="22" rx="4"/><text x="22" y="155">Create token</text></svg></section>
-
 <section id="U-4"><h2>U-4: Project ids to watch</h2>
+<p><b>Note:</b> your bar token (U-3) is limited to your personal projects (<code>pipocavsobake/…</code>); other projects return 403 and show as <code>+?</code>. Pick personal projects that use your runner, e.g. <code>pipocavsobake/sprecher</code>.</p>
 <p><b>Why:</b> the block counts pending jobs only for the projects you list (max 10; more are ignored). Spec: <a href="design/G1-runner-queue/spec.md">spec.md</a>.</p>
 <ol><li>Find each id: project page, <code>&#8942;</code> menu top right, "Copy project ID" (or Settings, General).</li>
 <li>Write them to <code>~/.config/custom_barista/runner-projects</code>, one per line. Numeric ids or <code>group/project</code> paths both work; <code>#</code> comments and blank lines are allowed:
@@ -60,5 +44,5 @@ group/sub/project</pre></li></ol>
 <text x="14" y="104">Project ID: 12345678 (Settings &rarr; General)</text></svg></section>
 
 <h2>Done</h2>
-<p class="mut">Nothing yet. Format: U-n, title, date.</p>
+<ul><li><b>U-3</b> GitLab token for the bar: done 2026-11-27. Fine-grained token, "Only my personal projects", CI/CD Pipeline + Runner read; saved to <code>~/.config/custom_barista/gitlab-token</code> (600). Tested: 200 on a personal project.</li></ul>
 </body></html>

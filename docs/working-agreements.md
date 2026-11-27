@@ -76,3 +76,13 @@ Rows: Agent roster, Git hygiene, Context diet, Backlog tidy (monthly), Dependenc
 *Everything waiting on the user is in `docs/USER_TODO.html`: numbered U-1, U-2, … with links and pictures where needed, refreshed regularly.*
 **Why:** user asked for one page with their action items and for it to be refreshed as part of the process.
 **How to apply:** add an item the moment something needs the user (decision page, token, file, post); move it to Done with the date when finished (numbers never reused); check it at `/roadmap` start and refresh at `/wrapup`; give its full path.
+
+## Ask before using the user's accounts (`ask-accounts`, safety; 2026-11-27)
+*Before calling the user's external accounts or CLIs (glab, gh, cloud CLIs) for anything beyond what they offered them for, ask first.*
+**Why:** a `glab api projects?membership=true` lookup (to find project ids) listed projects the user did not expect this account to reach.
+**How to apply:** state the exact command and what it reads, wait for an OK; prefer letting the user pick ids/paths themselves.
+
+## Stay in scope (`scope`, workflow; 2026-11-27)
+*This project is the i3 status bar. Account security, work-employer access and PC hardening belong to the setup session/roadmap, not here.*
+**Why:** user: "you can forget about distribusion, not your scope".
+**How to apply:** hand such findings to the setup session (SendMessage) and drop them from this roadmap, USER_TODO and progress notes.

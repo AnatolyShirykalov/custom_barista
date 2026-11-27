@@ -19,21 +19,12 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-No agent running. Done recently (2026-11-27, session 5): code review, R1 reboot-needed block + R1a popup fix, I2 install hardening, git hygiene, dep updates, look pass, widget health. Earlier sessions (11-17…11-22): i3status-rust switch, usage block, D5 regroup, hover tooltips T1, config.local install. Archive: `docs/roadmap-archive/2026-11.md`.
+No agent running. Done recently (2026-11-27, session 6): R1b reboot "Invalid JSON" fix, G1 GitLab runner queue block (research, spec, build, review, review fixes G1f; live checks G1e wait for the user), USER_TODO page, parallel agents rule, agent roster, context diet, backlog tidy, code review. Session 5 and earlier: see archive `docs/roadmap-archive/2026-11.md`.
 
 ### Queued next (one agent each, in order)
 
-1. [x] **R1b fix reboot block "Invalid JSON"**: reboot-needed.sh now prints `{"text":""}` when nothing needed (json=true rejected empty output); rb4 checks valid JSON; both bars smoke clean. Details: docs/progress/reboot-block.md
-2. [x] **Recurring: Agent roster** (done 2026-11-27): widget-builder now flags new visible blocks/clicks/popups without spec for bar-designer review, and requires `jq -e .` on every json custom block output path. Details: docs/progress/recurring.md
-3. [x] **Recurring: Context diet** (last 2026-11-22): ask user per findings. → `context-auditor`
-4. [x] **Recurring: Backlog tidy** (last 2026-11-22; backlog empty 2026-11-27, quick). → `chore`
-5. [x] **G1a research gitlab-runner queue source**: done; running jobs from user journal or `listen_address` metrics, pending only via API token; user picks A/B/C (see docs/progress/gitlab-runner-block.md).
-6. [x] **G1b spec runner queue block**: done; docs/design/G1-runner-queue/spec.md (build option A unless the user picks B/C in questions.html).
-7. [x] **G1c build runner queue block**: done, deployed (no-token path, idle option A); scripts/runner-queue.sh, rows rq1-rq20; user still creates token + project files (see progress note). → `widget-builder`
-8. [x] **G1d review runner queue block**: accepted, no fixes; live checks with a job and a token remain (see progress note).
-9. [x] **G1f fix runner block review findings** (code review 2026-11-27 (2) in docs/progress/recurring.md): lock/cache dir mkdir, umask 077, refresh timeout vs per-project max-time, hover max lines, empty projects file, shellcheck, tests for spawn/flock + cache mode + api500, README entry + deps. → `widget-builder` Done (see docs/progress/gitlab-runner-block.md).
-10. [ ] **G1e live acceptance checks for runner block** (ask when user has done U-3 + U-4 in docs/USER_TODO.html): spec acceptance 2, 3, 5, 6 — green `1/4` during a real job, token absent from `ps` during refresh, ≤1 API refresh per 60 s, yellow `net` on network drop; apply U-2 idle choice if not A. → `chore`
-11. [ ] **G2 runner block for anatolii, private sources only** (constraint from user via setup session, 2026-11-27): anatolii's runner data must never be visible to other local users: no `listen_address`/metrics TCP port for anatolii's runner (any localhost port is readable by anatoly), no world-readable files (cache dir 700/files 600 already). Allowed: anatolii's own `journalctl --user` (current fallback), API token in a 600 file in anatolii's home. Spec check first: does runner-queue.sh with no listen_address already comply; make install.sh/docs never enable metrics for other users; test as anatolii. → `bar-designer` (spec) then `widget-builder`
+1. [ ] **G2 runner block for anatolii, private sources only** (constraint from user via setup session, 2026-11-27): anatolii's runner data must never be visible to other local users: no `listen_address`/metrics TCP port for anatolii's runner (any localhost port is readable by anatoly), no world-readable files (cache dir 700/files 600 already). Allowed: anatolii's own `journalctl --user` (current fallback), API token in a 600 file in anatolii's home. Spec check first: does runner-queue.sh with no listen_address already comply; make install.sh/docs never enable metrics for other users; test as anatolii. → `bar-designer` (spec) then `widget-builder`
+2. [ ] **G1e live acceptance checks for runner block** (ask when user has done U-3 + U-4 in docs/USER_TODO.html): spec acceptance 2, 3, 5, 6 — green `1/4` during a real job, token absent from `ps` during refresh, ≤1 API refresh per 60 s, yellow `net` on network drop; apply U-2 idle choice if not A. → `chore`
 
 ### Background checks
 
@@ -77,5 +68,5 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
-- Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user action, from own GitHub account). asked 2026-11-17, still pending 2026-11-27
-- G1 Q1 idle look of the runner block (A always grey `0/4  +0` rec., B hidden, C icon only): docs/design/G1-runner-queue/questions.html. asked 2026-11-27
+- Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user action, from own GitHub account). asked 2026-11-17, still pending 2026-11-27 (USER_TODO U-1)
+- G1 Q1 idle look of the runner block (A always grey `0/4  +0` rec., B hidden, C icon only): docs/design/G1-runner-queue/questions.html. asked 2026-11-27 (USER_TODO U-2)
