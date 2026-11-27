@@ -161,3 +161,7 @@ code-reviewer (read-only) on 60bc4a6..47ffa41: test.sh 176/0, shellcheck info/st
 ## Context diet 2026-11-27
 
 Baseline first turn ~48.4k (was ~50k on 11-22). 6 candidates; user turned off (settings.local.json `skillOverrides`): anthropic-skills:chrome-browser, dataviz, artifact-capabilities, artifact-design, artifact-diagramming (~850 tok). Kept: computer-use/built-in-browser, Claude Docs connector, design/UI skills + tutorial-video, caveman plugin, roadmap-init. Confirm with `/context` next session.
+
+## Backlog tidy 2026-11-27
+
+Backlog still empty (only an empty "Bar blocks" heading): nothing to drop, merge or re-check. No changes besides the date.
