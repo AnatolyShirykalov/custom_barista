@@ -23,7 +23,7 @@ No agent running. Done recently (2026-11-27, session 5): code review, R1 reboot-
 ### Queued next (one agent each, in order)
 
 1. [x] **R1b fix reboot block "Invalid JSON"**: reboot-needed.sh now prints `{"text":""}` when nothing needed (json=true rejected empty output); rb4 checks valid JSON; both bars smoke clean. Details: docs/progress/reboot-block.md
-2. [ ] **Recurring: Agent roster** (last 2026-11-22): today R1 (new block) went straight to widget-builder without a bar-designer spec; review if builder prompt should require a quick designer check for new visible blocks. → `agent-curator`
+2. [x] **Recurring: Agent roster** (done 2026-11-27): widget-builder now flags new visible blocks/clicks/popups without spec for bar-designer review, and requires `jq -e .` on every json custom block output path. Details: docs/progress/recurring.md
 3. [ ] **Recurring: Context diet** (last 2026-11-22): ask user per findings. → `context-auditor`
 4. [ ] **Recurring: Backlog tidy** (last 2026-11-22; backlog empty 2026-11-27, quick). → `chore`
 
@@ -39,7 +39,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 | Check | Agent | What | Last run |
 |---|---|---|---|
-| Agent roster | `agent-curator` | revise `.claude/agents/*`: tighten, split, merge, add specialists for upcoming work no agent fits, retire unused; evidence from recent reports and items that lacked a specialist | 2026-11-22 |
+| Agent roster | `agent-curator` | revise `.claude/agents/*`: tighten, split, merge, add specialists for upcoming work no agent fits, retire unused; evidence from recent reports and items that lacked a specialist | 2026-11-27 |
 | Context diet | `context-auditor` | tools, MCP servers, connectors, plugins, skills, user agents loaded here but unused/unrelated; context cost; main session asks the user which to disable per project, applies, checks `/context` | 2026-11-22 |
 | Git hygiene | `repo-janitor` | anything tracked that shouldn't be (build output, logs, dumps, caches, large binaries, local config, secrets); `.gitignore` gaps; safe `git rm --cached` | 2026-11-27 |
 | Backlog tidy | `chore` | monthly: drop or merge stale, superseded or duplicate backlog items, check each still has an agent and a done condition; never touch the roadmap's queue | 2026-11-22 |

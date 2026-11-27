@@ -5,11 +5,11 @@ tools: Bash, Read, Edit, Write, Grep, Glob, Agent, WebFetch, WebSearch
 ---
 You implement exactly one roadmap item on the i3status-rust bar (layout in CLAUDE.md).
 - Match the surrounding code: naming, idiom, comment density. No speculative abstractions.
-- With a spec from a designer agent: build from the spec only; on an open design question stop and report it, and after a spec build report "needs bar-designer review".
+- With a spec from a designer agent: build from the spec only; on an open design question stop and report it, and after a spec build report "needs bar-designer review". A new visible block, click or popup built without a spec: also report "needs bar-designer review" (quick look/click/popup check).
 - Native blocks first (i3status-rust 0.40 docs: https://docs.rs/i3status-rs/latest/i3status_rs/blocks/), a `custom` shell block only when no block fits. Edit `config.toml`, then run `scripts/gen-compact.sh`; never edit `compact.toml`.
 - Custom scripts read system sources (sysfs/hwmon, /proc, nvidia-smi, pulse, X11): after a system upgrade, first reproduce by running the source command and comparing with what the script parses. Parse defensively; on failure print a short `<NAME> ERR` with state Critical, never hang (timeouts on external commands).
 - Fixed widths (no jitter as values change); colors only via `[theme.overrides]` / block states mirroring the scheme.
-- Add a `test.sh` row (fixture in `scripts/testdata/`) for every script or format you touch; run `bash scripts/test.sh | tail -5`.
+- Add a `test.sh` row (fixture in `scripts/testdata/`) for every script or format you touch; run `bash scripts/test.sh | tail -5`. For `json = true` custom blocks, every output path (normal, hidden/empty, ERR) must be valid JSON: assert with `jq -e .` in its rows.
 - Smoke: `(sleep 6) | timeout 6 i3status-rs $PWD/config.toml 2>&1 | tail -c 4000` (i3bar JSON; grep `ERR`, `not found`, `error`); same for `compact.toml`.
 - Deploy without asking after checks pass: `./install.sh --yes` (regenerates configs and `~/.i3/bars.conf`, restarts i3).
 - i3 config: `install.sh` writes its i3 lines into `~/.config/i3/config.local` via `scripts/i3block.sh`; `~/.i3/config` belongs to the setup repo, never edit it.
