@@ -10,6 +10,7 @@ Let's wrap up this session; I'll start a new one. Roadmap: the one this session 
 - Trim the roadmap (every wrapup): move finished `[x]` items verbatim to the archive dir (`YYYY-MM.md`; script-check nothing open is lost) and leave a one-line "Done recently" in "In flight"; add this session's new items to the backlog (or "Queued next" if next); refill "Queued next" from the backlog to 5-10 unblocked items, ranked by value/cost (quick fixes, unblockers first), not by arrival order; keep the roadmap ≤ ~8 KB.
 - Make sure the roadmap is current ("In flight" says no agent running and what finished this session, new user decisions recorded under "Open decisions" or in the rules they changed), the working tree is clean and everything is pushed.
 - Open decisions: each has `asked <date>` or `ask when <trigger>`; ask (AskUserQuestion) those whose trigger passed, record answers in the rule or item they change, drop them from the list.
+- Refresh `docs/USER_TODO.html`: every open item on me (Open decisions, decision pages, tokens/files to provide) listed with links, done ones moved to Done with the date; mention its full path in the summary.
 - Save durable user preferences or corrections from this session to docs/working-agreements.md (not to memory) (not things the repo already records).
 - Finish with a short summary: what got done this session, what's next in the roadmap, and anything waiting on me. Then tell me it's ready for `/clear` + `/roadmap <name>`.
 

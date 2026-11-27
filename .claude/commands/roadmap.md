@@ -19,6 +19,7 @@ Let's continue to follow it: "In flight", "Queued next", "Background checks"; op
 - At intake and at each start, re-rank "Queued next" by value/cost with a short reason (quick fixes, unblockers and test enablers first); the order my requests came in means nothing.
 - After about every 3 feature tasks, slot the recurring check with the oldest "Last run" date.
 - If a decision is genuinely mine, add it to "Open decisions" and ask me; don't block other items on it.
+- Keep `docs/USER_TODO.html` (my action items U-1, U-2, … with links and pictures) current: at session start check it against "Open decisions" and the roadmap; whenever an item needs me, or I finish one, update it in the same turn (done items move to its Done section with the date, numbers are never reused) and give me its full path.
 - When the context hook warns, finish the current item, make sure everything is committed and pushed and the roadmap is current, then tell me it's a good moment to `/clear` + `/roadmap <name>`.
 - Context diet results come back as a list: ask me with AskUserQuestion (multiSelect) which to disable, apply them to `.claude/settings.local.json` (or `settings.json` if I say shared), and set the row date.
 - After a block or design change is merged: `./install.sh --yes` (no need to ask), then check both bars run i3status-rs with no error blocks.

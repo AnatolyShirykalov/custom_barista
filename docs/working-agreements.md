@@ -72,3 +72,8 @@ Rows: Agent roster, Git hygiene, Context diet, Backlog tidy (monthly), Dependenc
 *Every file mentioned to the user is given as a full absolute path.*
 **Why:** user asked: "I always need full paths when you mention files".
 **How to apply:** write `/home/anatoly/projects/custom_barista/docs/...`, never `docs/...` or a bare filename; ask agents for full paths in their reports.
+
+## User action items page (`user-todo`, process; 2026-11-27)
+*Everything waiting on the user is in `docs/USER_TODO.html`: numbered U-1, U-2, … with links and pictures where needed, refreshed regularly.*
+**Why:** user asked for one page with their action items and for it to be refreshed as part of the process.
+**How to apply:** add an item the moment something needs the user (decision page, token, file, post); move it to Done with the date when finished (numbers never reused); check it at `/roadmap` start and refresh at `/wrapup`; give its full path.

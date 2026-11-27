@@ -12,6 +12,7 @@ Scope: whole project: maintenance of the custom_barista i3 status bar (fixing wi
 - No waiting agents: long jobs run detached (`nohup … > log/<name>.log 2>&1 &`), capped (`timeout 30m` or an item limit), resumable and safe to kill, and leave a check item under "Background checks" with the check command and the command for the next chunk.
 - Every change keeps `bash scripts/test.sh` green and the bar running (both bars show i3status-rs, no error blocks).
 - New items go to `docs/BACKLOG.md` unless they are next. `/wrapup` moves finished items verbatim to `docs/roadmap-archive/` (look there for the history of done work) and refills "Queued next" from the backlog.
+- My action items live in `docs/USER_TODO.html` (U-1, U-2, …; links, pictures); refresh it whenever an item on the user appears or is done, at every session start and at `/wrapup`.
 - Deploy = `./install.sh --yes` (config-only edits: `i3-msg restart`); agents may do it without asking after the checks pass.
 
 Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status line can count them ("roadmap done/total +N backlog, M done").
