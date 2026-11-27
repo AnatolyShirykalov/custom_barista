@@ -20,3 +20,7 @@
 - A: running jobs only, from journal (no config change). B: A + `listen_address` metrics (edit config.toml, restart runner). C: B + pending via API token (`read_api` PAT in a 0600 file, list of project ids).
 
 Sources: https://docs.gitlab.com/runner/monitoring/ , https://docs.gitlab.com/api/runners/ (List runner's jobs), https://docs.gitlab.com/api/jobs/ (scope pending), https://docs.gitlab.com/runner/executors/docker/ (managed label), https://gitlab.com/gitlab-org/gitlab-runner/-/merge_requests/2412 (job.id/runner.id labels).
+
+## G1b spec (2026-11-27)
+
+Spec `docs/design/G1-runner-queue/spec.md`, mocks `img/`, decision page `questions.html` (Q1 idle look; A recommended). New script `scripts/runner-queue.sh`, icon md-gitlab `\U000F0BA0` (renders in Symbols Nerd Font Mono), own group before the usage block. Text `r/c  +p` fixed width 7 for c=4; states off/ERR/net/stuck >15 min. Own port: `listen_address` from own config + `ss -p` pid match with the user unit MainPID. Pending: detached `refresh` under `flock`, TTL 60 s (600 s after 401), ≤10 projects, token via process substitution. Test rows rq1-rq20.

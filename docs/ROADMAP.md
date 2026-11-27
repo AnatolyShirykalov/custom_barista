@@ -28,7 +28,7 @@ No agent running. Done recently (2026-11-27, session 5): code review, R1 reboot-
 3. [x] **Recurring: Context diet** (last 2026-11-22): ask user per findings. → `context-auditor`
 4. [x] **Recurring: Backlog tidy** (last 2026-11-22; backlog empty 2026-11-27, quick). → `chore`
 5. [x] **G1a research gitlab-runner queue source**: done; running jobs from user journal or `listen_address` metrics, pending only via API token; user picks A/B/C (see docs/progress/gitlab-runner-block.md).
-6. [ ] **G1b spec runner queue block**: from G1a; text/icon/colors/hide rule/hover/click, both bars. → `bar-designer`
+6. [x] **G1b spec runner queue block**: done; docs/design/G1-runner-queue/spec.md (build option A unless the user picks B/C in questions.html).
 7. [ ] **G1c build runner queue block**: from G1b spec; json outputs `jq -e` tested; deploy. → `widget-builder`
 8. [ ] **G1d review runner queue block**: against spec, screenshot. → `bar-designer`
 
@@ -75,3 +75,4 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
 - Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user action, from own GitHub account). asked 2026-11-17, still pending 2026-11-27
+- G1 Q1 idle look of the runner block (A always grey `0/4  +0` rec., B hidden, C icon only): docs/design/G1-runner-queue/questions.html. asked 2026-11-27
