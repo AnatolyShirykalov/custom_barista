@@ -69,9 +69,6 @@ command = "~/projects/custom_barista/scripts/reboot-needed.sh"
 json = true
 interval = 60
 hide_when_empty = true
-[[block.click]]
-button = "left"
-cmd = "notify-send -u low 'Reboot needed' \"$(~/projects/custom_barista/scripts/reboot-needed.sh list)\""
 
 [[block]]
 block = "net"

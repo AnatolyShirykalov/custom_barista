@@ -64,3 +64,8 @@ Middle click on every block runs `scripts/explain.sh <name>` (names: kbd load te
 - scripts/reboot-needed.sh (custom block after gpu, interval 60, hide_when_empty, both bars): kernel modules dir gone -> Critical "reboot: kernel old->new" (pacman -Q linux, fallback modules dir listing); BOOT_PKGS upgraded/installed in pacman.log after /proc/stat btime -> Warning "reboot"; rule 3 built too: SESSION_PKGS after i3 process start (now - ps etimes) -> Info (dim) "relogin". Lists at the top of the script. `list` arg prints packages with versions: hover (explain.sh `reboot`, keys.toml) and left click (notify-send).
 - Log stamps are compared as local time to the second (DST edge ignored). Icon `reboot` (md-restart) in config.toml.
 - test.sh rb1-rb6 (fixtures testdata/reboot, env UNAME_R/MODULES_DIR/PACMAN_LOG/BTIME/SESSION_START/INSTALLED_KVER). pass=185 fail=0. Live: kernel case shown on both bars. Needs bar-designer review not required (no spec); not rebooted.
+
+## R1a reboot click + popup (2026-11-27)
+- config.toml: notify-send left click removed (no notification daemon; hover only); compact.toml regenerated. README updated.
+- reboot-needed.sh `list`: `collapse()` groups packages by family (name minus last -segment, base package joins its siblings) and equal version: `linux-firmware (14 pkgs) old→new`, `→` like the bar text; capped at LIST_MAX (default 8) lines with `+N more`. explain.sh drops `head -3` and the click line; test.sh explain line limit is 11 for reboot (legend 3 + list 8).
+- test.sh rb5 (collapse, 3 firmware in fixture) and rb7 (cap). pass=189 fail=0; live popup shows kernel, linux-firmware (14 pkgs), nvidia-open, pipewire. Deployed; both bars clean.

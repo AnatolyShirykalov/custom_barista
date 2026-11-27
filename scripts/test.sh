@@ -131,9 +131,9 @@ printf 'CONFDIR=/x/conf\nHOVER=0\n' >"$gd/bars0.env"; BARS_ENV=$gd/bars0.env "$d
 grep -q "hover-tee.py --output DP-0 -- i3status-rs /x/conf/config.toml" "$gd/h15.rs" && grep -q "hover-tee.py --output DP-2 -- i3status-rs /x/conf/compact.toml" "$gd/h15.rs" \
   && cmp -s "$gd/h15.rs" "$gd/h15.off" && ! grep -q hover-tee "$gd/h15.0" && grep -q 'status_command i3status-rs /x/conf/config.toml' "$gd/h15.0" \
   && pass=$((pass+1)) || { echo "FAIL h15: barsconf wrapping"; fail=$((fail+1)); }
-# explain.sh: every key in hover/keys.toml has a text of at most 6 lines; every config block has a key
+# explain.sh: every key in hover/keys.toml has a text of at most 6 lines (reboot 11: legend + list); every config block has a key
 for n in $(grep '^key = ' "$d/hover/keys.toml" | cut -d'"' -f2); do
-  o=$(EXPLAIN_DRY=1 "$d/explain.sh" $n 2>&1); [ -n "$o" ] && [ "$(wc -l <<<"$o")" -le 6 ] && pass=$((pass+1)) || { echo "FAIL explain $n"; fail=$((fail+1)); }
+  o=$(EXPLAIN_DRY=1 "$d/explain.sh" $n 2>&1); [ -n "$o" ] && [ "$(wc -l <<<"$o")" -le $([ $n = reboot ] && echo 11 || echo 6) ] && pass=$((pass+1)) || { echo "FAIL explain $n"; fail=$((fail+1)); }
 done
 ! grep -q 'explain\.sh' "$d/../config.toml" && pass=$((pass+1)) || { echo "FAIL explain: middle-click popup back in config.toml"; fail=$((fail+1)); }
 # hover core (T1b): rows h5-h14 in test_hover.py add their counts to ours
@@ -199,7 +199,8 @@ check rb1 "$(BTIME=$(b 2026-11-27T09:00:00) rb)" "reboot: kernel 7.3.5→7.3.6" 
 check rb2 "$(BTIME=$(b 2026-11-27T09:00:00) MODULES_DIR=$R/modules/7.3.6-arch1-1 rb)" "reboot" Warning
 check rb3 "$(BTIME=$(b 2026-11-27T11:30:00) SESSION_START=$(b 2026-11-27T09:30:00) MODULES_DIR=$R/modules/7.3.6-arch1-1 rb)" "relogin" Info
 [ -z "$(BTIME=$(b 2026-11-27T11:30:00) MODULES_DIR=$R/modules/7.3.6-arch1-1 rb)" ] && pass=$((pass+1)) || { echo "FAIL rb4: not hidden"; fail=$((fail+1)); }
-o=$(BTIME=$(b 2026-11-27T09:00:00) SESSION_START=$(b 2026-11-27T09:00:00) rb list); grep -q 'linux-firmware-amd 1-1 -> 1-2' <<<"$o" && grep -q 'mesa 1-1' <<<"$o" && ! grep -q 'vim\|systemd-libs\|nvidia' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rb5: list"; fail=$((fail+1)); }
+o=$(BTIME=$(b 2026-11-27T09:00:00) SESSION_START=$(b 2026-11-27T09:00:00) rb list); grep -q '^  linux-firmware (3 pkgs) 1-1→1-2$' <<<"$o" && grep -q '^  mesa 1-1→1-2$' <<<"$o" && grep -q '^Need relogin:' <<<"$o" && grep -q 'mesa 1-1' <<<"$o" && ! grep -q 'vim\|systemd-libs\|nvidia' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rb5: list"; fail=$((fail+1)); }
+o=$(BTIME=$(b 2026-11-20T00:00:00) SESSION_START=$(b 2026-11-27T09:00:00) LIST_MAX=4 rb list); [ "$(wc -l <<<"$o")" = 4 ] && tail -1 <<<"$o" | grep -q '^  +[0-9]* more$' && grep -q '^Need reboot:' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rb7: cap"; fail=$((fail+1)); }
 check rb6 "$(BTIME=x rb)" "REBOOT ERR" Critical
 unset SESSION_START
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]

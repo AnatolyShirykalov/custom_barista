@@ -10,7 +10,7 @@ case ${1:-} in
   disk)    t='Free space on /, GB.\nYellow below 100 GB, red below 30 GB.\nNot on the DP-2 bar.' ;;
   io)      t='Disk I/O of dm-0, kB/s: R read, W write.\nNot on the DP-2 bar.' ;;
   gpu)     t='GPU temperature (deg C) and VRAM used (GB), nvidia-smi.\nYellow above 60 C, red above 70 C.\nGPU ERR: nvidia-smi failed.' ;;
-  reboot)  t=$(printf 'Hidden unless a reboot or relogin is due (pacman.log).\nRed: running kernel replaced. Yellow: boot package upgraded.\nGrey relogin: session package upgraded. Left click: notify.\n%s' "$(timeout 5 "$(dirname "$0")/reboot-needed.sh" list | head -3)") ;;
+  reboot)  t=$(printf 'Hidden unless a reboot or relogin is due (pacman.log).\nRed: running kernel replaced. Yellow: boot package upgraded.\nGrey relogin: session package upgraded.\n%s' "$(timeout 5 "$(dirname "$0")/reboot-needed.sh" list)") ;;
   net)     t='Ethernet: upload / download speed, kB/s.\nOn DP-0 also the IP address.\n"down" = no link.' ;;
   wifi)    t='Wi-Fi: SSID, signal %, upload / download kB/s.\nHidden when not connected.' ;;
   battery) t='Battery charge, %. Hidden without a battery.' ;;
