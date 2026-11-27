@@ -22,7 +22,7 @@ No agent running. Done recently (2026-11-27, session 5): code review, R1 reboot-
 
 ### Queued next (one agent each, in order)
 
-1. [ ] **R1b verify reboot block hides after reboot** (ask when user has rebooted into 7.3.6): `bash scripts/reboot-needed.sh` prints nothing (pipewire relogin may still show until relogin; then nothing); both bars no error blocks. → `chore`
+1. [x] **R1b fix reboot block "Invalid JSON"**: reboot-needed.sh now prints `{"text":""}` when nothing needed (json=true rejected empty output); rb4 checks valid JSON; both bars smoke clean. Details: docs/progress/reboot-block.md
 2. [ ] **Recurring: Agent roster** (last 2026-11-22): today R1 (new block) went straight to widget-builder without a bar-designer spec; review if builder prompt should require a quick designer check for new visible blocks. → `agent-curator`
 3. [ ] **Recurring: Context diet** (last 2026-11-22): ask user per findings. → `context-auditor`
 4. [ ] **Recurring: Backlog tidy** (last 2026-11-22; backlog empty 2026-11-27, quick). → `chore`

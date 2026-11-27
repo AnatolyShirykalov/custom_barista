@@ -198,7 +198,7 @@ export SESSION_START=$(b 2026-11-27T12:00:00)
 check rb1 "$(BTIME=$(b 2026-11-27T09:00:00) rb)" "reboot: kernel 7.3.5→7.3.6" Critical
 check rb2 "$(BTIME=$(b 2026-11-27T09:00:00) MODULES_DIR=$R/modules/7.3.6-arch1-1 rb)" "reboot" Warning
 check rb3 "$(BTIME=$(b 2026-11-27T11:30:00) SESSION_START=$(b 2026-11-27T09:30:00) MODULES_DIR=$R/modules/7.3.6-arch1-1 rb)" "relogin" Info
-[ -z "$(BTIME=$(b 2026-11-27T11:30:00) MODULES_DIR=$R/modules/7.3.6-arch1-1 rb)" ] && pass=$((pass+1)) || { echo "FAIL rb4: not hidden"; fail=$((fail+1)); }
+o=$(BTIME=$(b 2026-11-27T11:30:00) MODULES_DIR=$R/modules/7.3.6-arch1-1 rb); [ "$(jq -r .text <<<"$o")" = "" ] && jq -e . <<<"$o" >/dev/null && pass=$((pass+1)) || { echo "FAIL rb4: not hidden"; fail=$((fail+1)); }
 o=$(BTIME=$(b 2026-11-27T09:00:00) SESSION_START=$(b 2026-11-27T09:00:00) rb list); grep -q '^  linux-firmware (3 pkgs) 1-1→1-2$' <<<"$o" && grep -q '^  mesa 1-1→1-2$' <<<"$o" && grep -q '^Need relogin:' <<<"$o" && grep -q 'mesa 1-1' <<<"$o" && ! grep -q 'vim\|systemd-libs\|nvidia' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rb5: list"; fail=$((fail+1)); }
 o=$(BTIME=$(b 2026-11-20T00:00:00) SESSION_START=$(b 2026-11-27T09:00:00) LIST_MAX=4 rb list); [ "$(wc -l <<<"$o")" = 4 ] && tail -1 <<<"$o" | grep -q '^  +[0-9]* more$' && grep -q '^Need reboot:' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rb7: cap"; fail=$((fail+1)); }
 check rb6 "$(BTIME=x rb)" "REBOOT ERR" Critical

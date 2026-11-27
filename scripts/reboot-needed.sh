@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# "Reboot needed" block: prints nothing when nothing applies. No root. Arg `list` prints the triggering packages (hover popup).
+# "Reboot needed" block: prints {"text":""} (hidden) when nothing applies. No root. Arg `list` prints the triggering packages (hover popup).
 #   1. running kernel's /usr/lib/modules dir gone (kernel upgraded) -> Critical "reboot: kernel old->new"
 #   2. BOOT_PKGS upgraded/installed in pacman.log after boot -> Warning "reboot"
 #   3. SESSION_PKGS changed after the i3 process started -> Info (dim) "relogin"
@@ -67,5 +67,6 @@ fi
 if [ -n "$kern" ]; then echo "{\"icon\":\"reboot\",\"state\":\"Critical\",\"text\":\"reboot: $kern\"}"
 elif [ -n "$boot" ]; then echo '{"icon":"reboot","state":"Warning","text":"reboot"}'
 elif [ -n "$rel" ]; then echo '{"icon":"reboot","state":"Info","text":"relogin"}'
+else echo '{"text":""}'   # json block: empty output is "Invalid JSON"; empty text is hidden by hide_when_empty
 fi
 exit 0
