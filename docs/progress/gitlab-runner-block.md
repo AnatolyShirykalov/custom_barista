@@ -52,3 +52,8 @@ Still open (need the user's token + project list): acceptance 2 (green `1/4` dur
 
 ## G1f review fixes (2026-11-27)
 runner-queue.sh: `spawn()` creates the cache dir (700) before `flock`; refresh has `umask 077`; `--max-time 4` per call, `timeout 60` for the refresh (flock keeps one refresh running); hover list capped at LIST_MAX exactly (headers counted); empty project ids skipped; shellcheck SC1007/SC2034 clean (SC2016 info left). test.sh: rq21 (cold cache dir, refresh spawned, modes 600/700), rq22 (`api500` -> net), rq23 (empty projects file); `rq()` accepts QC/NR overrides. README: script entry and deps.
+
+## G2a: metrics dropped (2026-11-27)
+- runner-queue.sh: metrics source removed (port discovery, ss/MainPID, curl, METRICS_FILE); running = `journalctl --user` `builds=N`, concurrent = config.toml; hover header `Running r/c:`. Tests: metrics fixtures removed, `journal_b2` added, rq5/6/8/14/19b/19c adapted (220 pass).
+- Machine: `listen_address` removed from ~/.gitlab-runner/config.toml (backup config.toml.bak-g2a), runner restarted while idle (builds=0, no containers); `ss -ltn` shows nothing on :9252. Other user's runner untouched.
+- README/spec updated (spec carries a dated note; metrics sections historical).

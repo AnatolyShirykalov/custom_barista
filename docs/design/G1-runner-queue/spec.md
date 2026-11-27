@@ -1,5 +1,7 @@
 # G1 gitlab-runner queue block: spec (bar-designer, 2026-11-27)
 
+> **Update 2026-11-27 (G2a):** metrics dropped (privacy: any localhost TCP port is readable by every local user). Running comes only from `journalctl --user -u gitlab-runner` (`builds=N`), concurrent from `config.toml`; no `listen_address`, no `ss`/`curl` to /metrics, no `METRICS_FILE`, hover header `Running r/c:`. The metrics sections below are historical.
+
 Source decision (2026-11-27): option C of G1a (docs/progress/gitlab-runner-block.md): running count from the
 current user's runner metrics endpoint, pending jobs from the GitLab API (read_api token). Mocks: `img/`.
 Open question for the user: only Q1 (idle visibility), page `questions.html`; build option A unless the answer says otherwise.

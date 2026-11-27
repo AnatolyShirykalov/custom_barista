@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # GitLab runner queue block (this user's runner): "running/concurrent  +pending", json for i3status-rs custom block.
 # Modes: (none) bar json | refresh (API fetch, detached by the bar run) | refresh-now (left click) | list (hover text) | open (right click)
-# Running: runner metrics on the own listen_address port (journal fallback). Pending: GitLab API, cached; see docs/design/G1-runner-queue/spec.md
-# Test overrides: RUNNER_CONFIG UNIT_STATE METRICS_FILE JOURNAL_FILE QUEUE_CACHE TOKEN_FILE PROJECTS_FILE NOW NO_REFRESH API_DIR LIST_MAX OPEN_CMD
+# Running: own `journalctl --user` builds=N (no metrics port: any local user could read it). Pending: GitLab API, cached; see docs/design/G1-runner-queue/spec.md
+# Test overrides: RUNNER_CONFIG UNIT_STATE JOURNAL_FILE QUEUE_CACHE TOKEN_FILE PROJECTS_FILE NOW NO_REFRESH API_DIR LIST_MAX OPEN_CMD
 set -u
 CFG=${RUNNER_CONFIG:-$HOME/.gitlab-runner/config.toml}
 TOKEN_FILE=${TOKEN_FILE:-$HOME/.config/custom_barista/gitlab-token}
@@ -31,27 +31,13 @@ mode_ok() { local m; m=$(tokmode); [[ $m =~ ^[0-7]+$ ]] && (( (8#$m & 077) == 0 
 unit_state() { echo "${UNIT_STATE:-$(timeout 2 systemctl --user is-active gitlab-runner 2>/dev/null)}"; }
 net_down() { journal --since -30s | grep -q 'Checking for jobs\.\.\. failed'; }
 
-metrics() { # metrics text of this user's runner; fails (journal fallback) unless the port is ours
-  [ -n "${METRICS_FILE+x}" ] && { cat "$METRICS_FILE" 2>/dev/null; return; }
-  local port pid
-  port=$(top | awk -F= '$1 ~ /^[ \t]*listen_address[ \t]*$/ { gsub(/[ \t"]/, "", $2); n = split($2, a, ":"); print a[n]; exit }')
-  [[ $port =~ ^[0-9]+$ ]] || return 1
-  pid=$(timeout 2 systemctl --user show -p MainPID --value gitlab-runner 2>/dev/null)
-  [[ $pid =~ ^[0-9]+$ ]] && [ "$pid" -gt 0 ] || return 1
-  timeout 2 ss -Hltnp "sport = :$port" 2>/dev/null | grep -q "pid=$pid," || return 1
-  timeout 3 curl -s --max-time 1 "http://127.0.0.1:$port/metrics"
-}
-
-# "r c src" from metrics, else journal / config
+# "r c src" from the journal (builds=N) and config (concurrent)
 counts() {
-  local m r c src=metrics
-  m=$(metrics) && [ -n "$m" ] || { m=; src=journal; }
-  r=$(awk '/^gitlab_runner_jobs[{ ]/ { s += $NF; f = 1 } END { if (f) printf "%d", s }' <<<"$m")
-  c=$(awk '/^gitlab_runner_concurrent[{ ]/ { printf "%d", $NF; exit }' <<<"$m")
-  [ -n "$r" ] || { src=journal; r=$(journal -n 200 | grep -o '\(^\|[ ]\)builds=[0-9]*' | tail -1 | grep -o '[0-9]*$'); }
-  [ -n "$c" ] || c=$(top | awk -F= '$1 ~ /^[ \t]*concurrent[ \t]*$/ { gsub(/[ \t"]/, "", $2); print $2; exit }')
+  local r c
+  r=$(journal -n 200 | grep -o '\(^\|[ ]\)builds=[0-9]*' | tail -1 | grep -o '[0-9]*$')
+  c=$(top | awk -F= '$1 ~ /^[ \t]*concurrent[ \t]*$/ { gsub(/[ \t"]/, "", $2); print $2; exit }')
   [[ ${r:-} =~ ^[0-9]+$ ]] || r=0; [[ ${c:-} =~ ^[0-9]+$ ]] || c='?'
-  echo "$r $c $src"
+  echo "$r $c journal"
 }
 
 fmt_age() { # seconds -> 12s 4m 3h 2d
@@ -153,7 +139,6 @@ list() {
   [ "$st" = active ] || { echo "runner unit: $st"; return; }
   [ -r "$CFG" ] || return
   local r c src; read -r r c src < <(counts)
-  local srcl=metrics; [ "$src" = journal ] && srcl='journal, metrics off'
   local meta; meta=$(jq -r '[(.err // "-"), (.ts // 0), (.ts_ok // 0)] | @tsv' "$CACHE" 2>/dev/null)
   local err=- ts=0 ts_ok=0; [ -n "$meta" ] && read -r err ts ts_ok <<<"$meta"
   local pstat='' usecache=''
@@ -164,7 +149,7 @@ list() {
   elif [ "$err" = net ]; then pstat="Pending: network down, last good $(fmt_age $((NOW - ts_ok))) ago"
   else usecache=1; fi
   {
-    echo "Running $r/$c ($srcl):"
+    echo "Running $r/$c:"
     if [ -n "$usecache" ] || [ "$err" = net ]; then jq -r --argjson now "$NOW" "$JQ_ROWS"'.running[]? | row' "$CACHE" 2>/dev/null
     else journal -n 1000 | awk '
         /Added job to processing list/ { j = ""; p = ""; for (i = 1; i <= NF; i++) { if ($i ~ /^job=/) j = substr($i, 5); if ($i ~ /^project_full_path=/) p = substr($i, 19) } if (j != "") { a[j] = p; o[++n] = j } }

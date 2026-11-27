@@ -205,7 +205,7 @@ check rb6 "$(BTIME=x rb)" "REBOOT ERR" Critical
 unset SESSION_START
 # runner-queue.sh (rq1-rq20): fixtures in testdata/runner, no systemd/network; NOW fixed; c = 4
 Q=$t/runner; RN=1795003200; rqd=$(mktemp -d -p "$gd"); qc=$rqd/q.json; printf 'tok\n' >"$rqd/tok"; chmod 600 "$rqd/tok"
-rq() { RUNNER_CONFIG=${RC:-$Q/config.toml} UNIT_STATE=${US:-active} METRICS_FILE=${MF-$Q/metrics_0} JOURNAL_FILE=${JF:-$Q/journal_ok} QUEUE_CACHE=${QC:-$qc} TOKEN_FILE=${TF:-$rqd/tok} PROJECTS_FILE=${PF:-$Q/projects} NOW=$RN NO_REFRESH=${NR-1} API_DIR=${API:-} LIST_MAX=${LM:-8} "$d/runner-queue.sh" "$@"; }
+rq() { RUNNER_CONFIG=${RC:-$Q/config.toml} UNIT_STATE=${US:-active} JOURNAL_FILE=${JF:-$Q/journal_ok} QUEUE_CACHE=${QC:-$qc} TOKEN_FILE=${TF:-$rqd/tok} PROJECTS_FILE=${PF:-$Q/projects} NOW=$RN NO_REFRESH=${NR-1} API_DIR=${API:-} LIST_MAX=${LM:-8} "$d/runner-queue.sh" "$@"; }
 qcache() { # ts_ok age, err, pending count, oldest pending age (s)
   jq -nc --argjson n "$RN" --argjson a "$1" --arg e "$2" --argjson c "$3" --argjson o "$4" '{ts:($n-$a),ts_ok:($n-$a),err:(if $e=="" then null else $e end),running:[],ignored:0,
     pending:[range(0;$c)|{project:"grp/proj",ref:"main",name:"build",created:($n-$o+.),url:"https://gitlab.example/grp/proj/-/jobs/1"}]}' >"$qc"; }
@@ -214,17 +214,17 @@ qcache 10 "" 0 0; o4=$(rq); check rq4 "$o4" "0/4  +0" Info
 check rq1 "$(RC=$rqd/none rq)" "" ""; o1=$(RC=$rqd/none rq)
 o2=$(US=failed rq); check rq2 "$o2" "ERR    " Critical
 o3=$(US=inactive rq); check rq3 "$o3" "off    " Info
-o5=$(MF=$Q/metrics_2 rq); check rq5 "$o5" "2/4  +0" Good
-qcache 10 "" 3 60; o6=$(MF=$Q/metrics_2 rq); check rq6 "$o6" "2/4  +3" Warning
+o5=$(JF=$Q/journal_b2 rq); check rq5 "$o5" "2/4  +0" Good
+qcache 10 "" 3 60; o6=$(JF=$Q/journal_b2 rq); check rq6 "$o6" "2/4  +3" Warning
 qcache 10 "" 1 1200; o7=$(rq); check rq7 "$o7" "0/4  +1" Critical
-qcache 10 "" 0 0; o8=$(MF=$Q/metrics_2 JF=$Q/journal_net rq); check rq8 "$o8" "2/4 net" Warning
-o9=$(MF= JF=$Q/journal_b3 rq); check rq9 "$o9" "3/4  +0" Good
+qcache 10 "" 0 0; o8=$(JF=$Q/journal_net rq); check rq8 "$o8" "0/4 net" Warning
+o9=$(JF=$Q/journal_b3 rq); check rq9 "$o9" "3/4  +0" Good
 qcache 10 auth 0 0; o10=$(rq); check rq10 "$o10" "0/4  +?" Info
 grep -q "foreground=\"#777777\">+?</span>" <<<"$(jq -r .text <<<"$o10")" && pass=$((pass+1)) || { echo "FAIL rq10: +? not dim"; fail=$((fail+1)); }
 qcache 360 "" 0 0; o11=$(rq); check rq11 "$o11" "0/4  +?" Info
 qcache 10 "" 0 0; o12=$(TF=$rqd/none PF=$rqd/none rq); check rq12 "$o12" "0/4" Info
 chmod 644 "$rqd/tok"; o13=$(rq); check rq13 "$o13" "0/4  +?" Info; chmod 600 "$rqd/tok"
-qcache 10 "" 150 60; o14=$(MF=$Q/metrics_0 rq); check rq14 "$o14" "0/4 +99" Warning
+qcache 10 "" 150 60; o14=$(rq); check rq14 "$o14" "0/4 +99" Warning
 # rq15/16: refresh from API fixtures (2 projects: 1 pending, 1 own + 1 foreign running); 401 -> err auth
 rm -f "$qc"; API=$Q/api rq refresh
 [ "$(jq -c '[.err,(.pending|length),(.running|length),.running[0].project,.pending[0].created]' "$qc" 2>/dev/null)" = '[null,1,1,"grp/proj",1795773600]' ] && pass=$((pass+1)) || { echo "FAIL rq15: refresh cache $(head -c 200 "$qc")"; fail=$((fail+1)); }
@@ -246,8 +246,8 @@ rqw=$(for v in "$o2" "$o3" "$o4" "$o5" "$o6" "$o7" "$o8" "$o9" "$o10" "$o11" "$o
 # rq19: list capped at LIST_MAX lines, last line "+N more" (headers count); rq19b statuses; rq19c script error -> RUN ERR json; rq19d open
 qcache 10 "" 12 600; o=$(rq list)
 [ "$(wc -l <<<"$o")" = 8 ] && tail -1 <<<"$o" | grep -qx '  +7 more' && grep -q '^Pending 12 (API, 10s ago):' <<<"$o" && grep -q '^  grp/proj  *main  *build  *[0-9]*[smh]$' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rq19: list $(wc -l <<<"$o") lines: $(tail -2 <<<"$o")"; fail=$((fail+1)); }
-o=$(TF=$rqd/none rq list); grep -q '^Pending: no token' <<<"$o" && grep -q '^Running 0/4 (metrics):' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rq19b: no-token list"; fail=$((fail+1)); }
-o=$(LM=20 MF= JF=$Q/journal_jobs TF=$rqd/none rq list); grep -q 'journal, metrics off' <<<"$o" && grep -q 'grp/proj12 *job 12' <<<"$o" && ! grep -q 'job 1$' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rq19c: journal running rows"; fail=$((fail+1)); }
+o=$(TF=$rqd/none rq list); grep -q '^Pending: no token' <<<"$o" && grep -q '^Running 0/4:' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rq19b: no-token list"; fail=$((fail+1)); }
+o=$(LM=20 JF=$Q/journal_jobs TF=$rqd/none rq list); grep -q 'grp/proj12 *job 12' <<<"$o" && ! grep -q 'job 1$' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rq19c: journal running rows"; fail=$((fail+1)); }
 o=$(PATH=/nonexistent /bin/bash "$d/runner-queue.sh" 2>/dev/null); jq -e '.state == "Critical"' >/dev/null 2>&1 <<<"$o" && pass=$((pass+1)) || { echo "FAIL rq19d: error path json: $o"; fail=$((fail+1)); }
 qcache 10 "" 2 600; printf '#!/bin/sh\necho "$1" >"%s/opened"\n' "$rqd" >"$rqd/opencmd"; chmod +x "$rqd/opencmd"; OPEN_CMD=$rqd/opencmd rq open; sleep 0.3
 [ "$(cat "$rqd/opened" 2>/dev/null)" = https://gitlab.example/grp/proj/-/jobs/1 ] && pass=$((pass+1)) || { echo "FAIL rq19e: open"; fail=$((fail+1)); }
