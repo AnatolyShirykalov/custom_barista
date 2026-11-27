@@ -37,7 +37,11 @@ cd ~/projects/custom_barista &amp;&amp; git pull &amp;&amp; ./install.sh --no-re
 exit</pre></li>
 <li>First time only, if the clone is missing: <code>git clone git@github.com:AnatolyShirykalov/custom_barista.git ~/projects/custom_barista</code> (needs a GitHub key for anatolii, otherwise the https URL).</li>
 <li>Restart the bar in anatolii's own X session: Win+Shift+R (i3 restart), or it starts at the next login.</li>
-<li>Runner block privacy: never add <code>listen_address</code> to anatolii's <code>~/.gitlab-runner/config.toml</code>; the pending count needs anatolii's own token in <code>~/.config/custom_barista/gitlab-token</code> (600).</li></ol></section>
+<li>Runner block privacy: never add <code>listen_address</code> to anatolii's <code>~/.gitlab-runner/config.toml</code>; the pending count needs anatolii's own token in <code>~/.config/custom_barista/gitlab-token</code> (600; done 2026-11-27): fine-grained, only the groups anatolii's runner builds, Group and project tab CI/CD Job: Read + Pipeline: Read; paste it with an editor into a file made by <code>install -m 600 /dev/null &lt;path&gt;</code>. Projects come from anatolii's runner log automatically.</li>
+<li>Testing under <code>sudo -iu anatolii</code>: prefix with <code>XDG_RUNTIME_DIR=/run/user/$(id -u)</code>, otherwise the block shows <code>off</code> (no user systemd bus):
+<pre>XDG_RUNTIME_DIR=/run/user/$(id -u) scripts/runner-queue.sh refresh-now
+XDG_RUNTIME_DIR=/run/user/$(id -u) scripts/runner-queue.sh | jq -c .</pre></li>
+<li><code>U1: statusline tap not installed</code> in the install output is fine: anatolii's Claude usage block uses the API fallback (anatolii has no custom Claude statusline script).</li></ol></section>
 
 <h2>Done</h2>
 <ul><li><b>U-3</b> GitLab token for the bar: done 2026-11-27. Fine-grained token, "Only my personal projects", CI/CD Pipeline + Runner read; saved to <code>~/.config/custom_barista/gitlab-token</code> (600). Tested: 200 on a personal project.</li><li><b>U-4</b> Project ids to watch: done 2026-11-27, superseded by G1g: projects come from the runner log; <code>runner-projects</code> is an optional extra.</li><li><b>U-4</b> Project ids to watch: done 2026-11-27, superseded by G1g: projects come from the runner log; <code>runner-projects</code> is an optional extra.</li></ul>
