@@ -23,8 +23,9 @@ No agent running. Done recently (2026-11-27, session 6): R1b reboot "Invalid JSO
 
 ### Queued next (one agent each, in order)
 
-1. [ ] **G2 runner block for anatolii, private sources only** (constraint from user via setup session, 2026-11-27): anatolii's runner data must never be visible to other local users: no `listen_address`/metrics TCP port for anatolii's runner (any localhost port is readable by anatoly), no world-readable files (cache dir 700/files 600 already). Allowed: anatolii's own `journalctl --user` (current fallback), API token in a 600 file in anatolii's home. Spec check first: does runner-queue.sh with no listen_address already comply; make install.sh/docs never enable metrics for other users; test as anatolii. → `bar-designer` (spec) then `widget-builder`
-2. [ ] **G1e live acceptance checks for runner block** (ask when user has done U-3 + U-4 in docs/USER_TODO.html): spec acceptance 2, 3, 5, 6 — green `1/4` during a real job, token absent from `ps` during refresh, ≤1 API refresh per 60 s, yellow `net` on network drop; apply U-2 idle choice if not A. → `chore`
+1. [ ] **G2a drop runner metrics (user decision 2026-11-27)**: remove the metrics path from scripts/runner-queue.sh (journal for running, config.toml for concurrent), update spec/tests/README/hover text; remove `listen_address` from ~/.gitlab-runner/config.toml and restart the user runner only when no job runs; deploy, smoke both bars. → `widget-builder`
+2. [ ] **G2 runner block for anatolii, private sources only** (constraint from user via setup session, 2026-11-27): anatolii's runner data must never be visible to other local users: no metrics at all (G2a), no `listen_address` TCP port (any localhost port is readable by anatoly), no world-readable files (cache dir 700/files 600 already). Allowed: anatolii's own `journalctl --user` (current fallback), API token in a 600 file in anatolii's home. Spec check first: does runner-queue.sh with no listen_address already comply; make install.sh/docs never enable metrics for other users; test as anatolii. → `bar-designer` (spec) then `widget-builder`
+3. [ ] **G1e live acceptance checks for runner block** (ask when user has done U-3 + U-4 in docs/USER_TODO.html): spec acceptance 2, 3, 5, 6 — green `1/4` during a real job, token absent from `ps` during refresh, ≤1 API refresh per 60 s, yellow `net` on network drop; apply U-2 idle choice if not A. → `chore`
 
 ### Background checks
 
@@ -50,6 +51,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 ## Decisions made
 
+- 2026-11-27: drop runner metrics for both users (replaces the metrics part of G1 option C): running count from `journalctl --user`, concurrent from config.toml, pending via API token; no TCP port.
 - 2026-11-27: G1 runner queue block data source C: running count from runner metrics (enable listen_address, restart runner) + pending jobs via GitLab API (read_api token in 0600 file, project id list).
 - 2026-11-20: T1 picks: Q1 B remove middle-click popups (hover only), Q2 A 500 ms delay then instant while sliding.
 - 2026-11-18: D5 picks: regrouping only (from option B), no P2/P3/P5 ("enough space"), clipboard block removed entirely; 7d usage mark always visible.
