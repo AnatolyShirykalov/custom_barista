@@ -157,3 +157,7 @@ code-reviewer (read-only) on 60bc4a6..47ffa41: test.sh 176/0, shellcheck info/st
 - Evidence since 2026-11-22 (archive 2026-11.md): widget-builder 23 items, chore 8, bar-designer 5, others 1-2; no item needed general-purpose, none failed or ran out of context. No add/split/retire.
 - R1 (new reboot block) went to widget-builder without a designer step; the look pass then found a dead notify-send click and a truncated popup (R1a). widget-builder now reports "needs bar-designer review" for any new visible block, click or popup built without a spec (a post-build review, cheaper than requiring a spec first; R1's item already held the design rules).
 - R1 shipped printing nothing under `json = true` ("Invalid JSON" after reboot, fixed cf3b6bd/R1b). widget-builder now requires `jq -e .` asserts in test.sh rows for every output path (normal, hidden/empty, ERR) of json custom blocks.
+
+## Context diet 2026-11-27
+
+Baseline first turn ~48.4k (was ~50k on 11-22). 6 candidates; user turned off (settings.local.json `skillOverrides`): anthropic-skills:chrome-browser, dataviz, artifact-capabilities, artifact-design, artifact-diagramming (~850 tok). Kept: computer-use/built-in-browser, Claude Docs connector, design/UI skills + tutorial-video, caveman plugin, roadmap-init. Confirm with `/context` next session.
