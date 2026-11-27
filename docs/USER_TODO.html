@@ -28,21 +28,6 @@ pre{padding:8px;overflow-x:auto}img,svg{max-width:100%;height:auto;border:1px so
 <p>B:<br><img src="design/G1-runner-queue/img/b-idle-hidden.png" alt="B idle hidden"></p>
 <p>C:<br><img src="design/G1-runner-queue/img/c-idle-icon.png" alt="C idle icon"></p>
 <p>Answer A, B or C in chat. The builder builds A unless told otherwise.</p></section>
-<section id="U-4"><h2>U-4: Project ids to watch</h2>
-<p><b>Note:</b> your bar token (U-3) is limited to your personal projects (<code>pipocavsobake/…</code>); other projects return 403 and show as <code>+?</code>. Pick personal projects that use your runner, e.g. <code>pipocavsobake/sprecher</code>.</p>
-<p>Quick start: <code>printf '%s\n' pipocavsobake/sprecher &gt; ~/.config/custom_barista/runner-projects</code> (the hover shows "Pending: no project list" until this file exists).</p>
-<p><b>Why:</b> the block counts pending jobs only for the projects you list (max 10; more are ignored). Spec: <a href="design/G1-runner-queue/spec.md">spec.md</a>.</p>
-<ol><li>Find each id: project page, <code>&#8942;</code> menu top right, "Copy project ID" (or Settings, General).</li>
-<li>Write them to <code>~/.config/custom_barista/runner-projects</code>, one per line. Numeric ids or <code>group/project</code> paths both work; <code>#</code> comments and blank lines are allowed:
-<pre># my projects
-12345678
-group/sub/project</pre></li></ol>
-<svg viewBox="0 0 360 120" width="360" role="img" aria-label="project page sketch">
-<rect class="b" x="2" y="2" width="356" height="116" rx="6"/>
-<text x="14" y="26">group / my-project</text><text x="326" y="26">&#8942;</text>
-<rect class="b" x="200" y="34" width="150" height="50" rx="4"/>
-<text x="210" y="54">Copy project ID</text><text x="210" y="74">Settings</text>
-<text x="14" y="104">Project ID: 12345678 (Settings &rarr; General)</text></svg></section>
 
 <section id="always-anatolii"><h2>Always: update the bar for anatolii</h2>
 <p><b>When:</b> after a session that changed the bar (see the roadmap's "Done recently").</p>
@@ -55,5 +40,5 @@ exit</pre></li>
 <li>Runner block privacy: never add <code>listen_address</code> to anatolii's <code>~/.gitlab-runner/config.toml</code>; the pending count needs anatolii's own token in <code>~/.config/custom_barista/gitlab-token</code> (600).</li></ol></section>
 
 <h2>Done</h2>
-<ul><li><b>U-3</b> GitLab token for the bar: done 2026-11-27. Fine-grained token, "Only my personal projects", CI/CD Pipeline + Runner read; saved to <code>~/.config/custom_barista/gitlab-token</code> (600). Tested: 200 on a personal project.</li></ul>
+<ul><li><b>U-3</b> GitLab token for the bar: done 2026-11-27. Fine-grained token, "Only my personal projects", CI/CD Pipeline + Runner read; saved to <code>~/.config/custom_barista/gitlab-token</code> (600). Tested: 200 on a personal project.</li><li><b>U-4</b> Project ids to watch: done 2026-11-27, superseded by G1g: projects come from the runner log; <code>runner-projects</code> is an optional extra.</li><li><b>U-4</b> Project ids to watch: done 2026-11-27, superseded by G1g: projects come from the runner log; <code>runner-projects</code> is an optional extra.</li></ul>
 </body></html>

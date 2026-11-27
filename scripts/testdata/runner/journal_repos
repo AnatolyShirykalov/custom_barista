@@ -1,0 +1,6 @@
+Started GitLab Runner (user).
+Checking for jobs... received                     [0;m  correlation_id[0;m=abc-TXL job[0;m=1 job_name[0;m=check repo_url[0;m=https://gitlab.com/pipocavsobake/old.git runner[0;m=pKFe-OkjY runner_name[0;m=local-arch-pc
+Checking for jobs... received                     [0;m  correlation_id[0;m=abc-TXL job[0;m=1 job_name[0;m=check repo_url[0;m=https://gitlab.com/pipocavsobake/data_zentrum.git runner[0;m=pKFe-OkjY runner_name[0;m=local-arch-pc
+Checking for jobs... received                     [0;m  correlation_id[0;m=abc-TXL job[0;m=1 job_name[0;m=check repo_url[0;m=https://gitlab.com/pipocavsobake/sub/deep.git runner[0;m=pKFe-OkjY runner_name[0;m=local-arch-pc
+Checking for jobs... received                     [0;m  correlation_id[0;m=abc-TXL job[0;m=1 job_name[0;m=check repo_url[0;m=https://gitlab.com/pipocavsobake/old.git runner[0;m=pKFe-OkjY runner_name[0;m=local-arch-pc
+Added job to processing list                      [0;m  builds[0;m=1 job[0;m=2 project_full_path[0;m=pipocavsobake/old

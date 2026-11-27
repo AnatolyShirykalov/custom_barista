@@ -203,7 +203,7 @@ o=$(BTIME=$(b 2026-11-27T09:00:00) SESSION_START=$(b 2026-11-27T09:00:00) rb lis
 o=$(BTIME=$(b 2026-11-20T00:00:00) SESSION_START=$(b 2026-11-27T09:00:00) LIST_MAX=4 rb list); [ "$(wc -l <<<"$o")" = 4 ] && tail -1 <<<"$o" | grep -q '^  +[0-9]* more$' && grep -q '^Need reboot:' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rb7: cap"; fail=$((fail+1)); }
 check rb6 "$(BTIME=x rb)" "REBOOT ERR" Critical
 unset SESSION_START
-# runner-queue.sh (rq1-rq20): fixtures in testdata/runner, no systemd/network; NOW fixed; c = 4
+# runner-queue.sh (rq1-rq29): fixtures in testdata/runner, no systemd/network; NOW fixed; c = 4
 Q=$t/runner; RN=1795003200; rqd=$(mktemp -d -p "$gd"); qc=$rqd/q.json; printf 'tok\n' >"$rqd/tok"; chmod 600 "$rqd/tok"
 rq() { RUNNER_CONFIG=${RC:-$Q/config.toml} UNIT_STATE=${US:-active} JOURNAL_FILE=${JF:-$Q/journal_ok} QUEUE_CACHE=${QC:-$qc} TOKEN_FILE=${TF:-$rqd/tok} PROJECTS_FILE=${PF:-$Q/projects} NOW=$RN NO_REFRESH=${NR-1} API_DIR=${API:-} LIST_MAX=${LM:-8} "$d/runner-queue.sh" "$@"; }
 qcache() { # ts_ok age, err, pending count, oldest pending age (s)
@@ -238,6 +238,17 @@ rm -f "$qc"; API=$Q/api500 rq refresh
 [ "$(jq -r .err "$qc" 2>/dev/null)" = net ] && jq -e . "$qc" >/dev/null 2>&1 && pass=$((pass+1)) || { echo "FAIL rq22: 500 -> err net"; fail=$((fail+1)); }
 printf '\n# none\n' >"$rqd/noproj"; rm -f "$qc"; PF=$rqd/noproj API=$Q/api rq refresh
 [ "$(jq -c '[.err,(.pending|length)]' "$qc" 2>/dev/null)" = '[null,0]' ] && pass=$((pass+1)) || { echo "FAIL rq23: empty projects file"; fail=$((fail+1)); }
+# rq24-28: projects from the runner log (real ANSI format) + optional file: log-only, file-only, both/dedupe, cap 10, none
+rqp() { rm -f "$qc" "${qc%.json}.projects"; ( export "$@" API=$Q/api; rq refresh ); jq -c '.projects' "$qc" 2>/dev/null; }
+[ "$(rqp JF=$Q/journal_repos PF=$rqd/none)" = '["pipocavsobake/old","pipocavsobake/sub/deep","pipocavsobake/data_zentrum"]' ] && pass=$((pass+1)) || { echo "FAIL rq24: log-only projects"; fail=$((fail+1)); }
+[ "$(rqp PF=$Q/projects)" = '["1","2"]' ] && pass=$((pass+1)) || { echo "FAIL rq25: file-only projects"; fail=$((fail+1)); }
+printf 'pipocavsobake/old\n7\n' >"$rqd/pf2"
+[ "$(rqp JF=$Q/journal_repos PF=$rqd/pf2)" = '["pipocavsobake/old","7","pipocavsobake/sub/deep","pipocavsobake/data_zentrum"]' ] && pass=$((pass+1)) || { echo "FAIL rq26: both/dedupe projects"; fail=$((fail+1)); }
+o=$(rqp JF=$Q/journal_repos12 PF=$Q/projects); [ "$(jq -c 'length' <<<"$o")" = 10 ] && [ "$(jq -r '.[0],.[2],.[9]' <<<"$o" | tr '\n' ' ')" = "1 pipocavsobake/p12 pipocavsobake/p5 " ] && [ "$(wc -l <"${qc%.json}.projects")" = 10 ] && [ "$(jq .ignored "$qc")" = 2 ] && pass=$((pass+1)) || { echo "FAIL rq27: cap 10: $o"; fail=$((fail+1)); }
+o=$(rqp PF=$rqd/none); [ "$o" = '[]' ] && o=$(PF=$rqd/none rq list) && grep -q '^Pending: no project list' <<<"$o" && o=$(PF=$rqd/none rq) && jq -e . >/dev/null 2>&1 <<<"$o" && grep -q '^0/4' <<<"$(jq -r .text <<<"$o")" && pass=$((pass+1)) || { echo "FAIL rq28: no projects"; fail=$((fail+1)); }
+# rq29: log-found projects make the hover and bar leave the "no project list" state without a file
+rm -f "$qc"; printf 'pipocavsobake/old\n' >"${qc%.json}.projects"; qcache 10 "" 3 60; o=$(PF=$rqd/none rq list); ! grep -q 'no project list' <<<"$o" && grep -q '^Pending 3' <<<"$o" && jq -e . >/dev/null 2>&1 <<<"$(PF=$rqd/none rq)" && pass=$((pass+1)) || { echo "FAIL rq29: auto list in hover"; fail=$((fail+1)); }
+rm -f "${qc%.json}.projects"
 # rq17: every output above is valid json; rq18: fixed width
 ok=1; for v in "$o1" "$o2" "$o3" "$o4" "$o5" "$o6" "$o7" "$o8" "$o9" "$o10" "$o11" "$o12" "$o13" "$o14"; do jq -e . >/dev/null 2>&1 <<<"$v" || ok=; done
 o=$(RC=$rqd/none rq); jq -e . >/dev/null 2>&1 <<<"$o" && [ -n "$ok" ] && pass=$((pass+1)) || { echo "FAIL rq17: invalid json"; fail=$((fail+1)); }

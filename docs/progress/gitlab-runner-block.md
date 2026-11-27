@@ -61,3 +61,8 @@ runner-queue.sh: `spawn()` creates the cache dir (700) before `flock`; refresh h
 ## G2b journal ANSI fix + project-list message (2026-11-27)
 - Real journal lines carry ANSI codes inside fields (`builds\e[0;m=0`); `journal()` strips them (strip helper). Fixtures journal_b2/b3/ok/net/jobs now use the real layout; rq19e asserts it (old code fails rq9, rq19c, rq19e).
 - Hover: missing token -> "Pending: no token (path)"; missing runner-projects -> "Pending: no project list (path)"; test rq19d.
+
+## G1g auto project list from runner log (2026-11-27)
+- `auto_scan` (journal `--since -30d`, `repo_url=https://host/path.git` -> path, newest first, unique, max 10) runs only in the background `refresh`, writes `runner-queue.projects` beside the cache; `plist` merges `runner-projects` (first) + that file; bar/hover read only the small file (no 30d journal per tick). Cache now carries `.projects`.
+- Hover "no project list" only when both empty; with a token but no list, the bar respawns refresh at most every 5 min.
+- Tests rq24-rq29 (real ANSI fixtures journal_repos, journal_repos12). U-4 moved to Done in USER_TODO.html. Live: bar shows `0/4  +0` with 3 projects found (data_zentrum, smart_speaker, concerts).

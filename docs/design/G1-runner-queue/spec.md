@@ -23,7 +23,8 @@ A keeps the width fixed in every state and shows runner health (off / net) at a 
 | Block script | `scripts/runner-queue.sh` | modes: none (bar json), `refresh` (API fetch, detached), `refresh-now` (left click: `refresh` unless cache < 10 s old), `list` (hover text), `open` (right click) |
 | Runner config (read only) | `$HOME/.gitlab-runner/config.toml` (`RUNNER_CONFIG`) | never `/home/*`, never another user's file |
 | API token | `~/.config/custom_barista/gitlab-token` (`TOKEN_FILE`) | one line, PAT or project token with `read_api`; dir 0700, file 0600 (or 0400). Any group/other bit set → treated as missing + hover says `token file mode NNN: chmod 600 <path>`. Outside the repo; install.sh never creates or reads it |
-| Project list | `~/.config/custom_barista/runner-projects` (`PROJECTS_FILE`) | one project per line: numeric id or `group/sub/project` path (script URL-encodes `/` → `%2F`); `#` comments and blank lines ignored; first 10 used, rest ignored (hover says `+N projects ignored`) |
+| Project list (G1g, 2026-11-27) | own runner log: `repo_url=https://host/group/project.git` lines of `journalctl --user -u gitlab-runner --since -30d` (ANSI stripped), unique, newest first, max 10; scanned only by the background refresh, stored in `runner-queue.projects` next to the cache | optional `runner-projects` below is merged in (file entries first, dedupe, cap 10); hover "no project list" only when both are empty |
+| Project list file (optional extra) | `~/.config/custom_barista/runner-projects` (`PROJECTS_FILE`) | one project per line: numeric id or `group/sub/project` path (script URL-encodes `/` → `%2F`); `#` comments and blank lines ignored; first 10 used, rest ignored (hover says `+N projects ignored`) |
 | Cache | `${XDG_CACHE_HOME:-$HOME/.cache}/custom_barista/runner-queue.json` (`QUEUE_CACHE`), lock `…/runner-queue.lock` | written atomically (tmp + `mv`); shared by the DP-0 and DP-2 bar processes |
 
 ## Runner setup (builder, once)

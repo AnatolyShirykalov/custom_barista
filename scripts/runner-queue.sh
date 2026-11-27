@@ -2,6 +2,7 @@
 # GitLab runner queue block (this user's runner): "running/concurrent  +pending", json for i3status-rs custom block.
 # Modes: (none) bar json | refresh (API fetch, detached by the bar run) | refresh-now (left click) | list (hover text) | open (right click)
 # Running: own `journalctl --user` builds=N (no metrics port: any local user could read it). Pending: GitLab API, cached; see docs/design/G1-runner-queue/spec.md
+# Projects: repo_url= lines of the own runner log (30d, newest first, written by refresh) + optional PROJECTS_FILE (first); max 10
 # Test overrides: RUNNER_CONFIG UNIT_STATE JOURNAL_FILE QUEUE_CACHE TOKEN_FILE PROJECTS_FILE NOW NO_REFRESH API_DIR LIST_MAX OPEN_CMD
 set -u
 CFG=${RUNNER_CONFIG:-$HOME/.gitlab-runner/config.toml}
@@ -9,6 +10,7 @@ TOKEN_FILE=${TOKEN_FILE:-$HOME/.config/custom_barista/gitlab-token}
 PROJECTS_FILE=${PROJECTS_FILE:-$HOME/.config/custom_barista/runner-projects}
 CACHE=${QUEUE_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/custom_barista/runner-queue.json}
 LOCK=${CACHE%.json}.lock
+AUTO=${CACHE%.json}.projects # projects found in the runner log, written by refresh
 NOW=${NOW:-$(date +%s)}
 LIST_MAX=${LIST_MAX:-8}
 TTL=60; TTL_AUTH=600; STALE=300; STUCK=900
@@ -29,6 +31,10 @@ first_runner() { # value of key $1 in the first [[runners]] table
 tokmode() { stat -c %a "$TOKEN_FILE" 2>/dev/null; }
 mode_ok() { local m; m=$(tokmode); [[ $m =~ ^[0-7]+$ ]] && (( (8#$m & 077) == 0 )); }
 unit_state() { echo "${UNIT_STATE:-$(timeout 2 systemctl --user is-active gitlab-runner 2>/dev/null)}"; }
+auto_scan() { # project paths from repo_url=https://host/group/project.git, newest first, max 10
+  journal --since -30d | grep -o 'repo_url=[^ ]*' | sed -n 's#^repo_url=https\?://[^/]*/\(.*\)\.git$#\1#p' | tac | awk '!s[$0]++' | head -n 10; }
+plist() { # file entries first, then the log-found ones; unique
+  { [ -r "$PROJECTS_FILE" ] && sed 's/#.*//; s/[[:space:]]//g; /^$/d' "$PROJECTS_FILE"; cat "$AUTO" 2>/dev/null; } | awk '!s[$0]++'; }
 net_down() { journal --since -30s | grep -q 'Checking for jobs\.\.\. failed'; }
 
 # "r c src" from the journal (builds=N) and config (concurrent)
@@ -50,7 +56,7 @@ bar() {
   emit() { jq -nc --arg t "$1" --arg s "$2" '{icon:"gitlab",state:$s,text:$t}'; }
   read -r r c src < <(counts)
   local w=$(( ${#c} * 2 + 1 )) slotted=1
-  [ -e "$TOKEN_FILE" ] || [ -e "$PROJECTS_FILE" ] || slotted=
+  [ -e "$TOKEN_FILE" ] || [ -e "$PROJECTS_FILE" ] || [ -n "$(plist)" ] || slotted=
   [ -n "$slotted" ] && w=$((w + 4))
   pad() { printf '%-*s' "$w" "$1"; }
   st=$(unit_state)
@@ -61,7 +67,7 @@ bar() {
   # pending slot: p count, oldest created, dim "?" when unknown
   local p=0 oldest=0 unknown='' err ts ts_ok
   if [ -n "$slotted" ]; then
-    if [ -e "$TOKEN_FILE" ] && [ -e "$PROJECTS_FILE" ] && mode_ok; then
+    if [ -e "$TOKEN_FILE" ] && [ -n "$(plist)" ] && mode_ok; then
       local row; row=$(jq -r '[(.err // "-"), (.ts // 0), (.ts_ok // 0), ([.pending[]?] | length), (([.pending[]?.created] | min) // 0)] | @tsv' "$CACHE" 2>/dev/null)
       if [ -n "$row" ]; then
         read -r err ts ts_ok p oldest <<<"$row"
@@ -73,7 +79,10 @@ bar() {
         unknown=1
         [ -z "${NO_REFRESH:-}" ] && spawn
       fi
-    else unknown=1; fi
+    else
+      unknown=1 # no project known yet: rescan the log at most every 5 min
+      [ -e "$TOKEN_FILE" ] && mode_ok && [ -z "${NO_REFRESH:-}" ] && { [ ! -e "$AUTO" ] || [ -n "$(find "$AUTO" -mmin +5 2>/dev/null)" ]; } && spawn
+    fi
     [ -n "$unknown" ] && { p=0; oldest=0; }
   fi
   local slot=
@@ -95,20 +104,21 @@ cache_age() { local t; t=$(jq -r '.ts // 0' "$CACHE" 2>/dev/null); echo $((NOW -
 
 # GitLab API fetch into the cache; one call per listed project, token via stdin (never in argv)
 refresh() {
-  [ -r "$CFG" ] && [ -r "$TOKEN_FILE" ] && [ -r "$PROJECTS_FILE" ] && mode_ok || return 0
+  [ -r "$CFG" ] && [ -r "$TOKEN_FILE" ] && mode_ok || return 0
   umask 077
+  mkdir -p "$(dirname "$CACHE")"; auto_scan >"$AUTO.new" && mv "$AUTO.new" "$AUTO"
   local base rid tok prev ids ignored id key n=0 code auth='' neterr=''
   base=$(first_runner url); rid=$(first_runner id)
   tok=$(head -n1 "$TOKEN_FILE" | tr -d '[:space:]')
   mkdir -p "$(dirname "$CACHE")"; td=$(mktemp -d -p "$(dirname "$CACHE")"); trap 'rm -rf "$td"' EXIT
   prev=$(jq -c . "$CACHE" 2>/dev/null) || prev=; [ -n "$prev" ] || prev='{"ts_ok":0,"pending":[],"running":[]}'
-  ids=$(sed 's/#.*//; s/[[:space:]]//g; /^$/d' "$PROJECTS_FILE")
-  ignored=$(( $(wc -l <<<"$ids") - 10 )); [ "$ignored" -gt 0 ] || ignored=0
+  ids=$(plist)
+  ignored=$(( $(grep -c . <<<"$ids") - 10 )); [ "$ignored" -gt 0 ] || ignored=0
   write() { # err
-    jq -nc --argjson now "$NOW" --argjson prev "$prev" --arg err "$1" --argjson ign "$ignored" --slurpfile new <(cat "$td"/p*.json 2>/dev/null | jq -s '{pending: ([.[].pending[]]), running: ([.[].running[]])}') '
+    jq -nc --argjson now "$NOW" --argjson prev "$prev" --arg err "$1" --argjson ign "$ignored" --arg ids "$ids" --slurpfile new <(cat "$td"/p*.json 2>/dev/null | jq -s '{pending: ([.[].pending[]]), running: ([.[].running[]])}') '
       ($new[0] // {pending: [], running: []}) as $n
-      | if $err == "" then {ts: $now, ts_ok: $now, err: null, pending: $n.pending, running: $n.running, ignored: $ign}
-        else {ts: $now, ts_ok: ($prev.ts_ok // 0), err: $err, pending: ($prev.pending // []), running: ($prev.running // []), ignored: $ign} end' >"$td/out" && mv "$td/out" "$CACHE"; }
+      | if $err == "" then {ts: $now, ts_ok: $now, err: null, pending: $n.pending, running: $n.running, ignored: $ign, projects: ($ids | split("\n") | map(select(. != "")) | .[0:10])}
+        else {ts: $now, ts_ok: ($prev.ts_ok // 0), err: $err, pending: ($prev.pending // []), running: ($prev.running // []), ignored: $ign, projects: ($ids | split("\n") | map(select(. != "")) | .[0:10])} end' >"$td/out" && mv "$td/out" "$CACHE"; }
   if net_down; then write net; return 0; fi
   while read -r id; do
     [ -n "$id" ] || continue
@@ -143,7 +153,7 @@ list() {
   local err=- ts=0 ts_ok=0; [ -n "$meta" ] && read -r err ts ts_ok <<<"$meta"
   local pstat='' usecache=''
   if [ ! -e "$TOKEN_FILE" ]; then pstat="Pending: no token (${TOKEN_FILE/#$HOME/\~})"
-  elif [ ! -e "$PROJECTS_FILE" ]; then pstat="Pending: no project list (${PROJECTS_FILE/#$HOME/\~})"
+  elif [ -z "$(plist)" ]; then pstat="Pending: no project list (none in runner log; ${PROJECTS_FILE/#$HOME/\~})"
   elif ! mode_ok; then pstat="Pending: token file mode $(tokmode): chmod 600 ${TOKEN_FILE/#$HOME/\~}"
   elif [ "$err" = auth ]; then pstat="Pending: token rejected (401), next try in 10 min"
   elif [ -z "$meta" ]; then pstat="Pending: not fetched yet"
