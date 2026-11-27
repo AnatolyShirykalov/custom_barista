@@ -123,3 +123,7 @@ Screenshots of both bars + 8 hover popups (DP-0 load, net, usage, clock; DP-2 fr
 ## Context diet 2026-11-22
 
 context-auditor (read-only): baseline first-turn context 48.6k-50.0k tokens. Offered: easel, Claude Docs, claude-in-chrome, stale Go allow rules, 14 web-design skills, roadmap-init, caveman, gopls-lsp. User picked: disable claude-in-chrome (`deniedMcpServers` + `permissions.deny mcp__claude-in-chrome`), remove `Bash(go get/doc:*)` allow rules, disable `gopls-lsp@claude-plugins-official` (`enabledPlugins`). Kept: easel, Claude Docs, design skills, roadmap-init, caveman. Applied in `.claude/settings.local.json` (untracked); takes effect next session.
+
+## Code review + docs 2026-11-27
+
+code-reviewer (read-only) on 60bc4a6..47ffa41: test.sh 176/0, shellcheck info/style only, compact.toml in sync. Findings (→ queued item I2): install.sh:71 dropped `$mod+i` duplicate check (i3 -C fails "Duplicate keybinding" when ~/.i3/config or old block has it); i3block.sh:12 BEGIN without END deletes rest of config.local; install.sh:107 i3block.sh failure masked inside `[ $(...) ]`; i3block.sh:18 dangling symlink mkdir wrong dir (`readlink -m`); test.sh:185 no rollback/duplicate/missing-END rows (add i5, i6); test_hover.py:109 rediscover() drain untested. hover-daemon drain logic sound. Agent files OK. Docs match: yes.

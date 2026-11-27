@@ -18,15 +18,16 @@ Work items are checkboxes (`- [ ]` / `1. [ ]`, `[x]` when done) so the status li
 
 ## In flight
 
-No agent running. Done recently (2026-11-22, session 4): install.sh writes i3 lines to ~/.config/i3/config.local (setup repo owns ~/.i3/config; verified both users), hover first-popup fix (X queue drain), recurring widget health, backlog tidy, agent roster, context diet (chrome + gopls off). (2026-11-20, session 3): D5-R review accepted; hover tooltips T1 (spike, spec, wrapper, core, daemon, review), middle-click popups removed (T1d), hover hardening from code review (T1e), README/CLAUDE.md docs (T1f); usage `cc …` first-run placeholder (U1c); recurring dep updates, code review, git hygiene, look pass. Earlier: 2026-11-18 i3status-rust switch, usage block U1/U1d, D5 regroup. Archive: `docs/roadmap-archive/2026-11.md`.
+R1 reboot-needed block → widget-builder (running). Done recently (2026-11-22, session 4): install.sh writes i3 lines to ~/.config/i3/config.local (setup repo owns ~/.i3/config; verified both users), hover first-popup fix (X queue drain), recurring widget health, backlog tidy, agent roster, context diet (chrome + gopls off). (2026-11-20, session 3): D5-R review accepted; hover tooltips T1 (spike, spec, wrapper, core, daemon, review), middle-click popups removed (T1d), hover hardening from code review (T1e), README/CLAUDE.md docs (T1f); usage `cc …` first-run placeholder (U1c); recurring dep updates, code review, git hygiene, look pass. Earlier: 2026-11-18 i3status-rust switch, usage block U1/U1d, D5 regroup. Archive: `docs/roadmap-archive/2026-11.md`.
 
 ### Queued next (one agent each, in order)
 
-1. [ ] **Recurring: Code review + docs** (last 2026-11-20): review 60bc4a6 (install.sh/i3block.sh config.local), 58750f0 (hover-daemon drain), 7211676 (agent files); README/CLAUDE.md match. Reviewer has no write tools: main session writes the note. → `code-reviewer`
+1. [x] **Recurring: Code review + docs** (done 2026-11-27, 6 findings → I2; note in recurring.md): review 60bc4a6 (install.sh/i3block.sh config.local), 58750f0 (hover-daemon drain), 7211676 (agent files); README/CLAUDE.md match. Reviewer has no write tools: main session writes the note. → `code-reviewer`
 2. [ ] **R1 reboot-needed block** (request 2026-11-27 via setup session): custom block, hidden when nothing applies. Rules (no root, cheap, interval ~60 s): (1) `/usr/lib/modules/$(uname -r)` missing → bad/red "⟳ reboot: kernel 7.3.5→7.3.6" (new ver from `pacman -Q linux`); (2) boot-time pkgs upgraded in /var/log/pacman.log after boot (btime from /proc/stat): nvidia*, linux-firmware*, amd-ucode/intel-ucode, systemd, glibc, dbus*, mkinitcpio, cryptsetup → degraded "reboot"; (3) optional, session pkgs after session start (xorg-server, i3-wm, mesa, pipewire, wireplumber, picom) → dim "relogin". Package lists in one editable place; click/hover lists triggering pkgs. Done: shows kernel case live now (running 7.3.5, modules dir gone; build before reboot), test.sh fakes uname/modules dir/pacman.log for rules 1-2. → `widget-builder`
-3. [ ] **Recurring: Git hygiene** (last 2026-11-20): check `config.local.bak-*`/install backups never land in the repo; .gitignore gaps. → `repo-janitor`
-4. [ ] **Recurring: Dependency updates** (last 2026-11-20): i3status-rs release, python-xlib (hover drain relies on pending_events/next_event behaviour). → `dep-updater`
-5. [ ] **Recurring: Look/usability pass** (last 2026-11-20): both bars + hover popups for both users (anatolii uses usage API fallback, no statusline tap). → `bar-designer`
+3. [ ] **I2 install hardening** (code review 2026-11-27, see recurring.md): install.sh warn/stop on existing `bindsym $mod+i`/`Mod4+i` in ~/.i3/config (tell user to remove in setup repo); i3block.sh exit 1 on BEGIN without END; install.sh:107 capture i3block.sh output with `|| exit`; i3block.sh mkdir via `readlink -m`; test rows i5 (rollback on dup binding) i6 (missing END); hover rediscover() drain test. → `widget-builder`
+4. [ ] **Recurring: Git hygiene** (last 2026-11-20): check `config.local.bak-*`/install backups never land in the repo; .gitignore gaps. → `repo-janitor`
+5. [ ] **Recurring: Dependency updates** (last 2026-11-20): i3status-rs release, python-xlib (hover drain relies on pending_events/next_event behaviour). → `dep-updater`
+6. [ ] **Recurring: Look/usability pass** (last 2026-11-20): both bars + hover popups for both users (anatolii uses usage API fallback, no statusline tap). → `bar-designer`
 
 ### Background checks
 
@@ -47,7 +48,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 | Dependency updates | `dep-updater` | i3status-rs installed vs latest release, changelog breaking config changes grep'd in config.toml/scripts, script deps (jq, xclip, yad, nvidia-smi, xdotool, node) present and formats unchanged; fix keys, backlog the rest | 2026-11-20 |
 | Look/usability pass | `bar-designer` | screenshot the bar; clarity, colors, stable widths, glyphs render; findings → backlog | 2026-11-20 |
 | Widget health | `chore` | every block shows real data on this machine: `bash scripts/test.sh`, smoke `(sleep 6) \| timeout 6 i3status-rs $PWD/config.toml` (and compact.toml), grep `ERR`/`not found`/`error`; after system upgrades check nvidia-smi, hwmon, pulse, sysfs formats; failures → backlog for `widget-builder` | 2026-11-22 |
-| Code review + docs | `code-reviewer` | review diffs since last run; README block list and CLAUDE.md match the code | 2026-11-20 |
+| Code review + docs | `code-reviewer` | review diffs since last run; README block list and CLAUDE.md match the code | 2026-11-27 |
 
 
 ## Decisions made
