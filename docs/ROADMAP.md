@@ -33,6 +33,7 @@ No agent running. Done recently (2026-11-27, session 5): code review, R1 reboot-
 8. [x] **G1d review runner queue block**: accepted, no fixes; live checks with a job and a token remain (see progress note).
 9. [x] **G1f fix runner block review findings** (code review 2026-11-27 (2) in docs/progress/recurring.md): lock/cache dir mkdir, umask 077, refresh timeout vs per-project max-time, hover max lines, empty projects file, shellcheck, tests for spawn/flock + cache mode + api500, README entry + deps. → `widget-builder` Done (see docs/progress/gitlab-runner-block.md).
 10. [ ] **G1e live acceptance checks for runner block** (ask when user has done U-3 + U-4 in docs/USER_TODO.html): spec acceptance 2, 3, 5, 6 — green `1/4` during a real job, token absent from `ps` during refresh, ≤1 API refresh per 60 s, yellow `net` on network drop; apply U-2 idle choice if not A. → `chore`
+11. [ ] **G2 runner block for anatolii, private sources only** (constraint from user via setup session, 2026-11-27): anatolii's runner data must never be visible to other local users: no `listen_address`/metrics TCP port for anatolii's runner (any localhost port is readable by anatoly), no world-readable files (cache dir 700/files 600 already). Allowed: anatolii's own `journalctl --user` (current fallback), API token in a 600 file in anatolii's home. Spec check first: does runner-queue.sh with no listen_address already comply; make install.sh/docs never enable metrics for other users; test as anatolii. → `bar-designer` (spec) then `widget-builder`
 
 ### Background checks
 
