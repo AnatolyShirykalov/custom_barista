@@ -26,6 +26,10 @@ No agent running. Done recently (2026-11-27, session 5): code review, R1 reboot-
 2. [x] **Recurring: Agent roster** (done 2026-11-27): widget-builder now flags new visible blocks/clicks/popups without spec for bar-designer review, and requires `jq -e .` on every json custom block output path. Details: docs/progress/recurring.md
 3. [x] **Recurring: Context diet** (last 2026-11-22): ask user per findings. → `context-auditor`
 4. [x] **Recurring: Backlog tidy** (last 2026-11-22; backlog empty 2026-11-27, quick). → `chore`
+5. [ ] **G1a research gitlab-runner queue source**: per-user runner (both users have own): how to get running + pending jobs for current user's runner (metrics endpoint, `gitlab-runner` CLI/logs, GitLab API + token), cost, auth, no root. → `researcher`
+6. [ ] **G1b spec runner queue block**: from G1a; text/icon/colors/hide rule/hover/click, both bars. → `bar-designer`
+7. [ ] **G1c build runner queue block**: from G1b spec; json outputs `jq -e` tested; deploy. → `widget-builder`
+8. [ ] **G1d review runner queue block**: against spec, screenshot. → `bar-designer`
 
 ### Background checks
 
