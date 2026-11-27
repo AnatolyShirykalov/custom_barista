@@ -146,3 +146,9 @@ code-reviewer (read-only) on 60bc4a6..47ffa41: test.sh 176/0, shellcheck info/st
 - Finding: left click `notify-send` is dead: no notification daemon on the session bus and none activatable (`notify-send` prints ServiceUnknown, exit 0, nothing shown).
 - Finding: hover popup uses `list | head -3`, so it shows the kernel line, "Need reboot:" and 1 of 14 linux-firmware split packages; nvidia-open and the pipewire relogin are cut. The full list (19 lines) would be readable only after collapsing the firmware family.
 - Both → backlog R1a (widget-builder). Hover for anatolii: not checkable from here (not logged in, home 0700); hover-daemon runs for anatoly only.
+
+## Widget health 2026-11-27 (after system upgrade)
+- test.sh pass=189 fail=0. Smoke config.toml and compact.toml (6 s): 0 ERR / not found / error lines; all blocks emit text (sound 80%, load, gpu 37° 1.1GB, cpu temp 51°, disk, mem, date, reboot, usage, net, kbd).
+- nvidia-smi works (RTX 5070 Ti 36.9°C, driver 620.73.04); hwmon names unchanged (k10temp present, chip glob `k10temp-*` OK); pulse protocol OK via pipewire-pulse, wpctl works.
+- Note (expected, not a bug): running pipewire/wirepluming still 1.6.11 (1.6.12 installed, applies after relogin); /lib/modules has only 7.3.6 while kernel 7.3.5 runs, so module loads fail until reboot; no block depends on that today. reboot block correctly shows 7.3.5→7.3.6.
+- No failures, no backlog items.
