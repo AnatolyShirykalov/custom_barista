@@ -183,6 +183,14 @@ rm "$il"; ln -s "$gd/itarget" "$il"; inst; irc=$?
   && pass=$((pass+1)) || { echo "FAIL i3: symlinked config.local rc=$irc $(ls -l "$il")"; fail=$((fail+1)); }
 printf '# BEGIN custom_barista\ninclude /home/x/.i3/bars.conf\n# END custom_barista\n' >>"$ih/.i3/config"; cp "$ih/.i3/config" "$gd/imain"; inst; irc=$?
 [ $irc = 0 ] && cmp -s "$ih/.i3/config" "$gd/imain" && grep -q 'still has an old custom_barista block' "$gd/inst.out" && pass=$((pass+1)) || { echo "FAIL i4: old block in ~/.i3/config rc=$irc"; fail=$((fail+1)); }
+# i5: a Win+i binding outside our block (config.local) -> rc 1, clear message, files untouched; i6: BEGIN without END -> rc 1, file unchanged
+cp "$ih/.i3/config" "$gd/imain"; cp -L "$il" "$gd/il5"; cp "$ih/.i3/bars.conf" "$gd/bars5"; rm -f "$il"; cp "$gd/il5" "$il"
+sed -i '1i bindsym $mod+i exec true' "$il"; cp "$il" "$gd/il5b"; inst; irc=$?
+[ $irc = 1 ] && grep -q 'Win+i is already bound' "$gd/inst.out" && ! grep -q 'Duplicate' "$gd/inst.out" && cmp -s "$il" "$gd/il5b" && cmp -s "$ih/.i3/bars.conf" "$gd/bars5" && cmp -s "$ih/.i3/config" "$gd/imain" \
+  && pass=$((pass+1)) || { echo "FAIL i5: duplicate Win+i rc=$irc $(tail -2 "$gd/inst.out")"; fail=$((fail+1)); }
+printf 'bindsym $mod+v exec true\n# BEGIN custom_barista\ninclude /x\nbindsym $mod+m exec true\n' >"$gd/il6"; cp "$gd/il6" "$gd/il6b"; printf 'x\n' >"$gd/blk6"
+"$ir/scripts/i3block.sh" "$gd/il6" "$gd/blk6" >"$gd/i6.out" 2>&1; irc=$?
+[ $irc = 1 ] && cmp -s "$gd/il6" "$gd/il6b" && grep -q 'without' "$gd/i6.out" && pass=$((pass+1)) || { echo "FAIL i6: BEGIN without END rc=$irc"; fail=$((fail+1)); }
 # reboot-needed.sh (rb1-rb6): fixtures in testdata/reboot, log stamps read as UTC
 R=$t/reboot; rb() { TZ=UTC UNAME_R=7.3.5-arch1-1 MODULES_DIR=${MODULES_DIR:-$R/modules/none} PACMAN_LOG=$R/pacman.log INSTALLED_KVER=7.3.6 "$d/reboot-needed.sh" "$@"; }
 b() { date -u -d "$1" +%s; }

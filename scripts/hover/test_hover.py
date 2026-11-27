@@ -120,5 +120,15 @@ dm.event, hd.log = seen.append, lambda *a: None
 dm.tick()
 check("h17", seen == ["enter"] and not dm.d.q, f"queued after tick: {dm.d.q}")
 
+# h18: rediscover() drains the events its replies (query_tree...) pulled into Xlib's queue
+class Root:
+    def query_tree(self): fx.q.append("enter"); return type("T", (), {"children": []})()
+fx = FakeX([])
+dm.d, dm.root, seen = fx, Root(), []
+dm.event, dm.schedule, dm.redisc_src = seen.append, lambda *a: None, None
+fx.flush = lambda: None
+dm.rediscover()
+check("h18", seen == ["enter"] and not fx.q, f"seen={seen} queued={fx.q}")
+
 print(f"pass={pas} fail={fail}")
 sys.exit(1 if fail else 0)

@@ -15,3 +15,7 @@
 - test.sh i1-i4 (install.sh copy without .git in a temp HOME): create, idempotent rerun, symlinked file keeps link + other lines, old block in ~/.i3/config only warned; main config byte-equal throughout. 175 pass.
 - Deployed as anatoly: config.local still a symlink, only the block's paths changed (`/home/anatoly` -> `~`); i3 -C ok, both bars i3status-rs, hover daemon up, no ERR.
 - anatolii: missing hover-run line is not intended; install.sh writes it unconditionally since T1c (ef80755, 2026-11-20; HOVER=0 is read by hover-run.sh at runtime), so anatolii's block predates T1c. Rerunning install.sh as anatolii adds it (and drops /home paths).
+
+## I2 install hardening (2026-11-27)
+
+Fixed the 6 code-review findings: install.sh stops with a clear message when Win+i is bound outside the custom_barista block (~/.i3/config or config.local, read only); i3block.sh refuses a BEGIN without END (rc 1, nothing written) and creates the directory of a dangling config.local symlink target; install.sh checks the i3block.sh exit status before reporting "updated". Tests: i5 (duplicate binding, files untouched), i6 (BEGIN without END), h18 (rediscover() drain with stubbed root.query_tree). test.sh 188/188; both bars smoke-tested, no errors; deployed.

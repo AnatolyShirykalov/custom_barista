@@ -71,6 +71,12 @@ ob=$(grep -n '^[[:space:]]*bar[[:space:]]*{' "$cfg" || true); [ -z "$ob" ] || wa
 mod='$mod'; grep -q '^[[:space:]]*set[[:space:]]\+\$mod[[:space:]]' "$cfg" || { mod=Mod4; warn "no 'set \$mod' in $cfg, using Mod4"; }
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 b=$tmp/block
+# our block binds Win+i; a second binding elsewhere (main config, or config.local outside our block) makes i3 -C fail
+# with a bare "Duplicate keybinding": stop early and say where to remove it
+bind_re='[[:space:]]*bindsym[[:space:]]+(\$mod|Mod4)\+i[[:space:]]'
+dup=$(grep -nE "^$bind_re" "$cfg" | sed "s|^|$cfg:|" || true)
+[ ! -f "$local_cfg" ] || dup+=$(awk '/^# BEGIN custom_barista/{s=1} !s{print FNR": "$0} /^# END custom_barista/{s=0}' "$local_cfg" | grep -E "^[0-9]+: $bind_re" | sed "s|^|$local_cfg:|" || true)
+[ -z "$dup" ] || { printf '%s\n' "$dup" >&2; echo "ERROR: Win+i is already bound outside the custom_barista block (above): remove that bindsym in the setup repo (it is not edited here), the block binds it to barcycle.sh" >&2; exit 1; }
 # bars live in bars.conf next to the main config (rewritten by barcycle.sh on Win+i); the env file gives the
 # generator and barcycle.sh the paths of this install
 barsconf=$(dirname "$cfg")/bars.conf
@@ -104,7 +110,8 @@ fi
 existed=0; [ -e "$local_cfg" ] && existed=1
 bak=$local_cfg.bak-$stamp  # next to the (maybe symlinked) file, not in the link target's repo
 wrote=0
-if [ "$("$REPO/scripts/i3block.sh" "$local_cfg" "$b" "$bak")" = unchanged ]; then say "$(tl "$local_cfg") already up to date"
+res=$("$REPO/scripts/i3block.sh" "$local_cfg" "$b" "$bak") || { warn "writing $local_cfg failed (see above), nothing changed there"; exit 1; }
+if [ "$res" = unchanged ]; then say "$(tl "$local_cfg") already up to date"
 else changed=1; wrote=1; say "$(tl "$local_cfg") updated$([ $existed = 1 ] && echo ", backup: $bak")"; fi
 if [ $changed = 1 ] && command -v i3 >/dev/null && ! i3 -C -c "$cfg" >"$tmp/val" 2>&1; then
   cat "$tmp/val" >&2
