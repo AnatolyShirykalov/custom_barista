@@ -127,3 +127,8 @@ context-auditor (read-only): baseline first-turn context 48.6k-50.0k tokens. Off
 ## Code review + docs 2026-11-27
 
 code-reviewer (read-only) on 60bc4a6..47ffa41: test.sh 176/0, shellcheck info/style only, compact.toml in sync. Findings (→ queued item I2): install.sh:71 dropped `$mod+i` duplicate check (i3 -C fails "Duplicate keybinding" when ~/.i3/config or old block has it); i3block.sh:12 BEGIN without END deletes rest of config.local; install.sh:107 i3block.sh failure masked inside `[ $(...) ]`; i3block.sh:18 dangling symlink mkdir wrong dir (`readlink -m`); test.sh:185 no rollback/duplicate/missing-END rows (add i5, i6); test_hover.py:109 rediscover() drain untested. hover-daemon drain logic sound. Agent files OK. Docs match: yes.
+
+## Git hygiene 2026-11-27
+- 199 tracked files; no logs, caches, .pyc, .env, backups, real secrets or large binaries (largest 44 KB PNG). Pattern scan for API keys/private keys: none. `creds*.json` under testdata/u1 hold fake tokens (TESTTOKEN-u1); `scripts/hover/keys.toml` is a block-to-key map.
+- `git check-ignore` confirms `config.local.bak-*`, any `*.bak-*`, `.claude/settings.local.json`, `__pycache__`, `log/` are ignored. `scripts/testdata/reboot/` fixture (.keep) kept as intended.
+- No .gitignore change or `git rm --cached` needed.
