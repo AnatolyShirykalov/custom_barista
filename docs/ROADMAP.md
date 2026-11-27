@@ -23,9 +23,10 @@ No agent running. Done recently (2026-11-22, session 4): install.sh writes i3 li
 ### Queued next (one agent each, in order)
 
 1. [ ] **Recurring: Code review + docs** (last 2026-11-20): review 60bc4a6 (install.sh/i3block.sh config.local), 58750f0 (hover-daemon drain), 7211676 (agent files); README/CLAUDE.md match. Reviewer has no write tools: main session writes the note. → `code-reviewer`
-2. [ ] **Recurring: Git hygiene** (last 2026-11-20): check `config.local.bak-*`/install backups never land in the repo; .gitignore gaps. → `repo-janitor`
-3. [ ] **Recurring: Dependency updates** (last 2026-11-20): i3status-rs release, python-xlib (hover drain relies on pending_events/next_event behaviour). → `dep-updater`
-4. [ ] **Recurring: Look/usability pass** (last 2026-11-20): both bars + hover popups for both users (anatolii uses usage API fallback, no statusline tap). → `bar-designer`
+2. [ ] **R1 reboot-needed block** (request 2026-11-27 via setup session): custom block, hidden when nothing applies. Rules (no root, cheap, interval ~60 s): (1) `/usr/lib/modules/$(uname -r)` missing → bad/red "⟳ reboot: kernel 7.3.5→7.3.6" (new ver from `pacman -Q linux`); (2) boot-time pkgs upgraded in /var/log/pacman.log after boot (btime from /proc/stat): nvidia*, linux-firmware*, amd-ucode/intel-ucode, systemd, glibc, dbus*, mkinitcpio, cryptsetup → degraded "reboot"; (3) optional, session pkgs after session start (xorg-server, i3-wm, mesa, pipewire, wireplumber, picom) → dim "relogin". Package lists in one editable place; click/hover lists triggering pkgs. Done: shows kernel case live now (running 7.3.5, modules dir gone; build before reboot), test.sh fakes uname/modules dir/pacman.log for rules 1-2. → `widget-builder`
+3. [ ] **Recurring: Git hygiene** (last 2026-11-20): check `config.local.bak-*`/install backups never land in the repo; .gitignore gaps. → `repo-janitor`
+4. [ ] **Recurring: Dependency updates** (last 2026-11-20): i3status-rs release, python-xlib (hover drain relies on pending_events/next_event behaviour). → `dep-updater`
+5. [ ] **Recurring: Look/usability pass** (last 2026-11-20): both bars + hover popups for both users (anatolii uses usage API fallback, no statusline tap). → `bar-designer`
 
 ### Background checks
 
