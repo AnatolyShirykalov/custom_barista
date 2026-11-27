@@ -165,3 +165,13 @@ Baseline first turn ~48.4k (was ~50k on 11-22). 6 candidates; user turned off (s
 ## Backlog tidy 2026-11-27
 
 Backlog still empty (only an empty "Bar blocks" heading): nothing to drop, merge or re-check. No changes besides the date.
+
+## Code review 2026-11-27 (2)
+
+Commits since 24d9c2d (cf3b6bd reboot fix OK; 777ed1c runner-queue.sh). Token handling OK (stdin `-H @-`), own-runner checks OK. Findings → G1f:
+- high runner-queue.sh:82,85,198: lock in cache dir created only inside refresh; `flock -n` fails (66) when `~/.cache/custom_barista` missing → pending stuck at `+?`.
+- medium :113,121: cache dir 755 / file 644 (umask 022) → other users can read job/project names. `umask 077`.
+- medium :82,130: `timeout 20` < 10 projects × `--max-time 5` → refresh killed, respawned every tick.
+- low :180 hover max+1 lines; :115-123 empty projects file → `/projects//jobs`; shellcheck SC1007/SC2034 (:73,110,152,153,156).
+- medium test.sh:208: all rq tests NO_REFRESH=1; spawn/flock, cache mode, net/5xx paths untested (add api500 fixture).
+- low README.md:9-16,31: no runner-queue.sh entry; deps miss ss, systemctl --user, xdg-open, ~/.config/custom_barista files.
