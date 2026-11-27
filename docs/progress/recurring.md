@@ -139,3 +139,10 @@ code-reviewer (read-only) on 60bc4a6..47ffa41: test.sh 176/0, shellcheck info/st
 - Deps present: jq, xclip, yad, nvidia-smi, xdotool, node, notify-send. nvidia-smi works with nvidia-open 620.73.04-2 (RTX 5070 Ti, temp/util read). pipewire 1.6.12.
 - pacman.log format `[ts] [ALPM] upgraded linux (a -> b)` unchanged (reboot-needed.sh parses it); kernel 7.3.6 pending reboot as expected.
 - test.sh: pass=188 fail=0. No edits to config/compact.toml.
+
+## Look/usability pass 2026-11-27
+- Screenshots of both bars (DP-0 full, DP-2 compact): all glyphs render (no tofu), widths stable (net/io/load `.eng(w:)`), dim icons + one accent per state hold; freq palette as agreed. Nothing else to change.
+- reboot-needed block (no spec, built today): placement after gpu, before net is fine (system-health group, alert sits at its right edge). md-restart icon reads well. Critical red text "reboot: kernel 7.3.5→7.3.6" is 26 chars; fits on DP-2 (left half of the compact bar is empty), no shortening needed.
+- Finding: left click `notify-send` is dead: no notification daemon on the session bus and none activatable (`notify-send` prints ServiceUnknown, exit 0, nothing shown).
+- Finding: hover popup uses `list | head -3`, so it shows the kernel line, "Need reboot:" and 1 of 14 linux-firmware split packages; nvidia-open and the pipewire relogin are cut. The full list (19 lines) would be readable only after collapsing the firmware family.
+- Both → backlog R1a (widget-builder). Hover for anatolii: not checkable from here (not logged in, home 0700); hover-daemon runs for anatoly only.

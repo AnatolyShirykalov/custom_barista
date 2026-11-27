@@ -27,7 +27,7 @@ Look/usability pass → bar-designer (running). Done 2026-11-27: code review, R1
 3. [x] **I2 install hardening** (code review 2026-11-27, see recurring.md): install.sh warn/stop on existing `bindsym $mod+i`/`Mod4+i` in ~/.i3/config (tell user to remove in setup repo); i3block.sh exit 1 on BEGIN without END; install.sh:107 capture i3block.sh output with `|| exit`; i3block.sh mkdir via `readlink -m`; test rows i5 (rollback on dup binding) i6 (missing END); hover rediscover() drain test. → `widget-builder` Done 2026-11-27: all 6 fixes + tests i5/i6, h18 (note in install.md).
 4. [x] **Recurring: Git hygiene** (last 2026-11-27): check `config.local.bak-*`/install backups never land in the repo; .gitignore gaps. → `repo-janitor`
 5. [x] **Recurring: Dependency updates** (last 2026-11-27, clean): i3status-rs release, python-xlib (hover drain relies on pending_events/next_event behaviour). → `dep-updater`
-6. [ ] **Recurring: Look/usability pass** (last 2026-11-20): both bars + hover popups for both users (anatolii uses usage API fallback, no statusline tap). → `bar-designer`
+6. [x] **Recurring: Look/usability pass** (done 2026-11-27: bars OK; reboot click dead + popup truncated → backlog R1a): both bars + hover popups for both users (anatolii uses usage API fallback, no statusline tap). → `bar-designer`
 
 ### Background checks
 
@@ -46,7 +46,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 | Git hygiene | `repo-janitor` | anything tracked that shouldn't be (build output, logs, dumps, caches, large binaries, local config, secrets); `.gitignore` gaps; safe `git rm --cached` | 2026-11-27 |
 | Backlog tidy | `chore` | monthly: drop or merge stale, superseded or duplicate backlog items, check each still has an agent and a done condition; never touch the roadmap's queue | 2026-11-22 |
 | Dependency updates | `dep-updater` | i3status-rs installed vs latest release, changelog breaking config changes grep'd in config.toml/scripts, script deps (jq, xclip, yad, nvidia-smi, xdotool, node) present and formats unchanged; fix keys, backlog the rest | 2026-11-27 |
-| Look/usability pass | `bar-designer` | screenshot the bar; clarity, colors, stable widths, glyphs render; findings → backlog | 2026-11-20 |
+| Look/usability pass | `bar-designer` | screenshot the bar; clarity, colors, stable widths, glyphs render; findings → backlog | 2026-11-27 |
 | Widget health | `chore` | every block shows real data on this machine: `bash scripts/test.sh`, smoke `(sleep 6) \| timeout 6 i3status-rs $PWD/config.toml` (and compact.toml), grep `ERR`/`not found`/`error`; after system upgrades check nvidia-smi, hwmon, pulse, sysfs formats; failures → backlog for `widget-builder` | 2026-11-22 |
 | Code review + docs | `code-reviewer` | review diffs since last run; README block list and CLAUDE.md match the code | 2026-11-27 |
 
