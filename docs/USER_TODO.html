@@ -44,6 +44,16 @@ group/sub/project</pre></li></ol>
 <text x="210" y="54">Copy project ID</text><text x="210" y="74">Settings</text>
 <text x="14" y="104">Project ID: 12345678 (Settings &rarr; General)</text></svg></section>
 
+<section id="always-anatolii"><h2>Always: update the bar for anatolii</h2>
+<p><b>When:</b> after a session that changed the bar (see the roadmap's "Done recently").</p>
+<ol><li>Update and install (no X needed; use <code>-iu</code>, not <code>su</code>):
+<pre>sudo -iu anatolii
+cd ~/projects/custom_barista &amp;&amp; git pull &amp;&amp; ./install.sh --no-restart
+exit</pre></li>
+<li>First time only, if the clone is missing: <code>git clone git@github.com:AnatolyShirykalov/custom_barista.git ~/projects/custom_barista</code> (needs a GitHub key for anatolii, otherwise the https URL).</li>
+<li>Restart the bar in anatolii's own X session: Win+Shift+R (i3 restart), or it starts at the next login.</li>
+<li>Runner block privacy: never add <code>listen_address</code> to anatolii's <code>~/.gitlab-runner/config.toml</code>; the pending count needs anatolii's own token in <code>~/.config/custom_barista/gitlab-token</code> (600).</li></ol></section>
+
 <h2>Done</h2>
 <ul><li><b>U-3</b> GitLab token for the bar: done 2026-11-27. Fine-grained token, "Only my personal projects", CI/CD Pipeline + Runner read; saved to <code>~/.config/custom_barista/gitlab-token</code> (600). Tested: 200 on a personal project.</li></ul>
 </body></html>

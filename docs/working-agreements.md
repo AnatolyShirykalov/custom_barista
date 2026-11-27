@@ -86,3 +86,8 @@ Rows: Agent roster, Git hygiene, Context diet, Backlog tidy (monthly), Dependenc
 *This project is the i3 status bar. Account security, work-employer access and PC hardening belong to the setup session/roadmap, not here.*
 **Why:** user: "you can forget about distribusion, not your scope".
 **How to apply:** hand such findings to the setup session (SendMessage) and drop them from this roadmap, USER_TODO and progress notes.
+
+## anatolii update steps stay in USER_TODO (`anatolii-update`, process; 2026-11-27)
+*`docs/USER_TODO.html` always carries the "Always: update the bar for anatolii" section (sudo -iu anatolii, git pull, install.sh --no-restart, i3 restart in their session).*
+**Why:** user asked to "have it in the user_todo always".
+**How to apply:** never move it to Done; update it when install steps or anatolii-specific rules change.
