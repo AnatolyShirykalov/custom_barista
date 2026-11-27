@@ -16,6 +16,9 @@ DIM='#777777'
 SELF=$(readlink -f "$0")
 mode=${1:-}
 
+spawn() { # detached refresh; the lock lives in the cache dir, so create it first; timeout covers 10 projects x --max-time 4
+  mkdir -p "$(dirname "$CACHE")" 2>/dev/null && chmod 700 "$(dirname "$CACHE")" 2>/dev/null
+  setsid -f flock -n "$LOCK" timeout 60 "$SELF" refresh >/dev/null 2>&1; }
 strip() { sed 's/\x1b\[[0-9;]*m//g'; }
 journal() { # args for journalctl; JOURNAL_FILE replaces both reads
   if [ -n "${JOURNAL_FILE:-}" ]; then cat "$JOURNAL_FILE" 2>/dev/null; else timeout 3 journalctl --user -u gitlab-runner -o cat "$@" 2>/dev/null; fi | strip; }
@@ -70,7 +73,7 @@ bar() {
   local rr; rr=$(printf '%*s' "${#c}" "$r")
   net_down && { emit "$(pad "$rr/$c net")" Warning; return; }
   # pending slot: p count, oldest created, dim "?" when unknown
-  local p=0 oldest=0 unknown= err ts ts_ok
+  local p=0 oldest=0 unknown='' err ts ts_ok
   if [ -n "$slotted" ]; then
     if [ -e "$TOKEN_FILE" ] && [ -e "$PROJECTS_FILE" ] && mode_ok; then
       local row; row=$(jq -r '[(.err // "-"), (.ts // 0), (.ts_ok // 0), ([.pending[]?] | length), (([.pending[]?.created] | min) // 0)] | @tsv' "$CACHE" 2>/dev/null)
@@ -79,10 +82,10 @@ bar() {
         case $err in auth|mode|cfg) unknown=1 ;; esac
         [ $((NOW - ts_ok)) -gt $STALE ] && unknown=1
         local ttl=$TTL; [ "$err" = auth ] && ttl=$TTL_AUTH
-        [ -z "${NO_REFRESH:-}" ] && [ $((NOW - ts)) -ge $ttl ] && setsid -f flock -n "$LOCK" timeout 20 "$SELF" refresh >/dev/null 2>&1
+        [ -z "${NO_REFRESH:-}" ] && [ $((NOW - ts)) -ge $ttl ] && spawn
       else
         unknown=1
-        [ -z "${NO_REFRESH:-}" ] && setsid -f flock -n "$LOCK" timeout 20 "$SELF" refresh >/dev/null 2>&1
+        [ -z "${NO_REFRESH:-}" ] && spawn
       fi
     else unknown=1; fi
     [ -n "$unknown" ] && { p=0; oldest=0; }
@@ -107,7 +110,8 @@ cache_age() { local t; t=$(jq -r '.ts // 0' "$CACHE" 2>/dev/null); echo $((NOW -
 # GitLab API fetch into the cache; one call per listed project, token via stdin (never in argv)
 refresh() {
   [ -r "$CFG" ] && [ -r "$TOKEN_FILE" ] && [ -r "$PROJECTS_FILE" ] && mode_ok || return 0
-  local base rid tok prev ids ignored id key n=0 code auth= neterr= body
+  umask 077
+  local base rid tok prev ids ignored id key n=0 code auth='' neterr=''
   base=$(first_runner url); rid=$(first_runner id)
   tok=$(head -n1 "$TOKEN_FILE" | tr -d '[:space:]')
   mkdir -p "$(dirname "$CACHE")"; td=$(mktemp -d -p "$(dirname "$CACHE")"); trap 'rm -rf "$td"' EXIT
@@ -121,13 +125,14 @@ refresh() {
         else {ts: $now, ts_ok: ($prev.ts_ok // 0), err: $err, pending: ($prev.pending // []), running: ($prev.running // []), ignored: $ign} end' >"$td/out" && mv "$td/out" "$CACHE"; }
   if net_down; then write net; return 0; fi
   while read -r id; do
+    [ -n "$id" ] || continue
     n=$((n + 1)); [ "$n" -gt 10 ] && break
     key=${id//\//_}
     if [ -n "${API_DIR:-}" ]; then
       code=$(cat "$API_DIR/$key.status" 2>/dev/null); cp "$API_DIR/$key.json" "$td/body" 2>/dev/null
     else
       [[ $id =~ ^[0-9]+$ ]] || id=${id//\//%2F}
-      code=$(printf 'PRIVATE-TOKEN: %s\n' "$tok" | timeout 8 curl -sg --max-time 5 -o "$td/body" -w '%{http_code}' -H @- "$base/api/v4/projects/$id/jobs?scope[]=pending&scope[]=running&per_page=50" 2>/dev/null)
+      code=$(printf 'PRIVATE-TOKEN: %s\n' "$tok" | timeout 6 curl -sg --max-time 4 -o "$td/body" -w '%{http_code}' -H @- "$base/api/v4/projects/$id/jobs?scope[]=pending&scope[]=running&per_page=50" 2>/dev/null)
     fi
     case $code in
       200) jq -c --argjson rid "${rid:-0}" '
@@ -149,11 +154,9 @@ list() {
   [ -r "$CFG" ] || return
   local r c src; read -r r c src < <(counts)
   local srcl=metrics; [ "$src" = journal ] && srcl='journal, metrics off'
-  local have_tok= m=
-  [ -e "$TOKEN_FILE" ] && [ -e "$PROJECTS_FILE" ] && have_tok=1
   local meta; meta=$(jq -r '[(.err // "-"), (.ts // 0), (.ts_ok // 0)] | @tsv' "$CACHE" 2>/dev/null)
   local err=- ts=0 ts_ok=0; [ -n "$meta" ] && read -r err ts ts_ok <<<"$meta"
-  local pstat= usecache=
+  local pstat='' usecache=''
   if [ ! -e "$TOKEN_FILE" ] || [ ! -e "$PROJECTS_FILE" ]; then pstat="Pending: no token (${TOKEN_FILE/#$HOME/\~})"
   elif ! mode_ok; then pstat="Pending: token file mode $(tokmode): chmod 600 ${TOKEN_FILE/#$HOME/\~}"
   elif [ "$err" = auth ]; then pstat="Pending: token rejected (401), next try in 10 min"
@@ -175,10 +178,10 @@ list() {
   } | awk -v max="$LIST_MAX" '
       { l[NR] = $0 }
       END { if (NR <= max) { for (i = 1; i <= NR; i++) print l[i]; exit }
-            # keep headers (no leading space); cut job rows from the end so the total is max
-            keep = max - 1; shown = 0; hidden = 0
-            for (i = 1; i <= NR; i++) { if (l[i] !~ /^  / ) { out[++k] = l[i] } else if (k < keep) { out[++k] = l[i] } else hidden++ }
-            for (i = 1; i <= k; i++) print out[i]
+            # keep headers (no leading space); job rows fill the rest, "+N more" is the last line, total max
+            for (i = 1; i <= NR; i++) if (l[i] !~ /^  /) h++
+            allow = max - h - 1; if (allow < 0) allow = 0
+            for (i = 1; i <= NR; i++) { if (l[i] !~ /^  /) print l[i]; else if (++rows <= allow) print l[i]; else hidden++ }
             printf "  +%d more\n", hidden }'
 }
 JQ_ROWS='
@@ -195,7 +198,7 @@ open_job() {
 
 case $mode in
   refresh) refresh; exit 0 ;;
-  refresh-now) [ "$(cache_age)" -ge 10 ] && setsid -f flock -n "$LOCK" timeout 20 "$SELF" refresh >/dev/null 2>&1; exit 0 ;;
+  refresh-now) [ "$(cache_age)" -ge 10 ] && spawn; exit 0 ;;
   list) list; exit 0 ;;
   open) open_job; exit 0 ;;
   *) command -v jq >/dev/null || { echo '{"icon":"gitlab","state":"Critical","text":"RUN ERR"}'; exit 0; }

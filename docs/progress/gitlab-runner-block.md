@@ -49,3 +49,6 @@ Built from the spec: `scripts/runner-queue.sh`, fixtures `scripts/testdata/runne
 
 Deviations accepted: rq19 `+7 more` is the correct hidden count (spec's `+5` was an arithmetic slip, spec row fixed); empty/missing `METRICS_FILE` = no metrics is a test-hook detail, production (unset) uses the real port path.
 Still open (need the user's token + project list): acceptance 2 (green `1/4` during a job), 3 (`ps` check during a live refresh), 5 (refresh ≤1/60 s log), 6 (net-down yellow). The script checks the token file mode only, not the dir mode; `~/.config/custom_barista` is 0755 today (file 0600 is enough).
+
+## G1f review fixes (2026-11-27)
+runner-queue.sh: `spawn()` creates the cache dir (700) before `flock`; refresh has `umask 077`; `--max-time 4` per call, `timeout 60` for the refresh (flock keeps one refresh running); hover list capped at LIST_MAX exactly (headers counted); empty project ids skipped; shellcheck SC1007/SC2034 clean (SC2016 info left). test.sh: rq21 (cold cache dir, refresh spawned, modes 600/700), rq22 (`api500` -> net), rq23 (empty projects file); `rq()` accepts QC/NR overrides. README: script entry and deps.

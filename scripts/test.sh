@@ -205,7 +205,7 @@ check rb6 "$(BTIME=x rb)" "REBOOT ERR" Critical
 unset SESSION_START
 # runner-queue.sh (rq1-rq20): fixtures in testdata/runner, no systemd/network; NOW fixed; c = 4
 Q=$t/runner; RN=1795003200; rqd=$(mktemp -d -p "$gd"); qc=$rqd/q.json; printf 'tok\n' >"$rqd/tok"; chmod 600 "$rqd/tok"
-rq() { RUNNER_CONFIG=${RC:-$Q/config.toml} UNIT_STATE=${US:-active} METRICS_FILE=${MF-$Q/metrics_0} JOURNAL_FILE=${JF:-$Q/journal_ok} QUEUE_CACHE=$qc TOKEN_FILE=${TF:-$rqd/tok} PROJECTS_FILE=${PF:-$Q/projects} NOW=$RN NO_REFRESH=1 API_DIR=${API:-} LIST_MAX=${LM:-8} "$d/runner-queue.sh" "$@"; }
+rq() { RUNNER_CONFIG=${RC:-$Q/config.toml} UNIT_STATE=${US:-active} METRICS_FILE=${MF-$Q/metrics_0} JOURNAL_FILE=${JF:-$Q/journal_ok} QUEUE_CACHE=${QC:-$qc} TOKEN_FILE=${TF:-$rqd/tok} PROJECTS_FILE=${PF:-$Q/projects} NOW=$RN NO_REFRESH=${NR-1} API_DIR=${API:-} LIST_MAX=${LM:-8} "$d/runner-queue.sh" "$@"; }
 qcache() { # ts_ok age, err, pending count, oldest pending age (s)
   jq -nc --argjson n "$RN" --argjson a "$1" --arg e "$2" --argjson c "$3" --argjson o "$4" '{ts:($n-$a),ts_ok:($n-$a),err:(if $e=="" then null else $e end),running:[],ignored:0,
     pending:[range(0;$c)|{project:"grp/proj",ref:"main",name:"build",created:($n-$o+.),url:"https://gitlab.example/grp/proj/-/jobs/1"}]}' >"$qc"; }
@@ -230,6 +230,14 @@ rm -f "$qc"; API=$Q/api rq refresh
 [ "$(jq -c '[.err,(.pending|length),(.running|length),.running[0].project,.pending[0].created]' "$qc" 2>/dev/null)" = '[null,1,1,"grp/proj",1795773600]' ] && pass=$((pass+1)) || { echo "FAIL rq15: refresh cache $(head -c 200 "$qc")"; fail=$((fail+1)); }
 rm -f "$qc"; API=$Q/api401 rq refresh
 [ "$(jq -r .err "$qc" 2>/dev/null)" = auth ] && pass=$((pass+1)) || { echo "FAIL rq16: 401 -> err auth"; fail=$((fail+1)); }
+# rq21: missing cache dir + refresh not disabled -> the bar run spawns the refresh (lock in a fresh 700 dir), cache file 600; rq22: 5xx -> err net; rq23: empty ids skipped
+qcold=$rqd/cold/q.json; o=$(QC=$qcold NR= API=$Q/api rq); jq -e . >/dev/null 2>&1 <<<"$o" || { echo "FAIL rq21: cold json"; fail=$((fail+1)); }
+for _ in 1 2 3 4 5 6 7 8 9 10; do [ -s "$qcold" ] && break; sleep 0.3; done
+[ "$(jq -r .err "$qcold" 2>/dev/null)" = null ] && [ "$(stat -c %a "$qcold" 2>/dev/null)" = 600 ] && [ "$(stat -c %a "$rqd/cold" 2>/dev/null)" = 700 ] && pass=$((pass+1)) || { echo "FAIL rq21: refresh did not run or modes $(stat -c %a "$qcold" "$rqd/cold" 2>&1 | tr '\n' ' ')"; fail=$((fail+1)); }
+rm -f "$qc"; API=$Q/api500 rq refresh
+[ "$(jq -r .err "$qc" 2>/dev/null)" = net ] && jq -e . "$qc" >/dev/null 2>&1 && pass=$((pass+1)) || { echo "FAIL rq22: 500 -> err net"; fail=$((fail+1)); }
+printf '\n# none\n' >"$rqd/noproj"; rm -f "$qc"; PF=$rqd/noproj API=$Q/api rq refresh
+[ "$(jq -c '[.err,(.pending|length)]' "$qc" 2>/dev/null)" = '[null,0]' ] && pass=$((pass+1)) || { echo "FAIL rq23: empty projects file"; fail=$((fail+1)); }
 # rq17: every output above is valid json; rq18: fixed width
 ok=1; for v in "$o1" "$o2" "$o3" "$o4" "$o5" "$o6" "$o7" "$o8" "$o9" "$o10" "$o11" "$o12" "$o13" "$o14"; do jq -e . >/dev/null 2>&1 <<<"$v" || ok=; done
 o=$(RC=$rqd/none rq); jq -e . >/dev/null 2>&1 <<<"$o" && [ -n "$ok" ] && pass=$((pass+1)) || { echo "FAIL rq17: invalid json"; fail=$((fail+1)); }

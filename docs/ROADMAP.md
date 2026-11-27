@@ -31,7 +31,7 @@ No agent running. Done recently (2026-11-27, session 5): code review, R1 reboot-
 6. [x] **G1b spec runner queue block**: done; docs/design/G1-runner-queue/spec.md (build option A unless the user picks B/C in questions.html).
 7. [x] **G1c build runner queue block**: done, deployed (no-token path, idle option A); scripts/runner-queue.sh, rows rq1-rq20; user still creates token + project files (see progress note). → `widget-builder`
 8. [x] **G1d review runner queue block**: accepted, no fixes; live checks with a job and a token remain (see progress note).
-9. [ ] **G1f fix runner block review findings** (code review 2026-11-27 (2) in docs/progress/recurring.md): lock/cache dir mkdir, umask 077, refresh timeout vs per-project max-time, hover max lines, empty projects file, shellcheck, tests for spawn/flock + cache mode + api500, README entry + deps. → `widget-builder`
+9. [x] **G1f fix runner block review findings** (code review 2026-11-27 (2) in docs/progress/recurring.md): lock/cache dir mkdir, umask 077, refresh timeout vs per-project max-time, hover max lines, empty projects file, shellcheck, tests for spawn/flock + cache mode + api500, README entry + deps. → `widget-builder` Done (see docs/progress/gitlab-runner-block.md).
 10. [ ] **G1e live acceptance checks for runner block** (ask when user has done U-3 + U-4 in docs/USER_TODO.html): spec acceptance 2, 3, 5, 6 — green `1/4` during a real job, token absent from `ps` during refresh, ≤1 API refresh per 60 s, yellow `net` on network drop; apply U-2 idle choice if not A. → `chore`
 
 ### Background checks
