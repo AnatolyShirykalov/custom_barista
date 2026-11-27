@@ -55,6 +55,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 ## Decisions made
 
+- 2026-11-27: G1 runner queue block data source C: running count from runner metrics (enable listen_address, restart runner) + pending jobs via GitLab API (read_api token in 0600 file, project id list).
 - 2026-11-20: T1 picks: Q1 B remove middle-click popups (hover only), Q2 A 500 ms delay then instant while sliding.
 - 2026-11-18: D5 picks: regrouping only (from option B), no P2/P3/P5 ("enough space"), clipboard block removed entirely; 7d usage mark always visible.
 - 2026-11-18: Claude usage block: statusline rate_limits cache + OAuth usage endpoint fallback; show window tokens, colour from real 5h %, reset time, window cost, cache ratio; ccusage dropped.
