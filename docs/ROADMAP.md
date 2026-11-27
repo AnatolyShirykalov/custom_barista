@@ -6,7 +6,7 @@ Scope: whole project: maintenance of the custom_barista i3 status bar (fixing wi
 
 ## How we work
 
-- The main session coordinates. Work goes to project agents (`.claude/agents/`, never `general-purpose`). One agent at a time (two at most): many in parallel hit the usage limit.
+- The main session coordinates. Work goes to project agents (`.claude/agents/`, never `general-purpose`). Agents run in parallel when they don't conflict (no shared files, one deploy/bar restart at a time); no fixed limit (user, 2026-11-27).
 - Split work into small tasks a fresh agent can finish in a small context. One item per agent; it stops after it.
 - Each agent finishes its item fully, records status in `docs/progress/<workstream>.md`, updates this file, commits its code and **never pushes** (the main session reviews and pushes in batches).
 - No waiting agents: long jobs run detached (`nohup … > log/<name>.log 2>&1 &`), capped (`timeout 30m` or an item limit), resumable and safe to kill, and leave a check item under "Background checks" with the check command and the command for the next chunk.

@@ -11,7 +11,7 @@ Custom i3 status bar on [i3status-rust](https://github.com/greshake/i3status-rus
 
 Full rules with reasons: `docs/working-agreements.md` (save new preferences there).
 - Work goes to project agents in `.claude/agents/`, never general-purpose; one item per agent, small tasks, reports ≤10 lines.
-- One agent at a time (two at most).
+- Agents may run in parallel, no fixed limit, when they don't conflict (no shared files, not both deploying/restarting the bar).
 - Model tiers: top model only for the hardest ~10 % (hard diagnosis, retry after a failed fix); middle model for designer/reviewer/curator; sonnet for chore/mechanical runs.
 - Context hygiene: no whole-file dumps; quiet test output.
 - No waiting agents: long jobs detached, capped, resumable, with a "Background checks" item.

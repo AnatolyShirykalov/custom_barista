@@ -8,11 +8,10 @@ The main session coordinates; each item goes to the matching agent in `.claude/a
 **Why:** set up with /roadmap-init.
 **How to apply:** no specialist fits → note it for the Agent roster check. [[one-at-a-time]]
 
-## One agent at a time (`one-at-a-time`, workflow; 2026-11-17)
-*Run agents one at a time (two at most).*
-Small single-machine project; there is one live bar to test against.
-**Why:** default chosen at setup; parallel runs hit the usage limit.
-**How to apply:** wait for the final notification before the next agent. [[specialists]]
+## Parallel agents when no conflict (`parallel-ok`, workflow; 2026-11-27, replaces one-at-a-time from 2026-11-17)
+*Run agents in parallel, no fixed limit, as long as they don't conflict.*
+**Why:** user: "you can run things in parallel, no limits if the subagents don't conflict".
+**How to apply:** parallel only for items with disjoint files; only one agent deploys/restarts the bar at a time; dependent items still wait for the final notification. The main session commits only named paths while agents run. [[specialists]]
 
 ## Batched push (`batched-push`, git; 2026-11-17)
 *Agents commit, never push; main session pushes in batches.*
