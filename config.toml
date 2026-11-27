@@ -14,6 +14,7 @@ icons = "material-nf"
 [icons.overrides]
 cpu_freq = "\U000F095B"   # md-sine_wave (frequency); better than md-flash, distinct from the load gauge
 gpu = "\U000F08AE"        # md-expansion_card
+reboot = "\U000F0709"       # md-restart
 ccusage = "\U000F0674"    # md-creation
 disk_read = "R"
 disk_write = "W"
@@ -80,6 +81,16 @@ block = "custom"
 command = "~/projects/custom_barista/scripts/gpu.sh"
 json = true
 interval = 2
+
+[[block]]
+block = "custom"
+command = "~/projects/custom_barista/scripts/reboot-needed.sh"
+json = true
+interval = 60
+hide_when_empty = true
+[[block.click]]
+button = "left"
+cmd = "notify-send -u low 'Reboot needed' \"$(~/projects/custom_barista/scripts/reboot-needed.sh list)\""
 
 [[block]]
 block = "net"

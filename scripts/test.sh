@@ -183,4 +183,15 @@ rm "$il"; ln -s "$gd/itarget" "$il"; inst; irc=$?
   && pass=$((pass+1)) || { echo "FAIL i3: symlinked config.local rc=$irc $(ls -l "$il")"; fail=$((fail+1)); }
 printf '# BEGIN custom_barista\ninclude /home/x/.i3/bars.conf\n# END custom_barista\n' >>"$ih/.i3/config"; cp "$ih/.i3/config" "$gd/imain"; inst; irc=$?
 [ $irc = 0 ] && cmp -s "$ih/.i3/config" "$gd/imain" && grep -q 'still has an old custom_barista block' "$gd/inst.out" && pass=$((pass+1)) || { echo "FAIL i4: old block in ~/.i3/config rc=$irc"; fail=$((fail+1)); }
+# reboot-needed.sh (rb1-rb6): fixtures in testdata/reboot, log stamps read as UTC
+R=$t/reboot; rb() { TZ=UTC UNAME_R=7.3.5-arch1-1 MODULES_DIR=${MODULES_DIR:-$R/modules/none} PACMAN_LOG=$R/pacman.log INSTALLED_KVER=7.3.6 "$d/reboot-needed.sh" "$@"; }
+b() { date -u -d "$1" +%s; }
+export SESSION_START=$(b 2026-11-27T12:00:00)
+check rb1 "$(BTIME=$(b 2026-11-27T09:00:00) rb)" "reboot: kernel 7.3.5→7.3.6" Critical
+check rb2 "$(BTIME=$(b 2026-11-27T09:00:00) MODULES_DIR=$R/modules/7.3.6-arch1-1 rb)" "reboot" Warning
+check rb3 "$(BTIME=$(b 2026-11-27T11:30:00) SESSION_START=$(b 2026-11-27T09:30:00) MODULES_DIR=$R/modules/7.3.6-arch1-1 rb)" "relogin" Info
+[ -z "$(BTIME=$(b 2026-11-27T11:30:00) MODULES_DIR=$R/modules/7.3.6-arch1-1 rb)" ] && pass=$((pass+1)) || { echo "FAIL rb4: not hidden"; fail=$((fail+1)); }
+o=$(BTIME=$(b 2026-11-27T09:00:00) SESSION_START=$(b 2026-11-27T09:00:00) rb list); grep -q 'linux-firmware-amd 1-1 -> 1-2' <<<"$o" && grep -q 'mesa 1-1' <<<"$o" && ! grep -q 'vim\|systemd-libs\|nvidia' <<<"$o" && pass=$((pass+1)) || { echo "FAIL rb5: list"; fail=$((fail+1)); }
+check rb6 "$(BTIME=x rb)" "REBOOT ERR" Critical
+unset SESSION_START
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]

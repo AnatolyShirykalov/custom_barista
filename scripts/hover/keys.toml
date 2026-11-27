@@ -24,6 +24,10 @@ block = "custom"
 command = "gpu.sh"
 key = "gpu"
 [[key]]
+block = "custom"
+command = "reboot-needed.sh"
+key = "reboot"
+[[key]]
 block = "net"
 device = "^wl"
 key = "wifi"

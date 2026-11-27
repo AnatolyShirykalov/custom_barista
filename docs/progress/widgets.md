@@ -59,3 +59,8 @@ Middle click on every block runs `scripts/explain.sh <name>` (names: kbd load te
 ## U1c first-run placeholder (2026-11-20)
 - claude-usage.sh: when no tap/API window exists and local logs have 0 tokens, prints a dim `cc …` padded to the normal text width (measured from a render at runtime, 40 chars). With local usage but no window it still shows tokens with `?%`.
 - explain.sh ccusage text: "cc … = waiting for first data" (kept to 6 lines). test.sh u28 (empty temp cache dir: text, Idle, dim, width = normal). pass=171 fail=0, deployed; both bars no errors, real block shows real data.
+
+## R1 reboot-needed block (2026-11-27)
+- scripts/reboot-needed.sh (custom block after gpu, interval 60, hide_when_empty, both bars): kernel modules dir gone -> Critical "reboot: kernel old->new" (pacman -Q linux, fallback modules dir listing); BOOT_PKGS upgraded/installed in pacman.log after /proc/stat btime -> Warning "reboot"; rule 3 built too: SESSION_PKGS after i3 process start (now - ps etimes) -> Info (dim) "relogin". Lists at the top of the script. `list` arg prints packages with versions: hover (explain.sh `reboot`, keys.toml) and left click (notify-send).
+- Log stamps are compared as local time to the second (DST edge ignored). Icon `reboot` (md-restart) in config.toml.
+- test.sh rb1-rb6 (fixtures testdata/reboot, env UNAME_R/MODULES_DIR/PACMAN_LOG/BTIME/SESSION_START/INSTALLED_KVER). pass=185 fail=0. Live: kernel case shown on both bars. Needs bar-designer review not required (no spec); not rebooted.
