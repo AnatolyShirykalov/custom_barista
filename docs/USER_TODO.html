@@ -20,10 +20,6 @@ pre{padding:8px;overflow-x:auto}img,svg{max-width:100%;height:auto;border:1px so
 <ol><li>Open the draft: <a href="design/D3-i3status-rust/upstream-issue.md">upstream-issue.md</a>.</li>
 <li>Go to <a href="https://github.com/greshake/i3status-rust/issues/new">new issue</a>, copy the Title and body from the draft.</li>
 <li>Post it, then tell Claude the issue URL.</li></ol></section>
-<section id="U-5"><h2>U-5: Monitor brightness/contrast block: pick the look (M1)</h2>
-<p><b>Why:</b> the builder needs one of three layouts; recommended B (both values, scroll over the one to change). Asked 2026-11-28.</p>
-<ol><li>Open <a href="design/M1-monitor-ddc/questions.html">M1 questions</a> (mock-ups of A, B, C and the states).</li>
-<li>Reply in chat with the line at the bottom, e.g. <code>M1 picks: Q1 B</code>.</li></ol></section>
 <section id="always-anatolii"><h2>Always: update the bar for anatolii</h2>
 <p><b>When:</b> after a session that changed the bar (see the roadmap's "Done recently").</p>
 <ol><li>Update and install (no X needed; use <code>-iu</code>, not <code>su</code>):
@@ -39,5 +35,5 @@ XDG_RUNTIME_DIR=/run/user/$(id -u) scripts/runner-queue.sh | jq -c .</pre></li>
 <li><code>U1: statusline tap not installed</code> in the install output is fine: anatolii's Claude usage block uses the API fallback (anatolii has no custom Claude statusline script).</li></ol></section>
 
 <h2>Done</h2>
-<ul><li><b>U-2</b> runner block idle look: A (always shown, grey, fixed width), 2026-11-27.</li><li><b>U-3</b> GitLab token for the bar: done 2026-11-27. Fine-grained token, "Only my personal projects", CI/CD Pipeline + Runner read; saved to <code>~/.config/custom_barista/gitlab-token</code> (600). Tested: 200 on a personal project.</li><li><b>U-4</b> Project ids to watch: done 2026-11-27, superseded by G1g: projects come from the runner log; <code>runner-projects</code> is an optional extra.</li><li><b>U-4</b> Project ids to watch: done 2026-11-27, superseded by G1g: projects come from the runner log; <code>runner-projects</code> is an optional extra.</li></ul>
+<ul><li><b>U-2</b> runner block idle look: A (always shown, grey, fixed width), 2026-11-27.</li><li><b>U-3</b> GitLab token for the bar: done 2026-11-27. Fine-grained token, "Only my personal projects", CI/CD Pipeline + Runner read; saved to <code>~/.config/custom_barista/gitlab-token</code> (600). Tested: 200 on a personal project.</li><li><b>U-4</b> Project ids to watch: done 2026-11-27, superseded by G1g: projects come from the runner log; <code>runner-projects</code> is an optional extra.</li><li><b>U-5</b> monitor brightness/contrast look: B (two fields, scroll over the one to change), 2026-11-28.</li></ul>
 </body></html>
