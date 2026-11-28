@@ -73,4 +73,5 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 
 Each line carries `asked <date>` or `ask when <trigger>`; `/wrapup` asks those whose trigger has passed.
 
+- M1 control style A/B/C (`docs/design/M1-monitor-ddc/questions.html`, USER_TODO U-5). asked 2026-11-28
 - Post the upstream issue `docs/design/D3-i3status-rust/upstream-issue.md` (user action, from own GitHub account). asked 2026-11-17, still pending 2026-11-27 (USER_TODO U-1)
