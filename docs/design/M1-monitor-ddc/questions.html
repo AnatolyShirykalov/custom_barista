@@ -1,0 +1,104 @@
+<!doctype html>
+<!-- M1 decision page (from roadmap-init decision-page.html). Local file only: never publish. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M1 monitor brightness/contrast block: decisions</title>
+<style>
+:root { --bg:#f6f7f9; --fg:#1b1f24; --muted:#5b6470; --card:#fff; --line:#d9dee5; --accent:#2f6fde; --rec:#1f8a4c; --risk:#b25e09; }
+@media (prefers-color-scheme: dark) { :root { --bg:#14171c; --fg:#e6e9ee; --muted:#9aa3ae; --card:#1d2129; --line:#2e3440; --accent:#6ea0ff; --rec:#4cc47e; --risk:#e0a050; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
+main { max-width:1000px; margin:0 auto; padding:24px 16px 64px; }
+h1 { font-size:1.6rem; margin:0 0 4px; }
+h2 { font-size:1.25rem; margin:0 0 8px; }
+.sub { color:var(--muted); margin:0 0 24px; }
+section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin:0 0 20px; }
+img { max-width:100%; height:auto; border-radius:8px; border:1px solid var(--line); display:block; }
+figure { margin:12px 0; }
+figcaption { color:var(--muted); font-size:.9rem; margin-top:4px; }
+.opts { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; }
+.opt { border:1px solid var(--line); border-radius:10px; padding:12px; }
+.opt h3 { margin:0 0 6px; font-size:1rem; }
+.rec { color:var(--rec); font-weight:600; font-size:.85rem; }
+.meta { color:var(--muted); font-size:.85rem; }
+.risk { color:var(--risk); font-size:.85rem; }
+.against { color:var(--muted); font-size:.9rem; margin:6px 0 0; }
+ul { margin:6px 0; padding-left:20px; }
+code { font-size:.9em; }
+label.pick { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); }
+label.pick input { margin-top:5px; transform:scale(1.3); }
+#out { width:100%; min-height:60px; font:14px monospace; }
+</style>
+</head>
+<body>
+<main>
+<h1>M1: monitor brightness/contrast block</h1>
+<p class="sub">Your note (2026-11-28): "add a widget to control the brightness and contrast on my monitors. Each monitor should have widget only for itself, not for both monitors." This page decides how the block looks and how you change the two values. Answer in the chat with the line at the bottom.</p>
+
+<section>
+<h2>Today</h2>
+<figure><img src="img/today-dp0.png" alt="DP-0 bar, right part"><figcaption>DP-0 bar: the new block goes between the keyboard layout (US) and the volume.</figcaption></figure>
+<figure><img src="img/today-dp2.png" alt="DP-2 bar, right part"><figcaption>DP-2 bar: same place; this bar controls only the AirPanel, the DP-0 bar only the MSI.</figcaption></figure>
+</section>
+
+<section>
+<h2>Question 1: one value with a mode switch, or both values?</h2>
+<div class="opts">
+  <div class="opt">
+    <h3>B. Two values side by side <span class="rec">recommended</span></h3>
+    <figure><img src="img/b-two.png" alt="US, brightness 93, contrast 28, volume"><figcaption>Scroll over the brightness number to change brightness, over the contrast number to change contrast. Left click reads the values again.</figcaption></figure>
+    <span class="meta">M &middot; <span class="risk">9 characters wide, no mode to remember</span></span>
+  </div>
+  <div class="opt">
+    <h3>A. One value, click to switch</h3>
+    <figure><img src="img/a-bright.png" alt="brightness 93"><img src="img/a-contrast.png" alt="contrast 28"><figcaption>Shows brightness or contrast; left click switches, scroll changes the shown one.</figcaption></figure>
+    <span class="meta">M &middot; <span class="risk">5 characters wide</span></span>
+    <p class="against">Why the designer is against A: half of the state is hidden, and you have to check the icon before every scroll; the bars have enough room for both.</p>
+  </div>
+  <div class="opt">
+    <h3>C. Both values, click picks which one scrolls</h3>
+    <figure><img src="img/c-both.png" alt="93 bold, 28 grey"><figcaption>The bold value is the one scroll changes; left click switches.</figcaption></figure>
+    <span class="meta">M &middot; <span class="risk">8 characters wide</span></span>
+    <p class="against">Why the designer is against C: still a mode, and grey already means "stale or idle" in this bar, so the grey contrast looks broken.</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>How the states look (same for every option)</h2>
+<figure><img src="img/s-ok.png" alt="ok"><figcaption>Normal: white numbers.</figcaption></figure>
+<figure><img src="img/s-max.png" alt="100 and 0"><figcaption>100 and 0: same width, nothing shifts.</figcaption></figure>
+<figure><img src="img/s-stale.png" alt="grey"><figcaption>Grey: the monitor does not answer (standby); last known values.</figcaption></figure>
+<figure><img src="img/s-unknown.png" alt="--"><figcaption>Not read yet.</figcaption></figure>
+<figure><img src="img/s-fail.png" alt="red 60"><figcaption>Red: the last change did not reach the monitor.</figcaption></figure>
+</section>
+
+<section>
+<h2>Picks</h2>
+<label class="pick"><input type="radio" name="q1" value="B" checked><span><b>B Two values side by side</b> <span class="rec">recommended</span><br>Scroll where you point; no mode.<br><span class="meta">M &middot; 9 characters</span></span></label>
+<label class="pick"><input type="radio" name="q1" value="A"><span><b>A One value, click to switch</b><br>Narrowest.<br><span class="meta">M &middot; 5 characters</span></span></label>
+<label class="pick"><input type="radio" name="q1" value="C"><span><b>C Both values, click picks</b><br>Both visible, one active.<br><span class="meta">M &middot; 8 characters</span></span></label>
+</section>
+
+<section>
+<h2>What doesn't change</h2>
+<ul><li>Each bar controls only its own monitor (DP-0 bar: MSI G281UV, DP-2 bar: Ugreen AirPanel 16), found by EDID, not by bus number.</li>
+<li>Scroll step 5 (0-100); the number changes at once, the monitor follows within about half a second.</li>
+<li>Hover shows the monitor name, both values and the click help.</li>
+<li>No sudo; the block hides itself where ddcutil or i2c access is missing (e.g. the other user).</li></ul>
+</section>
+
+<section>
+<h2>Your answer</h2>
+<p class="meta">Copy this line into the chat (read-only; nothing is saved from this page).</p>
+<textarea id="out" readonly></textarea>
+</section>
+</main>
+<script>
+function upd(){const r=document.querySelector('input[name=q1]:checked');document.getElementById('out').value='M1 picks: Q1 '+(r?r.value:'none');}
+document.querySelectorAll('input[type=radio]').forEach(c=>c.addEventListener('change',upd));upd();
+</script>
+</body>
+</html>
