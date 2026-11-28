@@ -7,7 +7,11 @@ def hover_dir():
     if os.environ.get("HOVER_DIR"):
         return os.environ["HOVER_DIR"]
     if os.environ.get("XDG_RUNTIME_DIR"):
-        return os.path.join(os.environ["XDG_RUNTIME_DIR"], "custom_barista", "hover")
+        parent = os.path.join(os.environ["XDG_RUNTIME_DIR"], "custom_barista")
+        os.makedirs(parent, mode=0o700, exist_ok=True)
+        if os.lstat(parent).st_uid == os.getuid():
+            os.chmod(parent, 0o700)
+        return os.path.join(parent, "hover")
     base = "/tmp/custom_barista-%d" % os.getuid()
     try:
         os.mkdir(base, 0o700)

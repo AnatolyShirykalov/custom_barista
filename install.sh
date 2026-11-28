@@ -32,8 +32,11 @@ command -v i3status-rs >/dev/null || warn "missing: i3status-rs (required for th
 for c in jq flock curl nvidia-smi xdotool pavucontrol; do
   command -v "$c" >/dev/null || warn "missing: $c (used by bar blocks/click actions)"
 done
-i2c_ok=; for f in /dev/i2c-*; do [ -r "$f" ] && [ -w "$f" ] && { i2c_ok=1; break; }; done
-{ command -v ddcutil >/dev/null && [ -n "$i2c_ok" ]; } || warn "M1: monitor block hidden: pacman -S ddcutil; usermod -aG i2c \$USER; i2c-dev module"
+command -v ddcutil >/dev/null || warn "M1: monitor block hidden, ddcutil missing: sudo pacman -S ddcutil"
+if ! id -nG | tr ' ' '\n' | grep -qx i2c; then
+  warn "M1: monitor block hidden, user not in group i2c: sudo usermod -aG i2c $(id -un), then log in again"
+fi
+[ -e /dev/i2c-0 ] || [ -d /sys/module/i2c_dev ] || warn "M1: monitor block hidden, i2c-dev not loaded: echo i2c-dev | sudo tee /etc/modules-load.d/i2c-dev.conf; sudo modprobe i2c-dev"
 command -v yad >/dev/null || warn "missing: yad (optional, calendar popup)"
 python3 -c 'import Xlib' 2>/dev/null || warn "missing: python-xlib (hover tooltips, scripts/hover-daemon.py)"
 python3 -c 'import gi; gi.require_version("Gtk", "3.0"); from gi.repository import Gtk' 2>/dev/null || warn "missing: python-gobject with Gtk 3 (hover tooltips)"

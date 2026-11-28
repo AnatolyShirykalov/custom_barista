@@ -12,7 +12,9 @@ self=$(readlink -f "$0")
 ddc=${DDC_CMD:-ddcutil}; xr=${XRANDR_CMD:-xrandr}; drm=${DRM_DIR:-/sys/class/drm}
 dir=${DDC_STATE_DIR:-}
 if [ -z "$dir" ]; then
-  if [ -n "${XDG_RUNTIME_DIR:-}" ]; then dir=$XDG_RUNTIME_DIR/custom_barista/ddc
+  if [ -n "${XDG_RUNTIME_DIR:-}" ]; then
+    mkdir -p "$XDG_RUNTIME_DIR/custom_barista" 2>/dev/null; [ -O "$XDG_RUNTIME_DIR/custom_barista" ] && chmod 0700 "$XDG_RUNTIME_DIR/custom_barista"
+    dir=$XDG_RUNTIME_DIR/custom_barista/ddc
   else dir=/tmp/custom_barista-$UID/ddc; fi
 fi
 [[ $conn =~ ^[A-Za-z0-9-]+$ ]] || { echo '{"text":"DDC ERR","state":"Critical"}'; exit 0; }

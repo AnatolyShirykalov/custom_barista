@@ -10,7 +10,9 @@ d=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 . "${BARS_ENV:-${XDG_CONFIG_HOME:-$HOME/.config}/custom_barista/bars.env}" 2>/dev/null
 # same rule as hover/rundir.py: no XDG_RUNTIME_DIR = a private /tmp/custom_barista-$UID, refused if not ours
 if [ -n "${HOVER_DIR:-}" ]; then dir=$HOVER_DIR
-elif [ -n "${XDG_RUNTIME_DIR:-}" ]; then dir=$XDG_RUNTIME_DIR/custom_barista/hover
+elif [ -n "${XDG_RUNTIME_DIR:-}" ]; then
+  mkdir -p "$XDG_RUNTIME_DIR/custom_barista" && [ -O "$XDG_RUNTIME_DIR/custom_barista" ] && chmod 0700 "$XDG_RUNTIME_DIR/custom_barista" || exit 1
+  dir=$XDG_RUNTIME_DIR/custom_barista/hover
 else
   base=/tmp/custom_barista-$UID; mkdir -m 0700 "$base" 2>/dev/null
   [ -d "$base" ] && [ ! -L "$base" ] && [ -O "$base" ] && [ "$(stat -c %a "$base")" = 700 ] || { echo "hover-run: $base is not a private dir of uid $UID" >&2; exit 1; }

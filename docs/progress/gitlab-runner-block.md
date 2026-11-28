@@ -93,3 +93,9 @@ Doc fix: spec "Runner setup" section marked historical / do not apply. Tests 257
 - Token absent from `ps`: 5 forced `runner-queue.sh refresh` runs, `ps -eo args` polled every 0.1 s (49 polls) against the first 8 chars of the token (pattern read from a 600 file via `grep -F -f`, so the check does not match itself): 0 matches. (A first attempt with the pattern in grep's own argv gave a false 38/38 self-match; discarded.)
 - API refresh rate with the bar running: cache `ts` watched for 200 s (1 s steps, no forced refresh): changes at +0, +62, +122, +182 s, i.e. one refresh per 60 s (TTL), never faster. Pass.
 - Not run (need the user): green `1/4` during a real job, yellow `net` on a network drop.
+
+## G2d runtime dir private + M1 warning (2026-11-28)
+
+- `$XDG_RUNTIME_DIR/custom_barista` is now chmod 700 (existing 755 dir fixed too, only if ours) in monitor-ddc.sh, hover-run.sh, hover/rundir.py; /tmp fallback was already 700. test.sh g2d rows: ddc, hover-run, rundir.py each leave a pre-made 755 parent at 700.
+- install.sh M1 warning split into three, each shown only when true: ddcutil missing, user not in group i2c (`id -nG`), i2c-dev not loaded (no /dev/i2c-0 and no /sys/module/i2c_dev).
+- Deployed; live dir is 700; `id -nG` in this session lists i2c, so no M1 warning printed here.

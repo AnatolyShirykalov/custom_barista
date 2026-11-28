@@ -340,4 +340,15 @@ m.EXPLAIN = ex; dm = object.__new__(m.Daemon); dm.texts, dm.texts_mt = {}, None
 a, b = dm.text("ddc-DP-0"), dm.text("ddc-DP-0"); c, e = dm.text("cpu"), dm.text("cpu")
 assert a != b and c == e, (a, b, c, e)
 PY
+# G2d: every creator of $XDG_RUNTIME_DIR/custom_barista leaves it 0700 (also an existing 755 one)
+for c in ddc hoverrun hoverpy; do
+  xr=$(mktemp -d); mkdir -m 755 "$xr/custom_barista"
+  case $c in
+    ddc) XDG_RUNTIME_DIR=$xr DDC_SIGNAL=0 "$d/monitor-ddc.sh" DP-0 render >/dev/null 2>&1 ;;
+    hoverrun) XDG_RUNTIME_DIR=$xr BARS_ENV=/dev/null HOVER=0 timeout 10 "$d/hover-run.sh" >/dev/null 2>&1 ;;
+    hoverpy) XDG_RUNTIME_DIR=$xr python3 -c "import sys; sys.path.insert(0, '$d/hover'); import rundir; rundir.hover_dir()" >/dev/null 2>&1 ;;
+  esac
+  [ "$(stat -c %a "$xr/custom_barista")" = 700 ] && pass=$((pass+1)) || { echo "FAIL g2d-$c: parent mode $(stat -c %a "$xr/custom_barista")"; fail=$((fail+1)); }
+  rm -rf "$xr"
+done
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]
