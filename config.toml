@@ -151,6 +151,48 @@ missing_format = ""
 interval = 60
 
 [[block]]
+block = "custom"
+command = "~/projects/custom_barista/scripts/monitor-ddc.sh DP-0 bright"
+json = true
+interval = 5
+signal = 7
+hide_when_empty = true
+merge_with_next = true
+[[block.click]]
+button = "up"
+cmd = "~/projects/custom_barista/scripts/monitor-ddc.sh DP-0 bright up"
+update = true
+[[block.click]]
+button = "down"
+cmd = "~/projects/custom_barista/scripts/monitor-ddc.sh DP-0 bright down"
+update = true
+[[block.click]]
+button = "left"
+cmd = "~/projects/custom_barista/scripts/monitor-ddc.sh DP-0 refresh"
+update = true
+
+[[block]]
+block = "custom"
+command = "~/projects/custom_barista/scripts/monitor-ddc.sh DP-0 contrast"
+json = true
+interval = 5
+signal = 7
+hide_when_empty = true
+merge_with_next = true
+[[block.click]]
+button = "up"
+cmd = "~/projects/custom_barista/scripts/monitor-ddc.sh DP-0 contrast up"
+update = true
+[[block.click]]
+button = "down"
+cmd = "~/projects/custom_barista/scripts/monitor-ddc.sh DP-0 contrast down"
+update = true
+[[block.click]]
+button = "left"
+cmd = "~/projects/custom_barista/scripts/monitor-ddc.sh DP-0 refresh"
+update = true
+
+[[block]]
 block = "sound"
 driver = "pulseaudio"   # follows the default sink; alsa driver spawned `alsactl monitor`, holding the HDA card open
 format = " $icon {$volume.eng(w:3)|MUT} "

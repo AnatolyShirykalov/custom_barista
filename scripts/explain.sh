@@ -15,6 +15,7 @@ case ${1:-} in
   net)     t='Ethernet: upload / download speed, kB/s.\nOn DP-0 also the IP address.\n"down" = no link.' ;;
   wifi)    t='Wi-Fi: SSID, signal %, upload / download kB/s.\nHidden when not connected.' ;;
   battery) t='Battery charge, %. Hidden without a battery.' ;;
+  ddc-DP-0|ddc-DP-2) t=$(printf '%s' "$(timeout 5 "$(dirname "$0")/monitor-ddc.sh" "${1#ddc-}" info)") ;;
   sound)   t='Output volume, %; MUT = muted.\nLeft click: open pavucontrol.' ;;
   ccusage) t='Claude usage, current 5h window: limit %, tokens, cost, cache (share\nof input read from cache), time to reset. Each part has its own colour.\nLimit %: green, yellow above 70, red above 90, grey = stale.\nCache: green from 90, yellow 70-89, red below 70.\n7d NN%: weekly limit; grey to 70, yellow above, red above 90; ?% = unknown.\ncc … = waiting for first data. Left click: refresh. DP-0 bar only.' ;;
   time)    t='Date and time.\nLeft click: open the calendar.' ;;

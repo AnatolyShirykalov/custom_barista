@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# fake ddcutil for test.sh: logs argv to $FAKE_LOG, sleeps $FAKE_SLEEP; FAKE_GET_FAIL=1, FAKE_SET_FAIL=1 fail the calls; FAKE_DETECT picks the detect fixture
+echo "$*" >>"${FAKE_LOG:-/dev/null}"
+case " $* " in
+  *" detect "*) cat "${FAKE_DETECT:?}" ;;
+  *" getvcp "*) sleep "${FAKE_SLEEP:-0}"; [ "${FAKE_GET_FAIL:-}" = 1 ] && { echo "Unable to open /dev/i2c-3" >&2; exit 1; }
+    printf 'VCP 10 C %s 100\nVCP 12 C %s 100\n' "${FAKE_BRIGHT:-93}" "${FAKE_CONTRAST:-28}" ;;
+  *" setvcp "*) sleep "${FAKE_SLEEP:-0}"; [ "${FAKE_SET_FAIL:-}" = 1 ] && exit 1; exit 0 ;;
+esac

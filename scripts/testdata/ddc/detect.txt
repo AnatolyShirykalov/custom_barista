@@ -1,0 +1,11 @@
+Display 1
+   I2C bus:          /dev/i2c-3
+   DRM connector:    card1-DP-1
+   drm_connector_id: 1146
+   Monitor:          MSI:MSI G281UV:CC8Q232B00442
+
+Display 2
+   I2C bus:          /dev/i2c-4
+   DRM connector:    card1-DP-2
+   drm_connector_id: 1150
+   Monitor:          UGR:AirPanel 16:FF7X00AP0107

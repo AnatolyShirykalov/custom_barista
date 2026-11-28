@@ -8,6 +8,14 @@ block = "temperature"
 key = "temp"
 [[key]]
 block = "custom"
+command = "monitor-ddc.sh DP-0"
+key = "ddc-DP-0"
+[[key]]
+block = "custom"
+command = "monitor-ddc.sh DP-2"
+key = "ddc-DP-2"
+[[key]]
+block = "custom"
 command = "freq.sh"
 key = "freq"
 [[key]]

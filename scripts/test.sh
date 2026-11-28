@@ -87,8 +87,8 @@ printf '99, 16303\n' > "$cj"; o=$("$d/gpu.sh" "$cj"); printf '9, 5\n' > "$cj"; o
 "$d/gen-compact.sh" - | cmp -s - "$d/../compact.toml" && pass=$((pass+1)) || { echo "FAIL compact: out of sync, run scripts/gen-compact.sh"; fail=$((fail+1)); }
 grep -qE 'disk_space|disk_iostats|claude-usage\.sh|\$ip' "$d/../compact.toml" && { echo "FAIL compact: dropped block left"; fail=$((fail+1)); } || pass=$((pass+1))
 [ "$(grep -cE 'disk_space|disk_iostats|claude-usage\.sh"|\$ip ' "$d/../config.toml")" == 4 ] && pass=$((pass+1)) || { echo "FAIL compact: config.toml patterns changed, update gen-compact.sh"; fail=$((fail+1)); }
-# D5-R groups: 7 merge flags on DP-0 (6 separators), 5 on DP-2; memory must not glue onto gpu on DP-2
-[ "$(grep -c '^merge_with_next = true$' "$d/../config.toml")" == 7 ] && [ "$(grep -c '^merge_with_next = true$' "$d/../compact.toml")" == 5 ] && pass=$((pass+1)) || { echo "FAIL groups: merge_with_next count"; fail=$((fail+1)); }
+# D5-R groups: 9 merge flags on DP-0 (6 separators + 2 ddc blocks + 1), 7 on DP-2; memory must not glue onto gpu on DP-2
+[ "$(grep -c '^merge_with_next = true$' "$d/../config.toml")" == 9 ] && [ "$(grep -c '^merge_with_next = true$' "$d/../compact.toml")" == 7 ] && pass=$((pass+1)) || { echo "FAIL groups: merge_with_next count"; fail=$((fail+1)); }
 awk '/^\[\[block\]\]$/ { b = "" } /^block = / { b = $0 } /^merge_with_next/ && b ~ /memory/ { f = 1 } END { exit f }' "$d/../compact.toml" && pass=$((pass+1)) || { echo "FAIL compact: memory still merged"; fail=$((fail+1)); }
 # bars.conf generator: per state valid blocks (i3 -C when available); the tray never moves (bar-main, DP-0)
 printf 'CONFDIR=/x/conf\n' >"$gd/bars.env"
@@ -266,4 +266,47 @@ qcache 10 "" 2 600; printf '#!/bin/sh\necho "$1" >"%s/opened"\n' "$rqd" >"$rqd/o
 [ "$(cat "$rqd/opened" 2>/dev/null)" = https://gitlab.example/grp/proj/-/jobs/1 ] && pass=$((pass+1)) || { echo "FAIL rq19e: open"; fail=$((fail+1)); }
 # rq20: explain text, key map; no token in the repo-side output
 o=$(EXPLAIN_DRY=1 "$d/explain.sh" runner); [ "$(wc -l <<<"$o")" -le 11 ] && grep -q 'GitLab runner' <<<"$o" && grep -q '^key = "runner"' "$d/hover/keys.toml" && pass=$((pass+1)) || { echo "FAIL rq20: explain runner"; fail=$((fail+1)); }
+# monitor-ddc.sh (d1-d19): fake ddcutil/xrandr in testdata/ddc, never a real monitor; DDC_NOW fixed, no signals
+D=$t/ddc; B=$'\U000F00E0'; C=$'\U000F00DF'; mkdir -p "$gd/drm/card1-DP-1" "$gd/drm/card1-DP-2"; : >"$gd/i2c-0"
+for p in "DP-1 dp0" "DP-2 dp2"; do set -- $p; sed 's/../\\x&/g' "$D/edid-$2.hex" | xargs -0 printf >"$gd/drm/card1-$1/edid"; done
+nd() { sd=$(mktemp -d -p "$gd"); : >"$sd/log"; }
+dx() { DDC_STATE_DIR=$sd DDC_CMD=${DC:-$D/ddcutil} XRANDR_CMD=$D/xrandr FAKE_XRANDR=${FXR:-$D/xrandr.txt} FAKE_DETECT=${FDET:-$D/detect.txt} FAKE_LOG=$sd/log DRM_DIR=$gd/drm DDC_I2C_GLOB=$gd/i2c-* DDC_SIGNAL=0 DDC_NOW=1000000 "$d/monitor-ddc.sh" "$@"; }
+ms() { printf '%s\n' bus=3 model=MSI read_ts=1000000 try_ts=1000000 read_err=0 "$@" >"$sd/${CN:-DP-0}.state"; }  # state fixture, later keys win
+dwait() { local i; for i in $(seq 100); do grep -q "${1:-setvcp}" "$sd/log" && break; sleep 0.1; done; sleep 0.1; for i in $(seq 100); do flock -n "$sd/${CN:-DP-0}.worker.lock" true && break; sleep 0.1; done; }
+sv() { grep "^$1=" "$sd/DP-0.state" | tail -1 | cut -d= -f2; }
+nd; ms bright=93 contrast=28; check d1 "$(dx DP-0 bright)" " $B 93 " Idle; check d1c "$(dx DP-0 contrast)" " $C 28 " Idle
+w=; for v in 0 5 93 100 ""; do nd; ms bright=$v; w+=$(len "$(dx DP-0 bright)"); done; [ "$w" = 66666 ] && pass=$((pass+1)) || { echo "FAIL d2: widths $w"; fail=$((fail+1)); }
+nd; ms bright=93 contrast=28 read_err=1; check d3 "$(dx DP-0 bright)" " $B 93 " Info
+nd; ms bright=93 contrast=28 read_ts=$((1000000-301)) try_ts=1000000; check d3b "$(dx DP-0 bright)" " $B 93 " Info
+nd; check d4 "$(dx DP-0 bright)" " $B -- " Info; dwait getvcp; grep -q getvcp "$sd/log" && pass=$((pass+1)) || { echo "FAIL d4: no background refresh"; fail=$((fail+1)); }
+nd; ms bright=60 contrast=28 werr_bright=1; check d5 "$(dx DP-0 bright)" " $B 60 " Critical; check d5c "$(dx DP-0 contrast)" " $C 28 " Idle
+nd; DC=/nonexistent DDC_FG=1 dx DP-0 refresh; [ "$(sv hidden)" = no-ddcutil ] && [ "$(DC=/nonexistent dx DP-0 bright)" = '{"text":""}' ] && pass=$((pass+1)) || { echo "FAIL d6: no ddcutil"; fail=$((fail+1)); }
+nd; FXR=$D/xrandr_nodp2.txt DDC_FG=1 dx DP-2 refresh; [ "$(grep '^hidden=' "$sd/DP-2.state")" = hidden=disconnected ] && [ "$(FXR=$D/xrandr_nodp2.txt dx DP-2 bright)" = '{"text":""}' ] && pass=$((pass+1)) || { echo "FAIL d7: disconnected"; fail=$((fail+1)); }
+nd; ms bright=93; dx DP-0 bright up; dwait; a=$(sv bright); dx DP-0 bright up; dwait; [ "$a $(sv bright)" = "98 100" ] || { echo "FAIL d8: up $a $(sv bright)"; fail=$((fail+1)); }
+nd; ms bright=3; dx DP-0 bright down; b=$(sv bright); nd; ms bright=; dx DP-0 bright up; sleep 0.5
+[ "$b" = 0 ] && [ -z "$(sv bright)" ] && ! grep -q setvcp "$sd/log" && pass=$((pass+1)) || { echo "FAIL d8: down/unknown ($b)"; fail=$((fail+1)); }
+nd; ms bright=50 contrast=40; s0=$EPOCHREALTIME; FAKE_SLEEP=2 dx DP-0 bright up; s1=$EPOCHREALTIME
+[ "$(echo "($s1 - $s0) < 0.3" | bc -l)" = 1 ] && ! grep -q setvcp "$sd/log" && pass=$((pass+1)) || { echo "FAIL d9: scroll not instant"; fail=$((fail+1)); }
+sleep 3; dwait
+nd; ms bright=50 contrast=40; for _ in 1 2 3 4 5 6; do FAKE_SLEEP=0.4 dx DP-0 bright up; done; dwait
+n=$(grep -c 'setvcp 10' "$sd/log"); [ "$n" -ge 1 ] && [ "$n" -le 3 ] && grep 'setvcp 10' "$sd/log" | tail -1 | grep -q ' 80$' && pass=$((pass+1)) || { echo "FAIL d10: $n setvcp, last $(tail -1 "$sd/log")"; fail=$((fail+1)); }
+[ "$(grep setvcp "$sd/log" | grep -vc -- '--bus 3 --noverify --sleep-multiplier .1')" = 0 ] && ! grep -q 'setvcp 12' "$sd/log" && pass=$((pass+1)) || { echo "FAIL d11: setvcp args"; fail=$((fail+1)); }
+nd; ms bright=93 contrast=40; dx DP-0 contrast down; dwait; [ "$(grep -c setvcp "$sd/log")" = 1 ] && grep -q 'setvcp 12 35$' "$sd/log" && pass=$((pass+1)) || { echo "FAIL d12: $(grep setvcp "$sd/log")"; fail=$((fail+1)); }
+nd; DDC_FG=1 dx DP-0 refresh; r0=$(sv bus); nd; CN=DP-2 DDC_FG=1 dx DP-2 refresh; r2=$(grep "^bus=" "$sd/DP-2.state")
+nd; FDET=$D/detect_swapped.txt DDC_FG=1 dx DP-0 refresh
+[ "$r0" = 3 ] && [ "$r2" = bus=4 ] && [ "$(sv bus)" = 4 ] && [ "$(sv drm)" = card1-DP-1 ] && pass=$((pass+1)) || { echo "FAIL d13: buses $r0 $r2 $(sv bus)"; fail=$((fail+1)); }
+nd; ms bright=93 contrast=28 read_ts=1 try_ts=1; ( FAKE_SLEEP=0.6 FAKE_BRIGHT=10 DDC_FG=1 dx DP-0 refresh ) & sleep 0.2; dx DP-0 bright up; wait; dwait
+[ "$(sv bright)" = 98 ] && pass=$((pass+1)) || { echo "FAIL d14: wanted value overwritten ($(sv bright))"; fail=$((fail+1)); }
+nd; ms bright=93 contrast=28 read_ts=1 try_ts=1; FAKE_GET_FAIL=1 DDC_FG=1 dx DP-0 refresh; [ "$(sv read_err)" = 1 ] && [ "$(sv bright)" = 93 ] && jq -e '.state == "Info"' >/dev/null <<<"$(dx DP-0 bright)" && pass=$((pass+1)) || { echo "FAIL d15: read failure"; fail=$((fail+1)); }
+nd; ms bright=93 contrast=28; FAKE_SET_FAIL=1 dx DP-0 bright down; dwait; o=$(dx DP-0 bright); check d16 "$o" " $B 88 " Critical; DDC_FG=1 FAKE_BRIGHT=88 dx DP-0 refresh; check d16b "$(dx DP-0 bright)" " $B 88 " Idle
+nd; cn=$(grep -c 'monitor-ddc.sh DP-0' "$d/../config.toml"); [ "$cn" -gt 0 ] && [ "$(grep -c 'monitor-ddc.sh DP-2' "$d/../compact.toml")" = "$cn" ] && ! grep -q 'monitor-ddc.sh DP-0' "$d/../compact.toml" && ! grep -q 'monitor-ddc.sh DP-2' "$d/../config.toml" && pass=$((pass+1)) || { echo "FAIL d17: connector mapping"; fail=$((fail+1)); }
+python3 - "$d/.." <<'PY' && pass=$((pass+1)) || { echo "FAIL d18: explain keys"; fail=$((fail+1)); }
+import sys; sys.path.insert(0, sys.argv[1] + "/scripts/hover"); import layout
+for cfg, k in (("config.toml", "ddc-DP-0"), ("compact.toml", "ddc-DP-2")):
+    ks = list(layout.explain_keys(f"{sys.argv[1]}/{cfg}").values())
+    assert ks.count(k) == 2, (cfg, ks)
+PY
+nd; ms bright=93 contrast=28 model="MSI G281UV"; o=$(DDC_STATE_DIR=$sd "$d/explain.sh" ddc-DP-0); [ "$(wc -l <<<"$o")" -le 6 ] && grep -q 'MSI G281UV on DP-0' <<<"$o" && pass=$((pass+1)) || { echo "FAIL d18b: explain text"; fail=$((fail+1)); }
+nd; ms bright=93 contrast=28; ts=(); for _ in 1 2 3 4 5; do s0=$EPOCHREALTIME; dx DP-0 bright >/dev/null; ts+=($(echo "($EPOCHREALTIME - $s0) * 1000 / 1" | bc)); done
+[ "$(printf '%s\n' "${ts[@]}" | sort -n | sed -n 3p)" -lt 50 ] && pass=$((pass+1)) || { echo "FAIL d19: render ${ts[*]} ms"; fail=$((fail+1)); }
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]
