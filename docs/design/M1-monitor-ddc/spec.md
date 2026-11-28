@@ -82,6 +82,7 @@ State dir: `$XDG_RUNTIME_DIR/custom_barista/ddc/`; no `XDG_RUNTIME_DIR` -> `/tmp
 Per connector (`<conn>` = `DP-0`):
 - `<conn>.state`: `key=value` lines, parsed with `while IFS== read` (never `source`d): `bright`, `contrast` (wanted values, empty = unknown), `seq` (incremented by every scroll), `read_ts` (epoch of last successful read), `read_err` (0/1), `werr_bright`, `werr_contrast` (0/1), `bus`, `model`, `drm`, `hidden` (empty or reason), `resolve_ts`.
 - `<conn>.lock`: guards read-modify-write of the state file (held a few ms; `flock -w 1`).
+- `<conn>.log` (mode 600, last 200 lines): one line per worker setvcp (`time conn setvcp code value seq=N rc=N`) and per refresh read differing from the state (`external code expected=N read=N`, the monitor changed outside the bar); worker/refresh only, never the render path.
 - `<conn>.worker.lock`: one ddcutil user per monitor (worker and refresh); `flock -n`, skip if busy.
 
 Flows:

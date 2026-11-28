@@ -29,6 +29,11 @@ load() { S=(); local k v; [ -r "$sf" ] || return 0
 save() { local k; { for k in "${KEYS[@]}"; do printf '%s=%s\n' "$k" "${S[$k]:-}"; done; } >"$sf.$$" && mv -f "$sf.$$" "$sf"; }
 # locked <fn> args...: load, run fn (edits S), save, all under the state lock
 locked() { ( flock -w 1 9 || exit 1; load; "$@"; save ) 9>"$lock"; }
+wlog() { # append one event line to <conn>.log (600), keep the last 200; never fails the caller
+  local lg=$dir/$conn.log t; printf -v t '%(%Y-%m-%dT%H:%M:%S%z)T' "$(now)"
+  { printf '%s %s %s\n' "$t" "$conn" "$*" >>"$lg"
+    [ "$(wc -l <"$lg")" -gt 200 ] && { tail -n 200 "$lg" >"$lg.$$" && mv -f "$lg.$$" "$lg"; }; } 2>/dev/null; chmod 600 "$lg" 2>/dev/null; return 0
+}
 setk() { while [ $# -ge 2 ]; do S[$1]=$2; shift 2; done; }   # setk k v [k v]... for use under `locked`
 signal() { [ "${DDC_SIGNAL:-1}" = 0 ] || pkill -u "$UID" -RTMIN+7 -x i3status-rs 2>/dev/null; return 0; }
 bg() { setsid "$@" </dev/null >/dev/null 2>&1 & }
@@ -76,9 +81,11 @@ scroll() {
 }
 
 apply() { # $1 code name, $2 value: setvcp with one retry; returns 0 on success
-  local c=10; [ "$1" = contrast ] && c=12
+  local c=10 rc; [ "$1" = contrast ] && c=12
   for _ in 1 2; do
-    timeout 10 "$ddc" --bus "${S[bus]}" --noverify --sleep-multiplier .1 setvcp $c "$2" >/dev/null 2>&1 && return 0
+    timeout 10 "$ddc" --bus "${S[bus]}" --noverify --sleep-multiplier .1 setvcp $c "$2" >/dev/null 2>&1; rc=$?
+    wlog "setvcp $c $2 seq=${S[seq]:-0} rc=$rc"
+    [ $rc = 0 ] && return 0
   done; return 1
 }
 worker() {
@@ -148,6 +155,7 @@ read_ok() { # $1 bright $2 contrast $3 seq0; under `locked`; a code with a chang
   for c in bright contrast; do
     v=${!i}; i=$((i + 1))
     [ -n "${S[a$c]:-}" ] && [ "${S[a$c]}" != "${S[$c]:-}" ] && [ "${S[werr_$c]:-0}" != 1 ] && continue
+    [[ ${S[$c]:-} =~ ^[0-9]+$ ]] && [ "$v" != "${S[$c]}" ] && wlog "external $c expected=${S[$c]} read=$v"
     setk "$c" "$v" "a$c" "$v" "werr_$c" 0
   done
 }

@@ -37,3 +37,7 @@
 - read_ok keeps a wanted value while a change is pending (a<code> set, differs, no werr); test d14b. resolve probes outside the state lock (`resolve` fills R_*, `store_resolve` under lock; a new bus drops a*/werr). try_ts claimed inside the lock. Standby `clear_bus` sets resolve_ts (no detect for 300 s) and clears pending; test d20/d20b/d20c. Hover `ddc-` re-read test (h-ddc, imports hover-daemon, stub explain). shellcheck: no warnings left (only SC2329/SC2030 info).
 - Dim colour: read `info_fg` from config.toml with the same sed as claude-usage.sh (DDC_CONFIG override), fallback `#777777`. runner-queue.sh left to G1h.
 - README deps and CLAUDE.md block mention added. Deployed; both bars error-free, each own monitor; live net-zero scroll (up/down) on both monitors, bright+contrast, getvcp unchanged (93/28, 72/40).
+
+## M1g write log (2026-11-28)
+- `wlog` in monitor-ddc.sh appends to `<state dir>/<conn>.log` (600, last 200 lines): each worker setvcp (`ISO time conn setvcp code value seq=N rc=N`, per attempt) and each refresh read differing from the wanted/known value (`external code expected=N read=N`, only when no change is pending). No extra ddcutil calls, nothing on the render path. Tests d21-d21d (setvcp line, external line, no line on equal read, cap 200 + mode 600). Spec data-files list mentions the log.
+- Deployed; both bars clean; live net-zero scroll on DP-2 (45 then 40) gave 2 setvcp lines, mode 600.

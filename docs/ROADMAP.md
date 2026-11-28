@@ -34,7 +34,7 @@ No agent running. Done recently (2026-11-27, session 6): G2a runner metrics drop
 
 1. [x] **G2d runtime dir private + specific M1 install warning** (U-6 result, 2026-11-28): `$XDG_RUNTIME_DIR/custom_barista` is 755 (created by `mkdir -p` in monitor-ddc.sh, hover-run.sh, hover/rundir.py), children 700; make the parent 700 everywhere it is created. install.sh M1 warning names only what is missing (ddcutil absent / user not in i2c / i2c-dev not loaded) with the exact command. DONE 2026-11-28: parent 700 in all 3 creators + test rows, install.sh M1 warning split per missing piece.
 
-1. [ ] **M1g DDC write log** (2026-11-28): MSI went 95/43 → 93/28 with only net-zero bar scrolls (93 not reachable in steps of 5; likely monitor restoring its picture-mode profile). Worker appends each setvcp (time, connector, code, value, seq, rc) and each refresh read that differs from the state to `$XDG_RUNTIME_DIR/custom_barista/ddc/<conn>.log` (600, capped ~200 lines); hover shows nothing new. After G2d (shares monitor-ddc.sh). → `widget-builder`
+1. [x] **M1g DDC write log** (2026-11-28): MSI went 95/43 → 93/28 with only net-zero bar scrolls (93 not reachable in steps of 5; likely monitor restoring its picture-mode profile). Worker appends each setvcp (time, connector, code, value, seq, rc) and each refresh read that differs from the state to `$XDG_RUNTIME_DIR/custom_barista/ddc/<conn>.log` (600, capped ~200 lines); hover shows nothing new. After G2d (shares monitor-ddc.sh). → `widget-builder` DONE 2026-11-28: wlog + tests d21*, see progress/monitor-ddc.md.
 
 ### Background checks
 
