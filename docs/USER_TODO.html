@@ -34,24 +34,6 @@ exit</pre></li>
 XDG_RUNTIME_DIR=/run/user/$(id -u) scripts/runner-queue.sh | jq -c .</pre></li>
 <li><code>U1: statusline tap not installed</code> in the install output is fine: anatolii's Claude usage block uses the API fallback (anatolii has no custom Claude statusline script).</li></ol></section>
 
-<section id="U-7"><h2>U-7: Runner block during a real CI job (G1e)</h2>
-<p><b>Why:</b> two live checks need a real job and a network drop; the token and rate checks already passed (2026-11-28). Asked 2026-11-28.</p>
-<ol><li>Start any pipeline that runs on your local runner (e.g. retry a job in one of your projects).</li>
-<li>While it runs, the DP-0 bar's runner block should turn green and show <code>1/4</code>.</li>
-<li>Optional: unplug the network or <code>nmcli networking off</code> for ~2 min; the block should show yellow <code>net</code>, then recover after <code>nmcli networking on</code>.</li>
-<li>Tell me in chat what you saw (or say "trigger one on &lt;project&gt;" and I will).</li></ol></section>
-<section id="U-6"><h2>U-6: Runner block privacy checks as anatolii (G2)</h2>
-<p><b>Why:</b> confirm in anatolii's own session that no runner data is readable by other users (files, ports, hover). Run in a terminal inside <b>anatolii's X session</b> (not <code>sudo -iu</code>), after <code>git pull &amp;&amp; ./install.sh --no-restart</code> (it now sets <code>~/.config/custom_barista</code> to 700).</p>
-<ol><li>File modes:
-<pre>stat -c '%a %U %n' ~/.config/custom_barista ~/.config/custom_barista/gitlab-token ~/.cache/custom_barista ~/.cache/custom_barista/runner-queue.json ~/.cache/custom_barista/runner-queue.projects "$XDG_RUNTIME_DIR/custom_barista/hover"
-find ~/.config/custom_barista ~/.cache/custom_barista "$XDG_RUNTIME_DIR/custom_barista" -maxdepth 0 -perm /077
-find /tmp -maxdepth 1 -name 'custom_barista*' ! -perm 700</pre>
-Expected: dirs <code>700 anatolii</code>, token/json/projects <code>600 anatolii</code>; both <code>find</code> lines print nothing.</li>
-<li>No port, no metrics:
-<pre>grep -n listen_address ~/.gitlab-runner/config.toml; ss -ltnp | grep -i gitlab; echo done</pre>
-Expected: only <code>done</code>.</li>
-<li>Hover: point at the runner block (gitlab icon) on the bar. Expected: tooltip with the 3 legend lines, <code>Running 0/16:</code>, then <code>Pending 0 (API, &lt;age&gt; ago):</code>.</li>
-<li>Tell Claude the output of steps 1-2 and whether the tooltip showed.</li></ol></section>
 <h2>Done</h2>
-<ul><li><b>U-2</b> runner block idle look: A (always shown, grey, fixed width), 2026-11-27.</li><li><b>U-3</b> GitLab token for the bar: done 2026-11-27. Fine-grained token, "Only my personal projects", CI/CD Pipeline + Runner read; saved to <code>~/.config/custom_barista/gitlab-token</code> (600). Tested: 200 on a personal project.</li><li><b>U-4</b> Project ids to watch: done 2026-11-27, superseded by G1g: projects come from the runner log; <code>runner-projects</code> is an optional extra.</li><li><b>U-5</b> monitor brightness/contrast look: B (two fields, scroll over the one to change), 2026-11-28.</li></ul>
+<ul><li><b>U-2</b> runner block idle look: A (always shown, grey, fixed width), 2026-11-27.</li><li><b>U-3</b> GitLab token for the bar: done 2026-11-27. Fine-grained token, "Only my personal projects", CI/CD Pipeline + Runner read; saved to <code>~/.config/custom_barista/gitlab-token</code> (600). Tested: 200 on a personal project.</li><li><b>U-4</b> Project ids to watch: done 2026-11-27, superseded by G1g: projects come from the runner log; <code>runner-projects</code> is an optional extra.</li><li><b>U-5</b> monitor brightness/contrast look: B (two fields, scroll over the one to change), 2026-11-28.</li><li><b>U-6</b> runner privacy checks as anatolii: done 2026-11-28; files 700/600, no listen_address, no port, /tmp clean (hover dir untestable under <code>sudo -iu</code>, no session). Found: anatoly's <code>/run/user/1000/custom_barista</code> 755 → G2d.</li><li><b>U-7</b> runner block live job: done 2026-11-28, green <code>1/4</code> seen; network-drop check waived by user (rare case).</li></ul>
 </body></html>
