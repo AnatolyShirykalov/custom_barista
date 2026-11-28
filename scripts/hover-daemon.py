@@ -347,7 +347,7 @@ class Daemon:
         mt = os.stat(EXPLAIN).st_mtime
         if mt != self.texts_mt:
             self.texts, self.texts_mt = {}, mt
-        if key not in self.texts:
+        if key not in self.texts or key.startswith("ddc-"):  # ddc text has live values (state file, ~10 ms)
             r = subprocess.run([EXPLAIN, key], capture_output=True, text=True, timeout=2, env={**os.environ, "EXPLAIN_DRY": "1"})
             self.texts[key] = "\n".join(r.stdout.rstrip("\n").split("\n")[:6]) if r.returncode == 0 else None
         return self.texts[key]

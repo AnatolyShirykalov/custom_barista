@@ -296,7 +296,7 @@ nd; DDC_FG=1 dx DP-0 refresh; r0=$(sv bus); nd; CN=DP-2 DDC_FG=1 dx DP-2 refresh
 nd; FDET=$D/detect_swapped.txt DDC_FG=1 dx DP-0 refresh
 [ "$r0" = 3 ] && [ "$r2" = bus=4 ] && [ "$(sv bus)" = 4 ] && [ "$(sv drm)" = card1-DP-1 ] && pass=$((pass+1)) || { echo "FAIL d13: buses $r0 $r2 $(sv bus)"; fail=$((fail+1)); }
 nd; ms bright=93 contrast=28 read_ts=1 try_ts=1; ( FAKE_SLEEP=0.6 FAKE_BRIGHT=10 DDC_FG=1 dx DP-0 refresh ) & sleep 0.2; dx DP-0 bright up; wait; dwait
-[ "$(sv bright)" = 98 ] && pass=$((pass+1)) || { echo "FAIL d14: wanted value overwritten ($(sv bright))"; fail=$((fail+1)); }
+[ "$(sv bright)" = 98 ] && grep -q "setvcp 10 98$" "$sd/log" && pass=$((pass+1)) || { echo "FAIL d14: wanted value overwritten or not applied ($(sv bright))"; fail=$((fail+1)); }
 nd; ms bright=93 contrast=28 read_ts=1 try_ts=1; FAKE_GET_FAIL=1 DDC_FG=1 dx DP-0 refresh; [ "$(sv read_err)" = 1 ] && [ "$(sv bright)" = 93 ] && jq -e '.state == "Info"' >/dev/null <<<"$(dx DP-0 bright)" && pass=$((pass+1)) || { echo "FAIL d15: read failure"; fail=$((fail+1)); }
 nd; ms bright=93 contrast=28; FAKE_SET_FAIL=1 dx DP-0 bright down; dwait; o=$(dx DP-0 bright); check d16 "$o" " $B 88 " Critical; DDC_FG=1 FAKE_BRIGHT=88 dx DP-0 refresh; check d16b "$(dx DP-0 bright)" " $B 88 " Idle
 nd; cn=$(grep -c 'monitor-ddc.sh DP-0' "$d/../config.toml"); [ "$cn" -gt 0 ] && [ "$(grep -c 'monitor-ddc.sh DP-2' "$d/../compact.toml")" = "$cn" ] && ! grep -q 'monitor-ddc.sh DP-0' "$d/../compact.toml" && ! grep -q 'monitor-ddc.sh DP-2' "$d/../config.toml" && pass=$((pass+1)) || { echo "FAIL d17: connector mapping"; fail=$((fail+1)); }

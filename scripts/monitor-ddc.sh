@@ -151,6 +151,8 @@ refresh_run() {
     locked setk read_err 1
     grep -qiE 'no such (file|device)|not found|unable to open' <<<"$out" && locked setk bus "" resolve_ts ""
   fi
+  # a scroll during the read started a worker that found worker.lock busy and quit: hand its value on
+  exec 8>&-; load; [ "${S[seq]:-0}" != "$seq0" ] && bg "$self" "$conn" worker
   signal
 }
 
