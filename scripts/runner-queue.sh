@@ -107,16 +107,16 @@ refresh() {
   [ -r "$CFG" ] && [ -r "$TOKEN_FILE" ] && mode_ok || return 0
   umask 077
   mkdir -p "$(dirname "$CACHE")"; auto_scan >"$AUTO.new" && mv "$AUTO.new" "$AUTO"
-  local base rid tok prev ids ignored id key n=0 code auth='' neterr=''
+  local base rid tok ids ignored id key n=0 code auth='' neterr=''
   base=$(first_runner url); rid=$(first_runner id)
   tok=$(head -n1 "$TOKEN_FILE" | tr -d '[:space:]')
   mkdir -p "$(dirname "$CACHE")"; td=$(mktemp -d -p "$(dirname "$CACHE")"); trap 'rm -rf "$td"' EXIT
-  prev=$(jq -c . "$CACHE" 2>/dev/null) || prev=; [ -n "$prev" ] || prev='{"ts_ok":0,"pending":[],"running":[]}'
-  ids=$(plist)
+  jq -c . "$CACHE" >"$td/prev" 2>/dev/null && [ -s "$td/prev" ] || echo '{"ts_ok":0,"pending":[],"running":[]}' >"$td/prev"
+  ids=$(plist); printf '%s\n' "$ids" >"$td/ids" # private values reach jq/curl via files in the 700 dir or env, never argv
   ignored=$(( $(grep -c . <<<"$ids") - 10 )); [ "$ignored" -gt 0 ] || ignored=0
   write() { # err
-    jq -nc --argjson now "$NOW" --argjson prev "$prev" --arg err "$1" --argjson ign "$ignored" --arg ids "$ids" --slurpfile new <(cat "$td"/p*.json 2>/dev/null | jq -s '{pending: ([.[].pending[]]), running: ([.[].running[]])}') '
-      ($new[0] // {pending: [], running: []}) as $n
+    jq -nc --argjson now "$NOW" --slurpfile prev "$td/prev" --arg err "$1" --argjson ign "$ignored" --rawfile ids "$td/ids" --slurpfile new <(cat "$td"/p*.json 2>/dev/null | jq -s '{pending: ([.[].pending[]]), running: ([.[].running[]])}') '
+      ($prev[0] // {}) as $prev | ($new[0] // {pending: [], running: []}) as $n
       | if $err == "" then {ts: $now, ts_ok: $now, err: null, pending: $n.pending, running: $n.running, ignored: $ign, projects: ($ids | split("\n") | map(select(. != "")) | .[0:10])}
         else {ts: $now, ts_ok: ($prev.ts_ok // 0), err: $err, pending: ($prev.pending // []), running: ($prev.running // []), ignored: $ign, projects: ($ids | split("\n") | map(select(. != "")) | .[0:10])} end' >"$td/out" && mv "$td/out" "$CACHE"; }
   if net_down; then write net; return 0; fi
@@ -128,13 +128,13 @@ refresh() {
       code=$(cat "$API_DIR/$key.status" 2>/dev/null); cp "$API_DIR/$key.json" "$td/body" 2>/dev/null
     else
       [[ $id =~ ^[0-9]+$ ]] || id=${id//\//%2F}
-      code=$(printf 'PRIVATE-TOKEN: %s\n' "$tok" | timeout 6 curl -sg --max-time 4 -o "$td/body" -w '%{http_code}' -H @- "$base/api/v4/projects/$id/jobs?scope[]=pending&scope[]=running&per_page=50" 2>/dev/null)
+      code=$(printf 'header = "PRIVATE-TOKEN: %s"\nurl = "%s/api/v4/projects/%s/jobs?scope[]=pending&scope[]=running&per_page=50"\n' "$tok" "$base" "$id" | timeout 6 curl -sg --max-time 4 -o "$td/body" -w '%{http_code}' -K - 2>/dev/null)
     fi
     case $code in
-      200) jq -c --argjson rid "${rid:-0}" '
+      200) RID=${rid:-0} jq -c '
              def proj: (.web_url | sub("^https?://[^/]+/"; "") | sub("/-/jobs/[0-9]+$"; ""));
              def j: {project: proj, ref: .ref, name: .name, created: ((.created_at | sub("\\.[0-9]+"; "") | fromdateiso8601?) // 0), url: .web_url};
-             {pending: [.[] | select(.status == "pending") | j], running: [.[] | select(.status == "running" and .runner.id == $rid) | j]}' "$td/body" >"$td/p$n.json" 2>/dev/null || neterr=1 ;;
+             {pending: [.[] | select(.status == "pending") | j], running: [.[] | select(.status == "running" and .runner.id == ($ENV.RID | tonumber)) | j]}' "$td/body" >"$td/p$n.json" 2>/dev/null || neterr=1 ;;
       401|403) auth=1; break ;;
       404) ;;
       *) neterr=1; break ;;

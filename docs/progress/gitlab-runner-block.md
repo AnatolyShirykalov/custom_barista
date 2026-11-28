@@ -79,3 +79,7 @@ runner-queue.sh: `spawn()` creates the cache dir (700) before `flock`; refresh h
 | argv | **leak → G2c** | `mount`: `/proc` without `hidepid`; refresh passes `--argjson prev "$prev"` (whole previous cache), `--arg ids` (project list) to jq and the project path in the curl URL; any local user can read them with `ps` while they run (each refresh, ~every 60 s). Token is safe (stdin). `bar()` `--arg t` carries counts only (low) |
 
 Doc fix: spec "Runner setup" section marked historical / do not apply. Tests 257 pass. Live checks as anatolii: USER_TODO U-6 (modes, `ss -ltnp`, hover).
+
+## G2c argv leak fixed (2026-11-28)
+- `refresh`: previous cache and project list written to `$td/prev`, `$td/ids` (700 dir, umask 077) and read with `--slurpfile`/`--rawfile`; runner id via `RID` env (`$ENV.RID`); curl gets `header`+`url` on stdin with `-K -`. Remaining argv: counts, err word, temp paths (not private).
+- Test rq30: fake curl/jq on PATH log argv; asserts no project path, token, job/ref name or host in the log, and the cache is still written. 258 pass. Deployed; both bars clean, runner block shows `0/4  +0`; config dir 700.

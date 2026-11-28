@@ -230,6 +230,13 @@ rm -f "$qc"; API=$Q/api rq refresh
 [ "$(jq -c '[.err,(.pending|length),(.running|length),.running[0].project,.pending[0].created]' "$qc" 2>/dev/null)" = '[null,1,1,"grp/proj",1795773600]' ] && pass=$((pass+1)) || { echo "FAIL rq15: refresh cache $(head -c 200 "$qc")"; fail=$((fail+1)); }
 rm -f "$qc"; API=$Q/api401 rq refresh
 [ "$(jq -r .err "$qc" 2>/dev/null)" = auth ] && pass=$((pass+1)) || { echo "FAIL rq16: 401 -> err auth"; fail=$((fail+1)); }
+# rq30: private values stay out of argv: fake curl/jq log their argv; project path, token, job/ref names must not appear (curl config on stdin, jq via files/env)
+fb=$rqd/fakebin; mkdir -p "$fb"; rj=$(command -v jq)
+printf '#!/bin/sh\nprintf "curl %%s\\n" "$*" >>"$ARGV_LOG"\nwhile [ $# -gt 0 ]; do [ "$1" = -o ] && o=$2; shift; done\ncat >/dev/null; cp "$FIX" "$o"; printf 200\n' >"$fb/curl"
+printf '#!/bin/sh\nprintf "jq %%s\\n" "$*" >>"$ARGV_LOG"\nexec %s "$@"\n' "$rj" >"$fb/jq"; chmod +x "$fb/curl" "$fb/jq"
+printf 'zzsecret/grp/proj\n' >"$rqd/pf30"; printf 'TESTTOK-rq30\n' >"$rqd/tok30"; chmod 600 "$rqd/tok30"; qcache 10 "" 2 60; : >"$rqd/argv.log"
+PATH=$fb:$PATH ARGV_LOG=$rqd/argv.log FIX=$Q/api/1.json TF=$rqd/tok30 PF=$rqd/pf30 JF=$Q/journal_ok NR= API= rq refresh
+[ "$(grep -c '^curl ' "$rqd/argv.log")" -ge 1 ] && [ "$(grep -c '^jq ' "$rqd/argv.log")" -ge 2 ] && ! grep -Eq 'zzsecret|TESTTOK|grp/proj|foreign|build|main|gitlab\.example' "$rqd/argv.log" && [ "$(jq -r '.pending[0].name' "$qc" 2>/dev/null)" = build ] && pass=$((pass+1)) || { echo "FAIL rq30: private value in argv or refresh broken: $(head -c 300 "$rqd/argv.log")"; fail=$((fail+1)); }
 # rq21: missing cache dir + refresh not disabled -> the bar run spawns the refresh (lock in a fresh 700 dir), cache file 600; rq22: 5xx -> err net; rq23: empty ids skipped
 qcold=$rqd/cold/q.json; o=$(QC=$qcold NR= API=$Q/api rq); jq -e . >/dev/null 2>&1 <<<"$o" || { echo "FAIL rq21: cold json"; fail=$((fail+1)); }
 for _ in 1 2 3 4 5 6 7 8 9 10; do [ -s "$qcold" ] && break; sleep 0.3; done
