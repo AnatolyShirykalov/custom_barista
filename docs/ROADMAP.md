@@ -29,6 +29,9 @@ No agent running. Done recently (2026-11-27, session 6): G2a runner metrics drop
 2. [ ] **G2c runner-queue.sh: no runner data in argv** (G2 finding, 2026-11-28): `/proc` has no `hidepid`, so every local user sees `jq --argjson prev` (whole cache: projects, refs, job names, URLs), `--arg ids` and the curl URL (project path) in `ps`. Pass them via files in the 700 tmp dir (`--slurpfile`/`--rawfile`) and the curl URL+header via `curl -K -` on stdin; test row: no project path in `/proc/*/cmdline` during a fixture refresh. → `widget-builder`
 3. [ ] **G1e live acceptance checks for runner block** (after G1g; U-2 = A, already built): spec acceptance 2, 3, 5, 6 — green `1/4` during a real job, token absent from `ps` during refresh, ≤1 API refresh per 60 s, yellow `net` on network drop; apply U-2 idle choice if not A. → `chore`
 
+1. [ ] **M1f monitor-ddc review fixes** (code review 2026-11-28, `docs/progress/recurring.md`): scroll lost when refresh takes worker.lock first; resolve outside state lock; try_ts compare-and-set; standby bus reset backoff + clear pending on bus change; shellcheck SC1097/SC2034/SC1007; dim colour from theme; README deps + CLAUDE.md block mention; tests d20, hover `ddc-` key, pending-state d-row. After G2c (shares test.sh). → `widget-builder`
+1. [ ] **G1h runner-queue auto_scan keeps good list** (code review 2026-11-28): journalctl timeout must not replace project list with partial/empty one (mv only if non-empty/rc 0, own timeout); SC2034 `src`; rq test empty journal + existing list. After G2c. → `widget-builder`
+
 ### Background checks
 
 Long detached jobs started by agents: `check` command, done when, follow-up. Main session checks between agents, removes finished items.
@@ -48,7 +51,7 @@ After about every 3 feature tasks, run the check with the oldest last-run date (
 | Dependency updates | `dep-updater` | i3status-rs installed vs latest release, changelog breaking config changes grep'd in config.toml/scripts, script deps (jq, xclip, yad, nvidia-smi, xdotool, node) present and formats unchanged; fix keys, backlog the rest | 2026-11-27 |
 | Look/usability pass | `bar-designer` | screenshot the bar; clarity, colors, stable widths, glyphs render; findings → backlog | 2026-11-27 |
 | Widget health | `chore` | every block shows real data on this machine: `bash scripts/test.sh`, smoke `(sleep 6) \| timeout 6 i3status-rs $PWD/config.toml` (and compact.toml), grep `ERR`/`not found`/`error`; after system upgrades check nvidia-smi, hwmon, pulse, sysfs formats; failures → backlog for `widget-builder` | 2026-11-27 |
-| Code review + docs | `code-reviewer` | review diffs since last run; README block list and CLAUDE.md match the code | 2026-11-27 |
+| Code review + docs | `code-reviewer` | review diffs since last run; README block list and CLAUDE.md match the code | 2026-11-28 |
 
 
 ## Decisions made

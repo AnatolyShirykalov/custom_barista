@@ -175,3 +175,15 @@ Commits since 24d9c2d (cf3b6bd reboot fix OK; 777ed1c runner-queue.sh). Token ha
 - low :180 hover max+1 lines; :115-123 empty projects file → `/projects//jobs`; shellcheck SC1007/SC2034 (:73,110,152,153,156).
 - medium test.sh:208: all rq tests NO_REFRESH=1; spawn/flock, cache mode, net/5xx paths untested (add api500 fixture).
 - low README.md:9-16,31: no runner-queue.sh entry; deps miss ss, systemctl --user, xdg-open, ~/.config/custom_barista files.
+
+## Code review 2026-11-28 (code-reviewer, 70a32d5..3f48b67)
+
+Tests 257/0, compact.toml in sync, no unrequested DDC writes on normal paths. Findings → roadmap M1f (monitor-ddc.sh) and G1h (runner-queue.sh):
+- medium monitor-ddc.sh:136-138,155: refresh grabbing worker.lock between scroll and worker start reverts the scroll. Skip codes with S[c]!=S[ac] in read_ok / respawn worker; d-row with pending state.
+- medium monitor-ddc.sh:104-135,142: `locked resolve` holds state lock ≤25 s (xrandr+detect); scrolls with `flock -w 1` fail silently. Probe outside the lock.
+- low monitor-ddc.sh:49-57: try_ts checked outside lock → two refresh/detect runs; re-check inside lock.
+- low monitor-ddc.sh:152: standby clears bus+resolve_ts → detect every 30 s; pending werr may go to swapped monitor. Set resolve_ts, clear pending on bus change.
+- medium runner-queue.sh:35-36,109: auto_scan journalctl timeout → partial/empty list replaces good one. mv only if non-empty/rc 0, own timeout, rq test.
+- low shellcheck: monitor-ddc.sh SC1097 (`IFS==`), SC2034, SC1007; runner-queue.sh:151 SC2034 `src`.
+- low README.md:33 deps miss ddcutil, i2c group/i2c-dev, xrandr, setsid; CLAUDE.md lacks monitor-ddc block; dim `#777777` hard-coded (monitor-ddc, runner-queue) instead of theme.
+- low test.sh: no test for bus reset on vanished device, worker retry, hover `ddc-` re-read (add d20 + hover key test).
