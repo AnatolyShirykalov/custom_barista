@@ -41,7 +41,7 @@ python3 -c 'import gi; gi.require_version("Gtk", "3.0"); from gi.repository impo
 
 # 3. i3status-rs configs: tracked files refer to ~/projects/custom_barista, generate copies with this checkout
 CONFDIR=${XDG_CONFIG_HOME:-$HOME/.config}/custom_barista
-do_ mkdir -p "$CONFDIR"
+do_ mkdir -p "$CONFDIR"; do_ chmod 700 "$CONFDIR" # G2: holds gitlab-token, runner-projects; never readable by other users
 for f in config.toml compact.toml; do
   if [ $dry = 1 ]; then say "[dry-run] generate $CONFDIR/$f (~/projects/custom_barista -> $REPO)"
   else c=$(<"$REPO/$f"); printf '%s\n' "${c//'~/projects/custom_barista'/$REPO}" >"$CONFDIR/$f"; fi

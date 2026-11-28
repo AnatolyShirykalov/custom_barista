@@ -66,3 +66,16 @@ runner-queue.sh: `spawn()` creates the cache dir (700) before `flock`; refresh h
 - `auto_scan` (journal `--since -30d`, `repo_url=https://host/path.git` -> path, newest first, unique, max 10) runs only in the background `refresh`, writes `runner-queue.projects` beside the cache; `plist` merges `runner-projects` (first) + that file; bar/hover read only the small file (no 30d journal per tick). Cache now carries `.projects`.
 - Hover "no project list" only when both empty; with a token but no list, the bar respawns refresh at most every 5 min.
 - Tests rq24-rq29 (real ANSI fixtures journal_repos, journal_repos12). U-4 moved to Done in USER_TODO.html. Live: bar shows `0/4  +0` with 3 projects found (data_zentrum, smart_speaker, concerts).
+
+## G2 spec check: private sources (2026-11-28, bar-designer, code reading only)
+| Check | Result | Evidence |
+|---|---|---|
+| (a) no TCP port / metrics with no `listen_address` | pass | runner-queue.sh has no listen/ss/metrics code since G2a; only outbound `curl` to `$base/api/v4` (first runner url); running from `journalctl --user`, concurrent from own config.toml |
+| (c) install.sh never enables metrics | pass | install.sh, i3block.sh, barsconf.sh, i3/ contain no `gitlab`/`listen_address`/`metrics`; never touches `~/.gitlab-runner` |
+| (b) cache files | pass | `spawn()` mkdir + chmod 700 of the cache dir before `flock`; `refresh` `umask 077` → `runner-queue.json`, `.projects`, `mktemp -d` 600/700, written tmp + `mv`. Lock file is created by `flock` with the bar's umask (likely 644) but sits inside the 700 dir |
+| (b) token | pass | script never writes it; refuses to use it if any group/other bit is set (`mode_ok`) |
+| (b) hover files | pass | `$XDG_RUNTIME_DIR/custom_barista/hover` (or `/tmp/custom_barista-$UID`, refused unless own + 700); hover-tee writes under a 0700 dir |
+| (b) config dir | fixed | `~/.config/custom_barista` was 0755 (install.sh `mkdir -p`); holds `runner-projects` (mode not checked by the script) → install.sh now `chmod 700` |
+| argv | **leak → G2c** | `mount`: `/proc` without `hidepid`; refresh passes `--argjson prev "$prev"` (whole previous cache), `--arg ids` (project list) to jq and the project path in the curl URL; any local user can read them with `ps` while they run (each refresh, ~every 60 s). Token is safe (stdin). `bar()` `--arg t` carries counts only (low) |
+
+Doc fix: spec "Runner setup" section marked historical / do not apply. Tests 257 pass. Live checks as anatolii: USER_TODO U-6 (modes, `ss -ltnp`, hover).

@@ -29,6 +29,8 @@ A keeps the width fixed in every state and shows runner health (off / net) at a 
 
 ## Runner setup (builder, once)
 
+> **Historical, do NOT apply (G2a, 2026-11-27):** never add `listen_address` for any user; the steps below are kept only as a record.
+
 1. Add top-level `listen_address = "127.0.0.1:9252"` to `~/.gitlab-runner/config.toml` (before `[[runners]]`; back up first), `systemctl --user restart gitlab-runner` (graceful: SIGQUIT drop-in; do it with no job running).
 2. Confirm metric names: `curl -s 127.0.0.1:9252/metrics | grep '^# HELP gitlab_runner_\(jobs\|concurrent\) '`. If `gitlab_runner_jobs` is named differently, use the real name and note it in the progress file.
 3. Other user (`anatolii`): not touched. If they want the block later they use a different port (suggest 9253) in their own config; the script never assumes a port.
