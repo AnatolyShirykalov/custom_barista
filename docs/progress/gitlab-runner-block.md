@@ -88,3 +88,8 @@ Doc fix: spec "Runner setup" section marked historical / do not apply. Tests 257
 - `auto_scan` reads the 30d journal itself (`timeout ${SCAN_TIMEOUT:-20} journalctl`), returns 1 on read failure or empty result; `refresh` then removes `.projects.new` and keeps the old `.projects`.
 - SC2034 `src` removed; `DIM` read from `info_fg` in `../config.toml` (fallback `#777777`).
 - Tests rq31 (empty journal), rq32 (failed read), rq33 (fake journalctl sleeping past SCAN_TIMEOUT=1); test helper `rq` now honors an empty `JF` (journalctl path). 266 pass; both bars no errors.
+
+## G1e live checks, part 1 (2026-11-28)
+- Token absent from `ps`: 5 forced `runner-queue.sh refresh` runs, `ps -eo args` polled every 0.1 s (49 polls) against the first 8 chars of the token (pattern read from a 600 file via `grep -F -f`, so the check does not match itself): 0 matches. (A first attempt with the pattern in grep's own argv gave a false 38/38 self-match; discarded.)
+- API refresh rate with the bar running: cache `ts` watched for 200 s (1 s steps, no forced refresh): changes at +0, +62, +122, +182 s, i.e. one refresh per 60 s (TTL), never faster. Pass.
+- Not run (need the user): green `1/4` during a real job, yellow `net` on a network drop.
