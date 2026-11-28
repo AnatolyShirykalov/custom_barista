@@ -187,3 +187,9 @@ Tests 257/0, compact.toml in sync, no unrequested DDC writes on normal paths. Fi
 - low shellcheck: monitor-ddc.sh SC1097 (`IFS==`), SC2034, SC1007; runner-queue.sh:151 SC2034 `src`.
 - low README.md:33 deps miss ddcutil, i2c group/i2c-dev, xrandr, setsid; CLAUDE.md lacks monitor-ddc block; dim `#777777` hard-coded (monitor-ddc, runner-queue) instead of theme.
 - low test.sh: no test for bus reset on vanished device, worker retry, hover `ddc-` re-read (add d20 + hover key test).
+
+## 2026-11-28 Widget health
+- test.sh pass=266 fail=0. Smoke config.toml (96 KB) and compact.toml (63 KB) 6 s: 0 matches for ERR/not found/error/Invalid.
+- All blocks in config.toml show values (load, temp, procs, mem, disk, io, GPU 37° 1.4GB, net, runner-queue "0/4 +0", claude usage, kbd, bright 93, contrast 28, vol, date).
+- nvidia-smi csv fields as expected; 10 hwmon names; pulse default sink present. monitor-ddc bright/contrast render from state file (read-only, no setvcp); runner-queue returns JSON.
+- No failures; nothing queued.
