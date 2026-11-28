@@ -83,3 +83,8 @@ Doc fix: spec "Runner setup" section marked historical / do not apply. Tests 257
 ## G2c argv leak fixed (2026-11-28)
 - `refresh`: previous cache and project list written to `$td/prev`, `$td/ids` (700 dir, umask 077) and read with `--slurpfile`/`--rawfile`; runner id via `RID` env (`$ENV.RID`); curl gets `header`+`url` on stdin with `-K -`. Remaining argv: counts, err word, temp paths (not private).
 - Test rq30: fake curl/jq on PATH log argv; asserts no project path, token, job/ref name or host in the log, and the cache is still written. 258 pass. Deployed; both bars clean, runner block shows `0/4  +0`; config dir 700.
+
+## G1h auto_scan keeps good list (2026-11-28)
+- `auto_scan` reads the 30d journal itself (`timeout ${SCAN_TIMEOUT:-20} journalctl`), returns 1 on read failure or empty result; `refresh` then removes `.projects.new` and keeps the old `.projects`.
+- SC2034 `src` removed; `DIM` read from `info_fg` in `../config.toml` (fallback `#777777`).
+- Tests rq31 (empty journal), rq32 (failed read), rq33 (fake journalctl sleeping past SCAN_TIMEOUT=1); test helper `rq` now honors an empty `JF` (journalctl path). 266 pass; both bars no errors.

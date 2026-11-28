@@ -205,7 +205,7 @@ check rb6 "$(BTIME=x rb)" "REBOOT ERR" Critical
 unset SESSION_START
 # runner-queue.sh (rq1-rq29): fixtures in testdata/runner, no systemd/network; NOW fixed; c = 4
 Q=$t/runner; RN=1795003200; rqd=$(mktemp -d -p "$gd"); qc=$rqd/q.json; printf 'tok\n' >"$rqd/tok"; chmod 600 "$rqd/tok"
-rq() { RUNNER_CONFIG=${RC:-$Q/config.toml} UNIT_STATE=${US:-active} JOURNAL_FILE=${JF:-$Q/journal_ok} QUEUE_CACHE=${QC:-$qc} TOKEN_FILE=${TF:-$rqd/tok} PROJECTS_FILE=${PF:-$Q/projects} NOW=$RN NO_REFRESH=${NR-1} API_DIR=${API:-} LIST_MAX=${LM:-8} "$d/runner-queue.sh" "$@"; }
+rq() { RUNNER_CONFIG=${RC:-$Q/config.toml} UNIT_STATE=${US:-active} JOURNAL_FILE=${JF-$Q/journal_ok} QUEUE_CACHE=${QC:-$qc} TOKEN_FILE=${TF:-$rqd/tok} PROJECTS_FILE=${PF:-$Q/projects} NOW=$RN NO_REFRESH=${NR-1} API_DIR=${API:-} LIST_MAX=${LM:-8} "$d/runner-queue.sh" "$@"; }
 qcache() { # ts_ok age, err, pending count, oldest pending age (s)
   jq -nc --argjson n "$RN" --argjson a "$1" --arg e "$2" --argjson c "$3" --argjson o "$4" '{ts:($n-$a),ts_ok:($n-$a),err:(if $e=="" then null else $e end),running:[],ignored:0,
     pending:[range(0;$c)|{project:"grp/proj",ref:"main",name:"build",created:($n-$o+.),url:"https://gitlab.example/grp/proj/-/jobs/1"}]}' >"$qc"; }
@@ -253,6 +253,14 @@ printf 'pipocavsobake/old\n7\n' >"$rqd/pf2"
 [ "$(rqp JF=$Q/journal_repos PF=$rqd/pf2)" = '["pipocavsobake/old","7","pipocavsobake/sub/deep","pipocavsobake/data_zentrum"]' ] && pass=$((pass+1)) || { echo "FAIL rq26: both/dedupe projects"; fail=$((fail+1)); }
 o=$(rqp JF=$Q/journal_repos12 PF=$Q/projects); [ "$(jq -c 'length' <<<"$o")" = 10 ] && [ "$(jq -r '.[0],.[2],.[9]' <<<"$o" | tr '\n' ' ')" = "1 pipocavsobake/p12 pipocavsobake/p5 " ] && [ "$(wc -l <"${qc%.json}.projects")" = 10 ] && [ "$(jq .ignored "$qc")" = 2 ] && pass=$((pass+1)) || { echo "FAIL rq27: cap 10: $o"; fail=$((fail+1)); }
 o=$(rqp PF=$rqd/none); [ "$o" = '[]' ] && o=$(PF=$rqd/none rq list) && grep -q '^Pending: no project list' <<<"$o" && o=$(PF=$rqd/none rq) && jq -e . >/dev/null 2>&1 <<<"$o" && grep -q '^0/4' <<<"$(jq -r .text <<<"$o")" && pass=$((pass+1)) || { echo "FAIL rq28: no projects"; fail=$((fail+1)); }
+# rq31-33: auto_scan keeps the old .projects on an empty journal, a failed journalctl and a timed-out one
+: >"$rqd/journal_empty"; printf 'keep/me\n' >"${qc%.json}.projects"
+rqk() { ( export "$@" API=$Q/api; rq refresh ); cat "${qc%.json}.projects" 2>/dev/null; }
+[ "$(rqk JF=$rqd/journal_empty PF=$rqd/none)" = keep/me ] && pass=$((pass+1)) || { echo "FAIL rq31: empty journal drops list"; fail=$((fail+1)); }
+[ "$(rqk JF=$rqd/nonexistent PF=$rqd/none)" = keep/me ] && pass=$((pass+1)) || { echo "FAIL rq32: failed journalctl drops list"; fail=$((fail+1)); }
+fj=$rqd/fakej; mkdir -p "$fj"; printf "#!/bin/sh\\nsleep 5\\n" >"$fj/journalctl"; chmod +x "$fj/journalctl"
+[ "$(PATH=$fj:$PATH SCAN_TIMEOUT=1 rqk JF= PF=$rqd/none)" = keep/me ] && pass=$((pass+1)) || { echo "FAIL rq33: timed-out journalctl drops list"; fail=$((fail+1)); }
+rm -f "${qc%.json}.projects" "$fj/journalctl"
 # rq29: log-found projects make the hover and bar leave the "no project list" state without a file
 rm -f "$qc"; printf 'pipocavsobake/old\n' >"${qc%.json}.projects"; qcache 10 "" 3 60; o=$(PF=$rqd/none rq list); ! grep -q 'no project list' <<<"$o" && grep -q '^Pending 3' <<<"$o" && jq -e . >/dev/null 2>&1 <<<"$(PF=$rqd/none rq)" && pass=$((pass+1)) || { echo "FAIL rq29: auto list in hover"; fail=$((fail+1)); }
 rm -f "${qc%.json}.projects"

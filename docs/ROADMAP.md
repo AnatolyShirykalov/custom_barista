@@ -30,7 +30,7 @@ No agent running. Done recently (2026-11-27, session 6): G2a runner metrics drop
 3. [ ] **G1e live acceptance checks for runner block** (after G1g; U-2 = A, already built): spec acceptance 2, 3, 5, 6 — green `1/4` during a real job, token absent from `ps` during refresh, ≤1 API refresh per 60 s, yellow `net` on network drop; apply U-2 idle choice if not A. → `chore`
 
 1. [x] **M1f monitor-ddc review fixes** (code review 2026-11-28, `docs/progress/recurring.md`): scroll lost when refresh takes worker.lock first; resolve outside state lock; try_ts compare-and-set; standby bus reset backoff + clear pending on bus change; shellcheck SC1097/SC2034/SC1007; dim colour from theme; README deps + CLAUDE.md block mention; tests d20, hover `ddc-` key, pending-state d-row. After G2c (shares test.sh). done (see docs/progress/monitor-ddc.md; runner-queue dim colour left to G1h)
-1. [ ] **G1h runner-queue auto_scan keeps good list** (code review 2026-11-28): journalctl timeout must not replace project list with partial/empty one (mv only if non-empty/rc 0, own timeout); SC2034 `src`; rq test empty journal + existing list. After G2c. → `widget-builder`
+1. [x] **G1h runner-queue auto_scan keeps good list** (code review 2026-11-28): journalctl timeout must not replace project list with partial/empty one (mv only if non-empty/rc 0, own timeout); SC2034 `src`; rq test empty journal + existing list. After G2c. → `widget-builder` DONE: auto_scan keeps old list on empty/failed/timed-out journalctl (20s own timeout), src SC2034, dim from info_fg; tests rq31-33 (266 pass), see progress/gitlab-runner-block.md.
 
 ### Background checks
 

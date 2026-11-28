@@ -14,8 +14,8 @@ AUTO=${CACHE%.json}.projects # projects found in the runner log, written by refr
 NOW=${NOW:-$(date +%s)}
 LIST_MAX=${LIST_MAX:-8}
 TTL=60; TTL_AUTH=600; STALE=300; STUCK=900
-DIM='#777777'
 SELF=$(readlink -f "$0")
+DIM=$(sed -n 's/^info_fg *= *"\(#[0-9a-fA-F]*\)".*/\1/p' "$(dirname "$SELF")/../config.toml" 2>/dev/null | head -1); DIM=${DIM:-#777777} # theme dim-icon
 mode=${1:-}
 
 spawn() { # detached refresh; the lock lives in the cache dir, so create it first; timeout covers 10 projects x --max-time 4
@@ -31,8 +31,10 @@ first_runner() { # value of key $1 in the first [[runners]] table
 tokmode() { stat -c %a "$TOKEN_FILE" 2>/dev/null; }
 mode_ok() { local m; m=$(tokmode); [[ $m =~ ^[0-7]+$ ]] && (( (8#$m & 077) == 0 )); }
 unit_state() { echo "${UNIT_STATE:-$(timeout 2 systemctl --user is-active gitlab-runner 2>/dev/null)}"; }
-auto_scan() { # project paths from repo_url=https://host/group/project.git, newest first, max 10
-  journal --since -30d | grep -o 'repo_url=[^ ]*' | sed -n 's#^repo_url=https\?://[^/]*/\(.*\)\.git$#\1#p' | tac | awk '!s[$0]++' | head -n 10; }
+auto_scan() { # project paths from repo_url=https://host/group/project.git, newest first, max 10; fails when the journal read fails or finds nothing
+  local raw; raw=$(if [ -n "${JOURNAL_FILE:-}" ]; then cat "$JOURNAL_FILE"; else timeout "${SCAN_TIMEOUT:-20}" journalctl --user -u gitlab-runner -o cat --since -30d; fi 2>/dev/null) || return 1
+  raw=$(strip <<<"$raw" | grep -o 'repo_url=[^ ]*' | sed -n 's#^repo_url=https\?://[^/]*/\(.*\)\.git$#\1#p' | tac | awk '!s[$0]++' | head -n 10)
+  [ -n "$raw" ] && printf '%s\n' "$raw"; }
 plist() { # file entries first, then the log-found ones; unique
   { [ -r "$PROJECTS_FILE" ] && sed 's/#.*//; s/[[:space:]]//g; /^$/d' "$PROJECTS_FILE"; cat "$AUTO" 2>/dev/null; } | awk '!s[$0]++'; }
 net_down() { journal --since -30s | grep -q 'Checking for jobs\.\.\. failed'; }
@@ -51,10 +53,10 @@ fmt_age() { # seconds -> 12s 4m 3h 2d
   if [ "$s" -lt 60 ]; then echo "${s}s"; elif [ "$s" -lt 3600 ]; then echo "$((s / 60))m"; elif [ "$s" -lt 86400 ]; then echo "$((s / 3600))h"; else echo "$((s / 86400))d"; fi; }
 
 bar() {
-  local r c src st
+  local r c st
   [ -r "$CFG" ] || { echo '{"text":""}'; return; }
   emit() { jq -nc --arg t "$1" --arg s "$2" '{icon:"gitlab",state:$s,text:$t}'; }
-  read -r r c src < <(counts)
+  read -r r c _ < <(counts)
   local w=$(( ${#c} * 2 + 1 )) slotted=1
   [ -e "$TOKEN_FILE" ] || [ -e "$PROJECTS_FILE" ] || [ -n "$(plist)" ] || slotted=
   [ -n "$slotted" ] && w=$((w + 4))
@@ -106,7 +108,7 @@ cache_age() { local t; t=$(jq -r '.ts // 0' "$CACHE" 2>/dev/null); echo $((NOW -
 refresh() {
   [ -r "$CFG" ] && [ -r "$TOKEN_FILE" ] && mode_ok || return 0
   umask 077
-  mkdir -p "$(dirname "$CACHE")"; auto_scan >"$AUTO.new" && mv "$AUTO.new" "$AUTO"
+  mkdir -p "$(dirname "$CACHE")"; auto_scan >"$AUTO.new" && mv "$AUTO.new" "$AUTO" || rm -f "$AUTO.new"
   local base rid tok ids ignored id key n=0 code auth='' neterr=''
   base=$(first_runner url); rid=$(first_runner id)
   tok=$(head -n1 "$TOKEN_FILE" | tr -d '[:space:]')
@@ -148,7 +150,7 @@ list() {
   local st; st=$(unit_state)
   [ "$st" = active ] || { echo "runner unit: $st"; return; }
   [ -r "$CFG" ] || return
-  local r c src; read -r r c src < <(counts)
+  local r c _; read -r r c _ < <(counts)
   local meta; meta=$(jq -r '[(.err // "-"), (.ts // 0), (.ts_ok // 0)] | @tsv' "$CACHE" 2>/dev/null)
   local err=- ts=0 ts_ok=0; [ -n "$meta" ] && read -r err ts ts_ok <<<"$meta"
   local pstat='' usecache=''
