@@ -32,3 +32,8 @@
 - Fix 2 (stale popup, hover-daemon.py): explain texts were cached until explain.sh's mtime changed, so the ddc popup showed the deploy-time values (93/28 at 12:33) forever; `ddc-*` keys are now re-run on each show (~10 ms). Deployed, popup shows live values.
 - Note: a hover right after scrolling shows nothing until the pointer leaves the bar (click suppression, by design).
 - Remains: acceptance 7-8 (no-i2c user, standby/unplug) not run live; d6/d7 cover them in tests.
+
+## M1f review fixes (2026-11-28)
+- read_ok keeps a wanted value while a change is pending (a<code> set, differs, no werr); test d14b. resolve probes outside the state lock (`resolve` fills R_*, `store_resolve` under lock; a new bus drops a*/werr). try_ts claimed inside the lock. Standby `clear_bus` sets resolve_ts (no detect for 300 s) and clears pending; test d20/d20b/d20c. Hover `ddc-` re-read test (h-ddc, imports hover-daemon, stub explain). shellcheck: no warnings left (only SC2329/SC2030 info).
+- Dim colour: read `info_fg` from config.toml with the same sed as claude-usage.sh (DDC_CONFIG override), fallback `#777777`. runner-queue.sh left to G1h.
+- README deps and CLAUDE.md block mention added. Deployed; both bars error-free, each own monitor; live net-zero scroll (up/down) on both monitors, bright+contrast, getvcp unchanged (93/28, 72/40).

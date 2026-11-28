@@ -5,7 +5,7 @@
 #        monitor-ddc.sh <conn> worker|refresh-run          internal (background)
 # Render reads only the state file (instant); setvcp/getvcp run in flock'd background jobs, one ddcutil user per monitor.
 # Spec: docs/design/M1-monitor-ddc/spec.md. Test overrides: DDC_STATE_DIR, DDC_CMD, XRANDR_CMD, DRM_DIR, DDC_I2C_GLOB,
-# DDC_NOW (epoch), DDC_SIGNAL=0 (no pkill), DDC_FG=1 (refresh inline).
+# DDC_NOW (epoch), DDC_SIGNAL=0 (no pkill), DDC_FG=1 (refresh inline), DDC_CONFIG (config.toml for the dim colour).
 set -u
 conn=${1:-}; op=${2:-}; arg=${3:-}
 self=$(readlink -f "$0")
@@ -23,7 +23,7 @@ now() { if [ -n "${DDC_NOW:-}" ]; then echo "$DDC_NOW"; else printf '%(%s)T' -1;
 KEYS=(bright contrast seq read_ts try_ts read_err werr_bright werr_contrast abright acontrast bus model drm hidden resolve_ts)
 declare -A S
 load() { S=(); local k v; [ -r "$sf" ] || return 0
-  while IFS== read -r k v; do [[ $k =~ ^[a-z_]+$ ]] && S[$k]=$v; done <"$sf"; }
+  while IFS='=' read -r k v; do [[ $k =~ ^[a-z_]+$ ]] && S[$k]=$v; done <"$sf"; }
 save() { local k; { for k in "${KEYS[@]}"; do printf '%s=%s\n' "$k" "${S[$k]:-}"; done; } >"$sf.$$" && mv -f "$sf.$$" "$sf"; }
 # locked <fn> args...: load, run fn (edits S), save, all under the state lock
 locked() { ( flock -w 1 9 || exit 1; load; "$@"; save ) 9>"$lock"; }
@@ -32,8 +32,8 @@ signal() { [ "${DDC_SIGNAL:-1}" = 0 ] || pkill -u "$UID" -RTMIN+7 -x i3status-rs
 bg() { setsid "$@" </dev/null >/dev/null 2>&1 & }
 
 render() { # $1 = bright|contrast
-  local code=$1 icon v t st=Idle n tn=$(now) hid
-  load
+  local code=$1 icon v st=Idle n tn dim hid cfg=${DDC_CONFIG:-${self%/*}/../config.toml}
+  tn=$(now); load
   hid=${S[hidden]:-}
   if [ -n "$hid" ]; then echo '{"text":""}'; need_refresh "$tn"; return; fi
   [ "$code" = bright ] && icon=$'\U000F00E0' || icon=$'\U000F00DF'
@@ -43,7 +43,8 @@ render() { # $1 = bright|contrast
     if [ "${S[read_err]:-0}" = 1 ] || ! [[ ${S[read_ts]:-} =~ ^[0-9]+$ ]] || [ $((tn - S[read_ts])) -gt 300 ]; then st=Info; fi
   else n=' --'; st=Info; fi
   [ "${S[werr_$code]:-0}" = 1 ] && st=Critical
-  printf '{"text":" <span foreground='"'#777777'"'>%s</span>%s ","state":"%s"}\n' "$icon" "$n" "$st"
+  dim=$(sed -n 's/^info_fg *= *"\(#[0-9a-fA-F]*\)".*/\1/p' "$cfg" 2>/dev/null | head -1)  # theme dim-icon, as claude-usage.sh
+  printf '{"text":" <span foreground='"'%s'"'>%s</span>%s ","state":"%s"}\n' "${dim:-#777777}" "$icon" "$n" "$st"
   need_refresh "$tn"
 }
 need_refresh() { # background refresh when the bus is unresolved (every 300 s) or the read is older than 60 s (throttled to 30 s)
@@ -54,7 +55,9 @@ need_refresh() { # background refresh when the bus is unresolved (every 300 s) o
   else
     [[ $r =~ ^[0-9]+$ ]] && [ $((tn - r)) -le 60 ] && return
   fi
-  locked setk try_ts "$tn" && bg "$self" "$conn" refresh-run
+  # claim the run inside the lock: another render may have claimed it since the check above
+  [ "$( ( flock -w 1 9 || exit 1; load; t=${S[try_ts]:-}
+          if [[ $t =~ ^[0-9]+$ ]] && [ $((tn - t)) -lt 30 ]; then echo 0; else S[try_ts]=$tn; save && echo 1; fi ) 9>"$lock")" = 1 ] && bg "$self" "$conn" refresh-run
 }
 
 step() { # $1 = code, $2 = up|down; under `locked`
@@ -71,16 +74,16 @@ scroll() {
 }
 
 apply() { # $1 code name, $2 value: setvcp with one retry; returns 0 on success
-  local c=10 try; [ "$1" = contrast ] && c=12
-  for try in 1 2; do
+  local c=10; [ "$1" = contrast ] && c=12
+  for _ in 1 2; do
     timeout 10 "$ddc" --bus "${S[bus]}" --noverify --sleep-multiplier .1 setvcp $c "$2" >/dev/null 2>&1 && return 0
   done; return 1
 }
 worker() {
   exec 8>"$wlock"; flock -n 8 || exit 0
   sleep 0.2
-  local round code want seq0 ok
-  for round in $(seq 30); do
+  local code want seq0
+  for _ in $(seq 30); do
     load; seq0=${S[seq]:-0}
     [ -n "${S[bus]:-}" ] || break
     for code in bright contrast; do
@@ -101,9 +104,8 @@ edid_hex() { # hex of the first 128 bytes of the connector's EDID from xrandr
     END { print tolower(substr(h, 1, 256)) }'
 }
 connected() { timeout 5 "$xr" --query 2>/dev/null | awk -v c="$conn" '$1 == c { print $2; exit }'; }
-resolve() { # sets S[bus] S[model] S[drm] S[hidden]; under `locked`
-  local hid= edid= f dn= bus= model= blk k mfg
-  S[resolve_ts]=$(now)
+resolve() { # probes xrandr/ddcutil (slow, no lock); sets R_bus R_model R_drm R_hidden
+  local hid='' edid='' f dn='' bus='' model='' blk k mfg ok
   if ! command -v "$ddc" >/dev/null 2>&1; then hid=no-ddcutil
   else
     ok=0; for f in ${DDC_I2C_GLOB:-/dev/i2c-*}; do [ -r "$f" ] && [ -w "$f" ] && { ok=1; break; }; done
@@ -114,7 +116,7 @@ resolve() { # sets S[bus] S[model] S[drm] S[hidden]; under `locked`
     if [ "$(connected)" != connected ] || [ ${#edid} -lt 256 ]; then hid=disconnected; fi
   fi
   if [ -z "$hid" ]; then
-    dn=; for f in "$drm"/card*-*/edid; do
+    dn=''; for f in "$drm"/card*-*/edid; do
       [ -r "$f" ] || continue
       [ "$(od -An -v -tx1 -N128 "$f" 2>/dev/null | tr -d ' \n')" = "$edid" ] && { dn=$(basename "$(dirname "$f")"); break; }
     done
@@ -130,26 +132,37 @@ resolve() { # sets S[bus] S[model] S[drm] S[hidden]; under `locked`
     fi
     if [ -z "$bus" ]; then hid=no-ddc; else model=${bus#*|}; model=${model#*:}; model=${model%%:*}; bus=${bus%%|*}; fi
   fi
-  S[hidden]=$hid; S[bus]=$bus; S[model]=$model; S[drm]=$dn
-  [ -n "$hid" ] && S[bus]=
+  R_hidden=$hid; R_bus=$bus; R_model=$model; R_drm=$dn
+  [ -n "$hid" ] && R_bus=''
 }
-read_ok() { # $1 bright $2 contrast $3 seq0; under `locked`
+store_resolve() { # under `locked`; a new bus drops pending values meant for the old monitor
+  [ "${S[bus]:-}" != "$R_bus" ] && setk abright "" acontrast "" werr_bright 0 werr_contrast 0
+  setk resolve_ts "$(now)" hidden "$R_hidden" bus "$R_bus" model "$R_model" drm "$R_drm"
+}
+read_ok() { # $1 bright $2 contrast $3 seq0; under `locked`; a code with a change still pending (worker not failed) keeps the wanted value
+  local c i=1 v
   S[read_ts]=$(now); S[read_err]=0
-  if [ "${S[seq]:-0}" = "$3" ]; then setk bright "$1" contrast "$2" abright "$1" acontrast "$2" werr_bright 0 werr_contrast 0; fi
+  [ "${S[seq]:-0}" = "$3" ] || return 0
+  for c in bright contrast; do
+    v=${!i}; i=$((i + 1))
+    [ -n "${S[a$c]:-}" ] && [ "${S[a$c]}" != "${S[$c]:-}" ] && [ "${S[werr_$c]:-0}" != 1 ] && continue
+    setk "$c" "$v" "a$c" "$v" "werr_$c" 0
+  done
 }
+clear_bus() { setk bus "" resolve_ts "$(now)" abright "" acontrast "" werr_bright 0 werr_contrast 0; }  # standby: wait 300 s before detecting again
 refresh_run() {
   load
-  if [ -z "${S[bus]:-}" ]; then locked resolve; load; fi
+  if [ -z "${S[bus]:-}" ]; then resolve; locked store_resolve; load; fi
   [ -n "${S[bus]:-}" ] || { signal; return; }
   exec 8>"$wlock"; flock -n 8 || return 0
-  local seq0=${S[seq]:-0} out b= c= rc
+  local seq0=${S[seq]:-0} out b='' c='' rc
   out=$(timeout 10 "$ddc" --bus "${S[bus]}" --sleep-multiplier .1 --brief getvcp 10 12 2>&1); rc=$?
   b=$(awk '$1 == "VCP" && $2 == "10" && $3 == "C" { print $4; exit }' <<<"$out")
   c=$(awk '$1 == "VCP" && $2 == "12" && $3 == "C" { print $4; exit }' <<<"$out")
   if [ $rc = 0 ] && [[ $b =~ ^[0-9]+$ ]] && [[ $c =~ ^[0-9]+$ ]]; then locked read_ok "$b" "$c" "$seq0"
   else
     locked setk read_err 1
-    grep -qiE 'no such (file|device)|not found|unable to open' <<<"$out" && locked setk bus "" resolve_ts ""
+    grep -qiE 'no such (file|device)|not found|unable to open' <<<"$out" && locked clear_bus
   fi
   # a scroll during the read started a worker that found worker.lock busy and quit: hand its value on
   exec 8>&-; load; [ "${S[seq]:-0}" != "$seq0" ] && bg "$self" "$conn" worker

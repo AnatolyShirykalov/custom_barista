@@ -316,4 +316,20 @@ PY
 nd; ms bright=93 contrast=28 model="MSI G281UV"; o=$(DDC_STATE_DIR=$sd "$d/explain.sh" ddc-DP-0); [ "$(wc -l <<<"$o")" -le 6 ] && grep -q 'MSI G281UV on DP-0' <<<"$o" && pass=$((pass+1)) || { echo "FAIL d18b: explain text"; fail=$((fail+1)); }
 nd; ms bright=93 contrast=28; ts=(); for _ in 1 2 3 4 5; do s0=$EPOCHREALTIME; dx DP-0 bright >/dev/null; ts+=($(echo "($EPOCHREALTIME - $s0) * 1000 / 1" | bc)); done
 [ "$(printf '%s\n' "${ts[@]}" | sort -n | sed -n 3p)" -lt 50 ] && pass=$((pass+1)) || { echo "FAIL d19: render ${ts[*]} ms"; fail=$((fail+1)); }
+nd; ms bright=98 abright=93 contrast=28 read_ts=1 try_ts=1; FAKE_BRIGHT=93 FAKE_CONTRAST=30 DDC_FG=1 dx DP-0 refresh; dwait
+[ "$(sv bright)" = 98 ] && [ "$(sv abright)" = 93 ] && [ "$(sv contrast)" = 30 ] && pass=$((pass+1)) || { echo "FAIL d14b: pending value reverted ($(sv bright) $(sv abright) $(sv contrast))"; fail=$((fail+1)); }
+nd; ms bright=98 abright=93 werr_bright=1 contrast=28; FAKE_GET_FAIL=1 DDC_FG=1 dx DP-0 refresh
+[ -z "$(sv bus)" ] && [ "$(sv resolve_ts)" = 1000000 ] && [ -z "$(sv abright)" ] && [ "$(sv werr_bright)" = 0 ] && pass=$((pass+1)) || { echo "FAIL d20: bus reset (bus=$(sv bus) rts=$(sv resolve_ts) a=$(sv abright))"; fail=$((fail+1)); }
+dx DP-0 bright >/dev/null; sleep 0.3; ! grep -q detect "$sd/log" && pass=$((pass+1)) || { echo "FAIL d20b: detect right after standby"; fail=$((fail+1)); }
+DDC_FG=1 dx DP-0 refresh; [ "$(sv bus)" = 3 ] && [ "$(sv read_err)" = 0 ] && pass=$((pass+1)) || { echo "FAIL d20c: no re-resolve ($(sv bus))"; fail=$((fail+1)); }
+# hover: a ddc- key is re-read on every popup, other keys stay cached
+DISPLAY="" python3 - "$d" "$gd" <<'PY' && pass=$((pass+1)) || { echo "FAIL h-ddc: hover ddc- text not re-read"; fail=$((fail+1)); }
+import importlib.util, os, sys
+d, gd = sys.argv[1:3]; ex = gd + "/explain-fake.sh"
+open(ex, "w").write('#!/bin/sh\necho "$1 $(date +%s%N)"\n'); os.chmod(ex, 0o755)
+sp = importlib.util.spec_from_file_location("hd", d + "/hover-daemon.py"); m = importlib.util.module_from_spec(sp); sp.loader.exec_module(m)
+m.EXPLAIN = ex; dm = object.__new__(m.Daemon); dm.texts, dm.texts_mt = {}, None
+a, b = dm.text("ddc-DP-0"), dm.text("ddc-DP-0"); c, e = dm.text("cpu"), dm.text("cpu")
+assert a != b and c == e, (a, b, c, e)
+PY
 echo "pass=$pass fail=$fail"; [ $fail -eq 0 ]
